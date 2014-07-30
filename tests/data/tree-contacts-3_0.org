@@ -1,0 +1,59 @@
+#+STARTUP: example
+#+CONTACTS_STYLE: tree
+#+VCARD_VERSION: 3.0
+#+STARTUP: exampleplus
+
+* People
+** Joan Smith
+:PROPERTIES:
+:KIND: individual 
+:FIELDTYPE: name
+:END:
+*** Landline
+**** 00 9999 9999
+:PROPERTIES:
+:FIELDTYPE: landline
+:END:
+*** Mobile
+**** 0000 999 999
+:PROPERTIES:
+:FIELDTYPE: mobile
+:END:
+*** Email
+**** joan@example.com
+:PROPERTIES:
+:PREFERRED: 
+:FIELDTYPE: email
+:END:
+*** Email
+**** joan.2@example.com
+:PROPERTIES:
+:FIELDTYPE: email
+:END:
+** John
+:PROPERTIES:
+:KIND: individual 
+:FIELDTYPE: name
+:END:
+*** Landline
+**** 01 9999 9999
+:PROPERTIES:
+:FIELDTYPE: landline
+:END:
+*** Mobile
+**** 0001 999 999
+:PROPERTIES:
+:FIELDTYPE: mobile
+:END:
+*** Email
+**** Work
+***** john@example.com
+:PROPERTIES:
+:PREFERRED: 
+:FIELDTYPE: email-work
+:END:
+**** Home
+***** john.2@example.com
+:PROPERTIES:
+:FIELDTYPE: email-home
+:END:

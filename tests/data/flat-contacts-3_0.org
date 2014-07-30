@@ -1,0 +1,20 @@
+#+STARTUP: something
+#+CONTACTS_STYLE: flat
+#+VCARD_VERSION: 3.0
+#+STARTUP: somethingelse
+
+* People
+** Joan Smith
+:PROPERTIES:
+:LANDLINE: 00 9999 9999
+:MOBILE: 0000 999 999
+:EMAIL: joan@example.com
+:EMAIL: joan.2@example.com
+:END:
+** John
+:PROPERTIES:
+:LANDLINE: 01 9999 9999
+:MOBILE: 0001 999 999
+:EMAIL_WORK: john@example.com
+:EMAIL_HOME: john.2@example.com
+:END:
