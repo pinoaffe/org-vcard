@@ -65,9 +65,11 @@
 
 (require 'org)
 
-(defconst org-vcard-elisp-dir (file-name-directory load-file-name))
+(defconst org-vcard-elisp-dir (file-name-directory load-file-name)
+  "Absolute path of the directory containing org-vcard.el.")
 (defconst org-vcard-mappings-dir (file-name-as-directory
-                                  (concat org-vcard-elisp-dir "mappings")))
+                                  (concat org-vcard-elisp-dir "mappings"))
+  "Absolute path of the directory containing org-vcard mappings.")
 
 (defgroup org-vcard nil
   "vCard support for Org mode."
