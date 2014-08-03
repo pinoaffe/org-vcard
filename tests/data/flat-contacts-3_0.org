@@ -1,7 +1,7 @@
-#+STARTUP: something
+#+STARTUP: example
 #+CONTACTS_STYLE: flat
 #+VCARD_VERSION: 3.0
-#+STARTUP: somethingelse
+#+STARTUP: exampleplus
 
 * People
 ** Joan Smith
