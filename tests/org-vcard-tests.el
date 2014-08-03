@@ -1,31 +1,9 @@
 
-;; Check if testing-related variables have been set, error if not.
-;;
-;; * org-vcard-elisp :
-;;   string containing absolute path to directory containing org-vcard.el.
-;; * org-vcard-tests-data-dir:
-;;   string containing absolute path to the org-vcard tests/data directory.
+(if (not (boundp 'org-vcard-elisp-dir))
+    (error "Variable org-vcard-elisp-dir not set; have you loaded org-vcard.el?"))
 
-
-(let ((status 0)
-      (err-msg ""))
-  (if (or (not (boundp 'org-vcard-elisp))
-         (string= "" org-vcard-elisp))
-      (setq status (+ 1 status)))
-  (if (or (not (boundp 'org-vcard-tests-data-dir))
-         (string= "" org-vcard-tests-data-dir))
-      (setq status (+ 2 status)))
-  (cond
-   ((= 1 status)
-    (setq err-msg "org-vcard-elisp not set"))
-   ((= 2 status)
-    (setq err-msg "org-vcard-test-data-dir not set"))
-   ((= 3 status)
-    (setq err-msg "org-vcard-elisp not set, org-vcard-test-data-dir not set")))
-  (if (not (string= "" err-msg))
-      (error (concat "Loading org-vcard tests failed: " err-msg))))
-
-(load (concat org-vcard-elisp "org-vcard.el"))
+(defconst org-vcard-tests-data-dir (file-name-as-directory
+                                    (concat org-vcard-elisp-dir "tests/data")))
 
 
 ;;;;
