@@ -406,6 +406,7 @@
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-active-style "flat")
         (org-vcard-active-version "4.0"))
 
     (unwind-protect
@@ -445,6 +446,7 @@
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-active-style "flat")
         (org-vcard-active-version "3.0"))
 
     (unwind-protect
@@ -484,6 +486,7 @@
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-active-style "flat")
         (org-vcard-active-version "2.1"))
 
     (unwind-protect
