@@ -8,6 +8,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [TODO](#todo)
+- [Issues](#issues)
 - [Testing](#testing)
 - [License](#license)
 
@@ -124,6 +125,22 @@ As the 'tree' style uses a heading's FIELDTYPE property to associate fields with
 * Improve compliance with each version of the vCard specification.
 
 * Extend test coverage.
+
+<a name="issues"></a>
+
+## Issues / bugs
+
+If you discover an issue or bug in `org-vcard` not already noted:
+
+* as a TODO item, or
+
+* in [the project's 'Issues' section on GitHub](https://github.com/flexibeast/org-vcard/issues),
+
+please create a new issue with as much detail as possible, including:
+
+* which version of Emacs you're running on which operating system, and
+
+* whether you installed `org-vcard` manually or from MELPA.
 
 ## Testing
 
