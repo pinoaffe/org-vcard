@@ -148,8 +148,7 @@ A basic test suite is located in the repository 'tests' directory, in `org-vcard
 
 1. Ensure `org-vcard.el` has been `load`ed, e.g. `(load "~/org-vcard/org-vcard.el")`.
 2. Load the test suite: e.g. `(load "~/org-vcard/tests/org-vcard-tests.el")`.
-3. Check the `org-vcard-mapping-language` variable, and ensure you're using the "en" set of contact-style mappings.
-4. Run the tests by evaluating `(ert '(tag org-vcard))`.
+3. Run the tests by evaluating `(ert '(tag org-vcard))`.
 
 ## License
 
