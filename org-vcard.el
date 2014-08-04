@@ -65,72 +65,137 @@
 
 (require 'org)
 
+;;
+;; Internal variables not dependent on custom settings.
+;;
+
 (defconst org-vcard-elisp-dir (file-name-directory load-file-name)
   "Absolute path of the directory containing org-vcard.el.")
-(defconst org-vcard-mappings-dir (file-name-as-directory
-                                  (concat org-vcard-elisp-dir "mappings"))
-  "Absolute path of the directory containing org-vcard mappings.")
+
+(defvar org-vcard-active-style ""
+  "The currently-active contacts style.")
+
+(defvar org-vcard-active-language ""
+  "The currently-active language.")
+
+(defvar org-vcard-active-version ""
+  "The currently-active version of vCard.")
+
+(defvar org-vcard-styles-functions
+  (let ((the-list) '())
+    (dolist (style (directory-files
+                    (file-name-as-directory
+                     (concat org-vcard-elisp-dir "styles"))
+                    t))
+      (if (and (not (string= "." (file-name-nondirectory style)))
+             (not (string= ".." (file-name-nondirectory style))))
+          (progn
+            (load (concat
+                   (file-name-as-directory style)
+                   "functions.el"))
+            (add-to-list 'the-list
+                         `(,(file-name-nondirectory style)
+                           ,(list
+                             (intern (concat "org-vcard-export-from-" (file-name-nondirectory style)))
+                             (intern (concat "org-vcard-import-to-" (file-name-nondirectory style)))))))))
+    (sort the-list #'(lambda (a b)
+                       (if (string< (car a) (car b))
+                           t
+                         nil))))
+    "org-vcard internal variable, containing available styles and
+their associated export and import functions.")
+
+(defvar org-vcard-mappings-list
+  (let ((mappings-list '())
+        (styles-dir (file-name-as-directory
+                     (concat org-vcard-elisp-dir "styles"))))
+    (dolist (style (directory-files styles-dir))
+      (if (and (not (string= "." (file-name-nondirectory style)))
+             (not (string= ".." (file-name-nondirectory style))))
+          (progn
+            (dolist (mapping (directory-files
+                              (file-name-as-directory
+                               (concat
+                                (file-name-as-directory
+                                 (concat styles-dir style))
+                                "mappings"))
+                              t))
+              (if (and (not (string= "." (file-name-nondirectory mapping)))
+                     (not (string= ".." (file-name-nondirectory mapping))))
+                  (add-to-list 'mappings-list
+                               `(const :tag ,(concat
+                                              style
+                                              " - "
+                                              (file-name-nondirectory mapping))
+                                       ,mapping)))))))
+    (sort mappings-list #'(lambda (a b)
+                            (if (string< (nth 2 a) (nth 2 b))
+                                t
+                              nil))))
+  "org-vcard internal variable, containing list of style mappings
+suitable for use by the org-vcard-default-style-language-mapping
+defcustom.")
+
+(defvar org-vcard-styles-languages-mappings
+  (let ((styles-dir (file-name-as-directory
+                     (concat org-vcard-elisp-dir "styles")))
+        (style-mappings '()))
+    (dolist (style (directory-files styles-dir))
+      (if (and (not (string= "." style))
+             (not (string= ".." style)))
+          (progn
+            (let ((language-mapping '()))
+              (dolist (mapping (directory-files
+                                (file-name-as-directory
+                                 (concat
+                                  (file-name-as-directory
+                                   (concat styles-dir style))
+                                  "mappings"))
+                                t))
+                (if (and (not (string= "." (file-name-nondirectory mapping)))
+                       (not (string= ".." (file-name-nondirectory mapping))))
+                    (progn
+                      (add-to-list 'language-mapping
+                                    `(,(file-name-nondirectory mapping)
+                                      ,@(list (car
+                                               (read-from-string
+                                                (with-temp-buffer
+                                                  (insert-file-contents-literally mapping)
+                                                  (buffer-string))))))))))
+              (setq language-mapping (list language-mapping))
+              (add-to-list 'style-mappings
+                            `(,style
+                              ,@language-mapping))))))
+    style-mappings)
+  "org-vcard internal variable, containing all styles and their
+associated mappings.")
+
+
+;;
+;; Customisation setup.
+;;
+
 
 (defgroup org-vcard nil
   "vCard support for Org mode."
-  :group 'org-vcard
   :prefix "org-vcard-")
 
-(defconst org-vcard-mode-keymap (make-sparse-keymap))
+;; We default to "flat", the style used by org-contacts.el.
 
-;; The per-file keyword #+VCARD_VERSION can be "4.0", "3.0" or "2.1".
-
-(defcustom org-vcard-default-version "4.0"
-  "Default version of the vCard standard to use.
-Initially set to 4.0."
-  :type '(radio (const "4.0") (const "3.0") (const "2.1"))
-  :group 'org-vcard)
-
-;; The per-file keyword #+CONTACTS_STYLE can be "flat" or "tree".
-;;
-;; "flat" is the style used by org-contacts.el. In the "flat"
-;; mapping, we include all properties that org-contacts.el uses,
-;; plus several more.
-;;
-;; "tree" is a new contacts style. The org-vcard README.md document
-;; contains examples of tree-style contacts.
-
-(defcustom org-vcard-default-style "flat"
-  "The default contacts style to use."
-  :type 'string
-  :group 'org-vcard)
-
-(defcustom org-vcard-contacts-styles '(("flat" .
-                                        (org-vcard-export-from-flat org-vcard-import-to-flat))
-                                       ("tree" .
-                                        (org-vcard-export-from-tree org-vcard-import-to-tree)))
-  "List representing available org-contacts styles and their associated
-export/import functions."
-  :type '(repeat (cons string (list symbol symbol)))
-  :group 'org-vcard)
-
-(defvar org-vcard-mapping-language-alist
-  (let ((alist '()))
-    (dolist (file (directory-files org-vcard-mappings-dir t))
-       (if (and (not (string= "." (file-name-nondirectory file)))
-              (not (string= ".." (file-name-nondirectory file))))
-           (setq alist (append alist (list `(const :tag ,(file-name-nondirectory file) ,file))))))
-    alist))
-
-(defcustom org-vcard-mapping-language (concat org-vcard-mappings-dir "en")
+(defcustom org-vcard-default-style-language-mapping (concat
+                                                     (file-name-as-directory
+                                                      (concat
+                                                       (file-name-as-directory
+                                                        (concat
+                                                         (file-name-as-directory
+                                                          (concat org-vcard-elisp-dir "styles"))
+                                                         "flat"))
+                                                       "mappings"))
+                                                     "en")
   "The human-language contacts style mapping to use. Note:
 Modifying this will require an Emacs restart before changes will
 take effect."
-  :type `(radio ,@org-vcard-mapping-language-alist)
-  :group 'org-vcard)
-
-(defcustom org-vcard-contacts-styles-mappings (car
-                                               (read-from-string
-                                                (with-temp-buffer
-                                                  (insert-file-contents-literally org-vcard-mapping-language)
-                                                  (buffer-string))))
-  "List of per-vCard-version mappings for each contacts style."
-  :type '(repeat (cons string (repeat (cons string (repeat (cons string string))))))
+  :type `(radio ,@org-vcard-mappings-list)
   :group 'org-vcard)
 
 (defcustom org-vcard-default-export-file "~/org-vcard-export.vcf"
@@ -142,6 +207,31 @@ take effect."
   "The default file to import from."
   :type 'file
   :group 'org-vcard)
+
+;; The in-buffer setting #+CONTACT_STYLE.
+
+(defcustom org-vcard-default-style "flat"
+  "Default contact style to use.
+Initially set to \"flat\"."
+  :type 'string
+  :group 'org-vcard)
+
+;; The in-buffer setting #+VCARD_VERSION;
+;; can be "4.0", "3.0" or "2.1".
+
+(defcustom org-vcard-default-version "4.0"
+  "Default version of the vCard standard to use.
+Initially set to 4.0."
+  :type '(radio (const "4.0") (const "3.0") (const "2.1"))
+  :group 'org-vcard)
+
+
+;;
+;; org-vcard-mode setup
+;;
+
+
+(defconst org-vcard-mode-keymap (make-sparse-keymap))
 
 (define-minor-mode org-vcard-mode
   "Toggle org-vcard mode.
@@ -160,17 +250,6 @@ to Emacs' menu bar."
 
 
 ;;
-;; Internal variables.
-;;
-
-(defvar org-vcard-active-version ""
-  "The currently-active version of vCard.")
-
-(defvar org-vcard-active-style ""
-  "The currently-active org-contacts style.")
-
-
-;;
 ;; Utility functions.
 ;;
 
@@ -179,13 +258,13 @@ to Emacs' menu bar."
   "Utility function to check integrity of org-vcard-contacts-styles
 variable."
   (let ((styles '()))
-    (dolist (style org-vcard-contacts-styles)
+    (dolist (style org-vcard-styles-functions)
       (if (not (member (car style) styles))
           (setq styles (append styles `(,(car style))))
-        (error (concat "Style '" (car style) "' appears more than once in org-vcards-contacts-styles")))
-      (if (not (functionp (nth 0 (cdr style))))
+        (error (concat "Style '" (cadr style) "' appears more than once in org-vcards-contacts-styles")))
+      (if (not (functionp (nth 0 (cadr style))))
           (error (concat "Style '" (car style) "' has an invalid export function")))
-      (if (not (functionp (nth 1 (cdr style))))
+      (if (not (functionp (nth 1 (cadr style))))
           (error (concat "Style '" (car style) "' has an invalid import function"))))))
 
 
@@ -254,18 +333,9 @@ instance of in-buffer setting; fall back to value of custom
 variables."
   (save-excursion
     (goto-char (point-min))
-    (let* ((valid-styles (mapcar 'car org-vcard-contacts-styles-mappings))
-           (valid-versions (let ((result '()))
-                             (dolist (style valid-styles)
-                               (let ((this-version '()))
-                                 (setq this-version (car (assoc style org-vcard-contacts-styles-mappings)))
-                                 (let ((version-list '()))
-                                   (dolist (version (cdr (assoc style org-vcard-contacts-styles-mappings)))
-                                     (setq version-list (append version-list
-                                                                (list (car version)))))
-                                   (setq result (append result (list (cons this-version (list version-list))))))))
-                             result))
-          (found-keywords '()))
+    (let* ((valid-styles (mapcar 'car org-vcard-styles-functions))
+           (valid-versions '("4.0" "3.0" "2.1"))
+           (found-keywords '()))
       (while (not (eobp))
         (if (looking-at "^#+")
             (let ((this-line (org-element-keyword-parser nil nil)))
@@ -278,7 +348,7 @@ variables."
                         (setq found-keywords (append found-keywords '("CONTACTS_STYLE"))))
                     (error "Invalid in-buffer setting for CONTACTS_STYLE")))
                  ((string= "VCARD_VERSION" (plist-get (cadr this-line) :key))
-                  (if (member (plist-get (cadr this-line) :value) (cadr (assoc org-vcard-active-style valid-versions)))
+                  (if (member (plist-get (cadr this-line) :value) valid-versions)
                       (progn
                         (setq org-vcard-active-version (plist-get (cadr this-line) :value))
                         (setq found-keywords (append found-keywords '("VCARD_VERSION"))))
@@ -353,230 +423,7 @@ CONTENT must be a string. DESTINATION must be either \"buffer\" or \"file\"."
     (error "Invalid destination type"))))
 
 
-;;
-;; The core export/import functions.
-;;
-
-
-(defun org-vcard-export-from-flat (source destination)
-  "Export flat-style SOURCE to vCard format, sending output
-to DESTINATION.
-
-SOURCE must be either \"buffer\", \"region\" or \"subtree\".
-DESTINATION must be either \"buffer\" or \"file\"."
-  (let* ((scope (cond
-                 ((string= "buffer" source) nil)
-                 ((string= "region" source) 'region)
-                 ((string= "subtree" source) 'tree)
-                 (t (error "Invalid source type"))))
-         (encoding (cond
-                    ((string= "4.0" org-vcard-active-version) 'utf-8)
-                    ((string= "3.0" org-vcard-active-version) 'utf-8)
-                    ((string= "2.1" org-vcard-active-version) 'us-ascii)))
-         (output (encode-coding-string "" encoding)))
-    (org-map-entries
-     (lambda ()
-       (let ((properties (org-entry-properties))
-             (in-contact-entry nil)
-             (flat-style-properties
-              (or (assoc org-vcard-active-version (cdr (assoc "flat" org-vcard-contacts-styles-mappings)))
-                 (error "No mapping available for specified vCard version")))
-             (content (encode-coding-string "" encoding)))
-         ;; Does this entry contain a PROPERTY listed in
-         ;; the "flat" mapping? If so, assume we're in
-         ;; a contact entry.
-         (dolist (p properties)
-           (if (assoc (car p) flat-style-properties)
-               (setq in-contact-entry t)))
-         (when in-contact-entry
-           ;; vCard 2.1 and 3.0 require the 'N' property be present.
-           ;; Trying to create this by parsing the heading is
-           ;; fraught with challenges - cf.
-           ;; http://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
-           ;; - so we just create an empty 'N' property.
-           (if (and (or (string= "3.0" org-vcard-active-version)
-                     (string= "2.1" org-vcard-active-version))
-                  (not (member "N" properties)))
-               (setq content (concat
-                              content
-                              (org-vcard-export-line "N" ""))))
-           (dolist (p properties)
-             (if (assoc (car p) flat-style-properties)
-                 (setq content (concat
-                                content
-                                (org-vcard-export-line
-                                 (cdr (assoc (car p) flat-style-properties))
-                                 (cdr p))))))
-           (setq output
-                 (concat
-                  output
-                  (org-vcard-export-line "BEGIN" "VCARD")
-                  (org-vcard-export-line "VERSION" org-vcard-active-version)
-                  (org-vcard-export-line "FN" (plist-get
-                                               (nth 1 (org-element-headline-parser (line-end-position)))
-                                               :raw-value))
-                  content
-                  (org-vcard-export-line "END" "VCARD"))))))
-     nil scope)
-    (org-vcard-write-to-destination output destination)))
-
-
-(defun org-vcard-import-to-flat (source destination)
-  "Import contents of SOURCE from vCard format, sending flat-style
-OUTPUT to DESTINATION.
-
-SOURCE must be one of \"buffer\", \"file\" or \"region\".
-DESTINATION must be one of \"buffer\" or \"file\"."
-  (let ((cards (org-vcard-import-parser source))
-        (filename "")
-        (vcard-property-for-heading "")
-        (heading ""))
-    (if (not (member source '("buffer" "file" "region")))
-        (error "Invalid source type"))
-    (cond
-     ((string= "buffer" destination)
-      (generate-new-buffer "*org-vcard-import*")
-      (set-buffer "*org-vcard-import*"))
-     ((string= "file" destination)
-      (setq filename (read-from-minibuffer "Filename? " "org-vcard-import.org"))
-      (find-file filename))
-     (t
-      (error "Invalid destination type")))
-    (dolist (card cards)
-      (if (assoc "VERSION" card)
-          (setq org-vcard-active-version (cdr (assoc "VERSION" card)))
-        (setq org-vcard-active-version org-vcard-default-version))
-      (setq vcard-property-for-heading
-            (cdr
-             (assoc "[HEADING]"
-                    (assoc org-vcard-active-version
-                           (assoc "flat" org-vcard-contacts-styles-mappings)))))
-      (setq heading (cdr (assoc vcard-property-for-heading card)))
-      (insert (concat "* " heading "\n"))
-      (insert ":PROPERTIES:\n")
-      (dolist (entry card)
-        (if (not (string= vcard-property-for-heading (car entry)))
-            (insert (concat ":"
-                            (car (rassoc (car entry)
-                                         (cdr (assoc org-vcard-active-version
-                                                     (cdr (assoc org-vcard-active-style
-                                                                 org-vcard-contacts-styles-mappings))))))
-                            ": "
-                            (cdr entry)
-                            "\n"))))
-      (insert ":END:\n"))
-    (if (string= "file" destination)
-        (write-file filename))))
-
-
-(defun org-vcard-export-from-tree (source destination)
-  "Export tree-style SOURCE to vCard format, sending output
-to DESTINATION.
-
-SOURCE must be \"buffer\", \"region\" or \"subtree\".
-DESTINATION must be either \"buffer\" or \"file\"."
-  (let* ((in-contact-entry nil)
-         (tree-style-properties
-          (or (assoc org-vcard-active-version (cdr (assoc "tree" org-vcard-contacts-styles-mappings)))
-             (error "No mapping available for specified vCard version")))
-         (encoding (cond
-                    ((string= "4.0" org-vcard-active-version) 'utf-8)
-                    ((string= "3.0" org-vcard-active-version) 'utf-8)
-                    ((string= "2.1" org-vcard-active-version) 'us-ascii)))
-         (output (encode-coding-string "" encoding)))
-    (if (not (member source '("buffer" "region" "subtree")))
-        (error "Invalid source type"))
-    (save-excursion
-      (let ((mapping (assoc org-vcard-active-version
-                            (assoc "tree" org-vcard-contacts-styles-mappings)))
-            (search-result nil))
-        (cond
-         ((string= "region" source)
-          (narrow-to-region (region-beginning) (region-end)))
-         ((string= "subtree" source)
-          (org-narrow-to-subtree)))
-        (goto-char (point-min))
-        (setq case-fold-search t)
-        (while (re-search-forward "\\s *:FIELDTYPE:\\s *name" nil t)
-          (let ((content (concat (org-vcard-export-line "BEGIN:VCARD" "" t)
-                                 (org-vcard-export-line "VERSION" org-vcard-active-version)))
-                (end-vcard nil))
-            (setq content (concat content
-                                  (org-vcard-export-line "FN" (org-get-heading t t))))
-            ;; vCard 2.1 and 3.0 require the 'N' property be present.
-            ;; Trying to create this by parsing the heading which has
-            ;; FIELDTYPE 'name' is fraught with challenges - cf.
-            ;; http://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
-            ;; - so we just create an empty 'N' property.
-            (if (or (string= "3.0" org-vcard-active-version)
-                   (string= "2.1" org-vcard-active-version))
-                (setq content (concat content
-                                      (org-vcard-export-line "N" ""))))
-            (while (and (setq search-result (re-search-forward "\\s *:FIELDTYPE:\\s *\\(\\(?:\\w\\|-\\)+\\)" nil t))
-                      (not end-vcard))
-              (let ((fieldtype (match-string 1)))
-                (if (not (string= "name" (downcase fieldtype)))
-                    (setq content (concat content
-                                          (org-vcard-export-line
-                                           (cdr (assoc (downcase fieldtype) mapping))
-                                           (org-get-heading t t))))
-                  (setq end-vcard t))))
-            (setq content (concat content
-                                  (org-vcard-export-line "END:VCARD" "" t)))
-            (setq output (concat output content)))
-          (if search-result
-              (re-search-backward "\\s *:FIELDTYPE:\\s *name")))
-        (org-vcard-write-to-destination output destination)))))
-
-
-(defun org-vcard-import-to-tree (source destination)
-  "Import contents of SOURCE from vCard format, sending tree-style
-OUTPUT to DESTINATION.
-
-SOURCE must be one of \"buffer\", \"file\" or \"region\".
-DESTINATION must be one of \"buffer\" or \"file\"."
-  (let ((cards (org-vcard-import-parser source))
-        (filename "")
-        (sorted-card-properties nil))
-    (if (not (member source '("buffer" "file" "region")))
-        (error "Invalid source type"))
-    (cond
-     ((string= "buffer" destination)
-      (generate-new-buffer "*org-vcard-import*")
-      (set-buffer "*org-vcard-import*"))
-     ((string= "file" destination)
-      (setq filename (read-from-minibuffer "Filename? " "org-vcard-import.org"))
-      (find-file filename))
-     (t
-      (error "Invalid destination type")))
-    (dolist (card cards)
-      (if (assoc "VERSION" card)
-          (setq org-vcard-active-version (cdr (assoc "VERSION" card)))
-        (setq org-vcard-active-version org-vcard-default-version))
-      (insert (concat "* " (cdr (assoc "FN" card)) "\n"
-                      ":PROPERTIES:\n"
-                      ":KIND: " (if (assoc "KIND" card)
-                                    (cdr (assoc "KIND" card))
-                                  "individual") "\n"
-                      ":FIELDTYPE: name\n"
-                      ":END:\n"))
-      (setq sorted-card-properties (sort (mapcar 'car card) 'string<))
-      (dolist (property sorted-card-properties)
-        (if (not (member property '("FN" "KIND" "VERSION")))
-            (progn
-              (insert (concat "** " (cdr (assoc property card)) "\n"))
-              (insert (concat ":PROPERTIES:\n"
-                              ":FIELDTYPE: "
-                              (car (rassoc property
-                                           (cdr (assoc org-vcard-active-version
-                                                       (cdr (assoc "tree"
-                                                                   org-vcard-contacts-styles-mappings))))))
-                              "\n"
-                              ":END:\n"))))
-        (setq card (delq (assoc property card) card))))))
-
-
-(defun org-vcard-transfer-helper (source destination style version direction)
+(defun org-vcard-transfer-helper (source destination style language version direction)
   "Utility function via which other functions can dispatch export
 and import requests to the appropriate functions.
 
@@ -588,6 +435,7 @@ variable. DIRECTION must be either the symbol 'export or the symbol
   (let ((position nil))
     (org-vcard-check-contacts-styles)
     (setq org-vcard-active-style style)
+    (setq org-vcard-active-language language)
     (setq org-vcard-active-version version)
     (cond
      ((eq 'export direction)
@@ -596,9 +444,9 @@ variable. DIRECTION must be either the symbol 'export or the symbol
       (setq position 1))
      (t
       (error "Invalid direction type")))
-    (dolist (style org-vcard-contacts-styles)
+    (dolist (style org-vcard-styles-functions)
       (if (string= (car style) org-vcard-active-style)
-          (funcall (nth position (cdr style)) source destination)))))
+          (funcall (nth position (cadr style)) source destination)))))
 
 
 ;;
@@ -614,10 +462,12 @@ variable. DIRECTION must be either the symbol 'export or the symbol
                 (completing-read "Source: " '(buffer region subtree))
                 (completing-read "Destination: " '(file buffer))))
   (let ((style "")
+        (language "")
         (version ""))
-    (setq style (completing-read "Style: " (mapcar 'car org-vcard-contacts-styles)))
-    (setq version (completing-read "Version: " (mapcar 'car (cdr (assoc style org-vcard-contacts-styles-mappings)))))
-    (org-vcard-transfer-helper source destination style version 'export)))
+    (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions)))
+    (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings)))))
+    (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings)))))))
+    (org-vcard-transfer-helper source destination style language version 'export)))
 
 
 ;;;###autoload
@@ -627,60 +477,70 @@ variable. DIRECTION must be either the symbol 'export or the symbol
                 (completing-read "Source: " '(file buffer region))
                 (completing-read "Destination: " '(file buffer))))
   (let ((style "")
+        (language "")
         (version ""))
-    (setq style (completing-read "Style: " (mapcar 'car org-vcard-contacts-styles)))
-    (setq version (completing-read "Version: " (mapcar 'car (cdr (assoc style org-vcard-contacts-styles-mappings)))))
-    (org-vcard-transfer-helper source destination style version 'import)))
+    (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions)))
+    (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings)))))
+    (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings)))))))
+    (org-vcard-transfer-helper source destination style language version 'import)))
 
 
 ;;;###autoload
-(defun org-vcard-export-via-menu (style version)
+(defun org-vcard-export-via-menu (style language version)
   "User command for exporting to vCard via Emacs' menu bar."
   (let ((source nil)
         (destination nil))
     (setq source (completing-read "Source: " '(buffer region subtree)))
     (setq destination (completing-read "Destination: " '(file buffer)))
-    (org-vcard-transfer-helper source destination style version 'export)))
+    (org-vcard-transfer-helper source destination style language version 'export)))
 
 
 ;;;###autoload
-(defun org-vcard-import-via-menu (style version)
+(defun org-vcard-import-via-menu (style language version)
   "User command for importing from vCard via Emacs' menu bar."
   (let ((source nil)
         (destination nil))
     (setq source (completing-read "Source: " '(file buffer region)))
     (setq destination (completing-read "Destination: " '(file buffer)))
-    (org-vcard-transfer-helper source destination style version 'import)))
+    (org-vcard-transfer-helper source destination style language version 'import)))
 
 
 (easy-menu-define org-vcard-menu org-vcard-mode-keymap "Menu bar entry for org-vcard"
   `("Org-vCard"
     ,(let ((export '("Export")))
-       (let ((style-list nil))
-         (dolist (style org-vcard-contacts-styles-mappings)
-           (setq style-list (list (concat "from " (car style))))
-           (let ((version-list '()))
-             (dolist (version (cdr (assoc (car style) org-vcard-contacts-styles-mappings)))
-               (setq version-list (append version-list
-                                          (list (vector
-                                                 (concat "to vCard " (car version))
-                                                 `(org-vcard-export-via-menu ,(car style) ,(car version)) t)))))
-             (setq style-list (append style-list version-list)))
-           (setq export (append export `(,style-list)))))
-      export)
+       (let ((style-list '()))
+         (dolist (style (sort (mapcar 'car org-vcard-styles-languages-mappings) 'string<))
+           (setq style-list (list (concat "from " style)))
+           (let ((language-list '()))
+             (dolist (language (sort (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) 'string<))
+               (setq language-list (list language))
+               (let ((version-list '()))
+                 (dolist (version (sort (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) 'string<))
+                   (setq version-list (append version-list
+                                              (list (vector
+                                                     (concat "to vCard " version)
+                                                     `(org-vcard-export-via-menu ,style ,language ,version) t)))))
+                 (setq language-list (append language-list version-list)))
+             (setq style-list (append style-list `(,language-list)))))
+         (setq export (append export `(,style-list)))))
+       export)
     ,(let ((import '("Import")))
-      (let ((style-list nil))
-        (dolist (style org-vcard-contacts-styles-mappings)
-          (setq style-list (list (concat "to " (car style))))
-          (let ((version-list '()))
-            (dolist (version (cdr (assoc (car style) org-vcard-contacts-styles-mappings)))
-              (setq version-list (append version-list
-                                         (list (vector
-                                                (concat "from vCard " (car version))
-                                                `(org-vcard-import-via-menu ,(car style) ,(car version)) t)))))
-            (setq style-list (append style-list version-list)))
-          (setq import (append import `(,style-list)))))
-      import)
+       (let ((style-list '()))
+         (dolist (style (sort (mapcar 'car org-vcard-styles-languages-mappings) 'string<))
+           (setq style-list (list (concat "to " style)))
+           (let ((language-list '()))
+             (dolist (language (sort (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) 'string<))
+               (setq language-list (list language))
+               (let ((version-list '()))
+                 (dolist (version (sort (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) 'string<))
+                   (setq version-list (append version-list
+                                              (list (vector
+                                                     (concat "from vCard " version)
+                                                     `(org-vcard-import-via-menu ,style ,language ,version) t)))))
+                 (setq language-list (append language-list version-list)))
+             (setq style-list (append style-list `(,language-list)))))
+         (setq import (append import `(,style-list)))))
+       import)
     ["Customize" (customize-group 'org-vcard) t]))
 
 

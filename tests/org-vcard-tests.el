@@ -15,28 +15,28 @@
   "Test the org-vcard-check-contacts-styles function."
   :tags '(org-vcard)
 
-  (should-error (let ((org-vcard-contacts-styles
-                       '(("flat" .
+  (should-error (let ((org-vcard-styles-functions
+                       '(("flat"
                           (nil org-vcard-import-to-flat))
-                         ("tree" .
+                         ("tree"
                           (org-vcard-export-from-tree org-vcard-import-to-tree)))))
                   (org-vcard-check-contacts-styles)))
-  (should-error (let ((org-vcard-contacts-styles
-                       '(("flat" .
+  (should-error (let ((org-vcard-styles-functions
+                       '(("flat"
                           (org-vcard-export-from-flat nil))
-                         ("tree" .
+                         ("tree"
                           (org-vcard-export-from-tree org-vcard-import-to-tree)))))
                   (org-vcard-check-contacts-styles)))
-  (should-error (let ((org-vcard-contacts-styles
-                       '(("flat" .
+  (should-error (let ((org-vcard-styles-functions
+                       '(("flat"
                           (org-vcard-export-from-flat org-vcard-import-to-flat))
-                         ("tree" .
+                         ("tree"
                           (nil org-vcard-import-to-tree)))))
                   (org-vcard-check-contacts-styles)))
-  (should-error (let ((org-vcard-contacts-styles
-                       '(("flat" .
+  (should-error (let ((org-vcard-styles-functions
+                       '(("flat"
                           (org-vcard-export-from-flat org-vcard-import-to-flat))
-                         ("tree" .
+                         ("tree"
                           (org-vcard-export-from-tree nil)))))
                   (org-vcard-check-contacts-styles))))
 
@@ -279,6 +279,7 @@
   :tags '(org-vcard)
   
   (let ((crlf "\u000D\u000A")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "4.0"))
 
     (unwind-protect
@@ -320,6 +321,7 @@
   :tags '(org-vcard)
 
   (let ((crlf "\015\012")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "3.0"))
 
     (unwind-protect
@@ -363,6 +365,7 @@
   :tags '(org-vcard)
 
   (let ((crlf "\015\012")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "2.1"))
 
     (unwind-protect
@@ -407,6 +410,7 @@
   
   (let ((lf "\n")
         (org-vcard-active-style "flat")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "4.0"))
 
     (unwind-protect
@@ -447,6 +451,7 @@
   
   (let ((lf "\n")
         (org-vcard-active-style "flat")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "3.0"))
 
     (unwind-protect
@@ -487,6 +492,7 @@
   
   (let ((lf "\n")
         (org-vcard-active-style "flat")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "2.1"))
 
     (unwind-protect
@@ -531,6 +537,7 @@
   :tags '(org-vcard)
   
   (let ((crlf "\u000D\u000A")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "4.0"))
 
     (unwind-protect
@@ -571,6 +578,7 @@
   :tags '(org-vcard)
   
   (let ((crlf "\015\012")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "3.0"))
 
     (unwind-protect
@@ -613,6 +621,7 @@
   :tags '(org-vcard)
 
   (let ((crlf "\015\012")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "2.1"))
 
     (unwind-protect
@@ -655,6 +664,7 @@
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "4.0"))
 
     (unwind-protect
@@ -720,6 +730,7 @@
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "3.0"))
 
     (unwind-protect
@@ -785,6 +796,7 @@
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-active-language "en")
         (org-vcard-active-version "2.1"))
 
     (unwind-protect
