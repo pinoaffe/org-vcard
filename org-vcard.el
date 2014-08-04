@@ -178,6 +178,7 @@ associated mappings.")
 
 (defgroup org-vcard nil
   "vCard support for Org mode."
+  :group 'org
   :prefix "org-vcard-")
 
 ;; We default to "flat", the style used by org-contacts.el.
