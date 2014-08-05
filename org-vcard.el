@@ -322,6 +322,12 @@ variables."
                         (setq org-vcard-active-style (plist-get (cadr this-line) :value))
                         (setq found-keywords (append found-keywords '("CONTACTS_STYLE"))))
                     (error "Invalid in-buffer setting for CONTACTS_STYLE")))
+                 ((string= "CONTACTS_LANGUAGE" (plist-get (cadr this-line) :key))
+                  (if (member (plist-get (cadr this-line) :value) valid-styles)
+                      (progn
+                        (setq org-vcard-active-style (plist-get (cadr this-line) :value))
+                        (setq found-keywords (append found-keywords '("CONTACTS_LANGUAGE"))))
+                    (error "Invalid in-buffer setting for CONTACTS_LANGUAGE")))
                  ((string= "VCARD_VERSION" (plist-get (cadr this-line) :key))
                   (if (member (plist-get (cadr this-line) :value) valid-versions)
                       (progn
