@@ -309,6 +309,7 @@ variables."
   (save-excursion
     (goto-char (point-min))
     (let* ((valid-styles (mapcar 'car org-vcard-styles-functions))
+           (valid-languages '("en" "en_AU" "en_US"))
            (valid-versions '("4.0" "3.0" "2.1"))
            (found-keywords '()))
       (while (not (eobp))
@@ -323,9 +324,9 @@ variables."
                         (setq found-keywords (append found-keywords '("CONTACTS_STYLE"))))
                     (error "Invalid in-buffer setting for CONTACTS_STYLE")))
                  ((string= "CONTACTS_LANGUAGE" (plist-get (cadr this-line) :key))
-                  (if (member (plist-get (cadr this-line) :value) valid-styles)
+                  (if (member (plist-get (cadr this-line) :value) valid-languages)
                       (progn
-                        (setq org-vcard-active-style (plist-get (cadr this-line) :value))
+                        (setq org-vcard-active-language (plist-get (cadr this-line) :value))
                         (setq found-keywords (append found-keywords '("CONTACTS_LANGUAGE"))))
                     (error "Invalid in-buffer setting for CONTACTS_LANGUAGE")))
                  ((string= "VCARD_VERSION" (plist-get (cadr this-line) :key))
