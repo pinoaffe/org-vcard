@@ -66,7 +66,7 @@
 (require 'org)
 
 ;;
-;; Internal variables not dependent on custom settings.
+;; Internal variables.
 ;;
 
 (defconst org-vcard-elisp-dir (file-name-directory load-file-name)
@@ -105,71 +105,6 @@
     "org-vcard internal variable, containing available styles and
 their associated export and import functions.")
 
-(defvar org-vcard-mappings-list
-  (let ((mappings-list '())
-        (styles-dir (file-name-as-directory
-                     (concat org-vcard-elisp-dir "styles"))))
-    (dolist (style (directory-files styles-dir))
-      (if (and (not (string= "." (file-name-nondirectory style)))
-             (not (string= ".." (file-name-nondirectory style))))
-          (progn
-            (dolist (mapping (directory-files
-                              (file-name-as-directory
-                               (concat
-                                (file-name-as-directory
-                                 (concat styles-dir style))
-                                "mappings"))
-                              t))
-              (if (and (not (string= "." (file-name-nondirectory mapping)))
-                     (not (string= ".." (file-name-nondirectory mapping))))
-                  (add-to-list 'mappings-list
-                               `(const :tag ,(concat
-                                              style
-                                              " - "
-                                              (file-name-nondirectory mapping))
-                                       ,mapping)))))))
-    (sort mappings-list #'(lambda (a b)
-                            (if (string< (nth 2 a) (nth 2 b))
-                                t
-                              nil))))
-  "org-vcard internal variable, containing list of style mappings
-suitable for use by the org-vcard-default-style-language-mapping
-defcustom.")
-
-(defvar org-vcard-styles-languages-mappings
-  (let ((styles-dir (file-name-as-directory
-                     (concat org-vcard-elisp-dir "styles")))
-        (style-mappings '()))
-    (dolist (style (directory-files styles-dir))
-      (if (and (not (string= "." style))
-             (not (string= ".." style)))
-          (progn
-            (let ((language-mapping '()))
-              (dolist (mapping (directory-files
-                                (file-name-as-directory
-                                 (concat
-                                  (file-name-as-directory
-                                   (concat styles-dir style))
-                                  "mappings"))
-                                t))
-                (if (and (not (string= "." (file-name-nondirectory mapping)))
-                       (not (string= ".." (file-name-nondirectory mapping))))
-                    (progn
-                      (add-to-list 'language-mapping
-                                    `(,(file-name-nondirectory mapping)
-                                      ,@(list (car
-                                               (read-from-string
-                                                (with-temp-buffer
-                                                  (insert-file-contents-literally mapping)
-                                                  (buffer-string))))))))))
-              (setq language-mapping (list language-mapping))
-              (add-to-list 'style-mappings
-                            `(,style
-                              ,@language-mapping))))))
-    style-mappings)
-  "org-vcard internal variable, containing all styles and their
-associated mappings.")
-
 
 ;;
 ;; Customisation setup.
@@ -181,22 +116,53 @@ associated mappings.")
   :group 'org
   :prefix "org-vcard-")
 
-;; We default to "flat", the style used by org-contacts.el.
-
-(defcustom org-vcard-default-style-language-mapping (concat
-                                                     (file-name-as-directory
-                                                      (concat
-                                                       (file-name-as-directory
-                                                        (concat
-                                                         (file-name-as-directory
-                                                          (concat org-vcard-elisp-dir "styles"))
-                                                         "flat"))
-                                                       "mappings"))
-                                                     "en")
-  "The human-language contacts style mapping to use. Note:
-Modifying this will require an Emacs restart before changes will
-take effect."
-  :type `(radio ,@org-vcard-mappings-list)
+(defcustom org-vcard-styles-languages-mappings
+  (let ((styles-dir (file-name-as-directory
+                     (concat org-vcard-elisp-dir "styles")))
+        (style-mappings '()))
+    (dolist (style
+             ;; Reverse the list so that the repeated calls to
+             ;; add-to-list will produce a lexicographically-sorted
+             ;; list.
+             (sort (directory-files styles-dir) #'(lambda (a b)
+                                                    (if (not (string< a b))
+                                                        t
+                                                      nil))))
+      (if (and (not (string= "." style))
+             (not (string= ".." style)))
+          (progn
+            (let ((language-mapping '()))
+              (dolist (mapping
+                       ;; Reverse the list so that the repeated calls to
+                       ;; add-to-list will produce a lexicographically-sorted
+                       ;; list.
+                       (sort (directory-files
+                              (file-name-as-directory
+                               (concat
+                                (file-name-as-directory
+                                 (concat styles-dir style))
+                                "mappings"))
+                              t) #'(lambda (a b)
+                                     (if (not (string< a b))
+                                         t
+                                       nil))))
+                (if (and (not (string= "." (file-name-nondirectory mapping)))
+                       (not (string= ".." (file-name-nondirectory mapping))))
+                    (progn
+                      (add-to-list 'language-mapping
+                                   `(,(file-name-nondirectory mapping)
+                                     ,@(list (car
+                                              (read-from-string
+                                                (with-temp-buffer
+                                                  (insert-file-contents-literally mapping)
+                                                  (buffer-string))))))))))
+              (setq language-mapping (list language-mapping))
+              (add-to-list 'style-mappings
+                           `(,style
+                             ,@language-mapping))))))
+    style-mappings)
+  "Details of the available styles and their associated mappings."
+  :type '(repeat (list string (repeat (list string (repeat (list string (repeat (cons string string))))))))
   :group 'org-vcard)
 
 (defcustom org-vcard-default-export-file "~/org-vcard-export.vcf"
@@ -214,6 +180,14 @@ take effect."
 (defcustom org-vcard-default-style "flat"
   "Default contact style to use.
 Initially set to \"flat\"."
+  :type 'string
+  :group 'org-vcard)
+
+;;
+
+(defcustom org-vcard-default-language "en"
+  "Default language to use.
+Initially set to \"en\"."
   :type 'string
   :group 'org-vcard)
 
@@ -358,6 +332,8 @@ variables."
       (cond
        ((not (member "CONTACTS_STYLE" found-keywords))
         (setq org-vcard-active-style org-vcard-default-style))
+       ((not (member "CONTACTS_LANGUAGE" found-keywords))
+        (setq org-vcard-active-language org-vcard-default-language))
        ((not (member "VCARD_VERSION" found-keywords))
         (setq org-vcard-active-version org-vcard-default-version))))))
 
