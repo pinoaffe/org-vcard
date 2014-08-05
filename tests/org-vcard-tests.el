@@ -115,11 +115,10 @@
              (org-vcard-export-line "FN" "word" t)))))
 
 
-(ert-deftest org-vcard-test-set-active-settings ()
-  "Test the org-vcard-set-active-settings function."
+(ert-deftest org-vcard-test-set-active-settings-style ()
+  "Test the org-vcard-set-active-settings function with
+the CONTACTS_STYLE in-buffer setting."
   :tags '(org-vcard)
-
-  ;; Tests for CONTACTS_STYLE in-buffer setting.
   
   (should (with-temp-buffer
             (insert "#+CONTACTS_STYLE: flat\n")
@@ -159,9 +158,59 @@
 
   (should-error (with-temp-buffer
                   (insert "#+CONTACTS_STYLE: syzygy\n")
-                  (org-vcard-set-active-settings)))
+                  (org-vcard-set-active-settings))))
 
-  ;; Tests for VCARD_VERSION in-buffer setting.
+
+(ert-deftest org-vcard-test-set-active-settings-language ()
+  "Test the org-vcard-set-active-settings function with
+the CONTACTS_LANGUAGE in-buffer setting."
+  :tags '(org-vcard)
+  
+  (should (with-temp-buffer
+            (insert "#+CONTACTS_LANGUAGE: en\n")
+            (org-vcard-set-active-settings)
+            (string= "en" org-vcard-active-language)))
+  (should (with-temp-buffer
+            (insert "#+STARTUP: overview\n")
+            (insert "#+CONTACTS_LANGUAGE: en\n")
+            (insert "#+CONSTANTS: a=1\n")
+            (org-vcard-set-active-settings)
+            (string= "en" org-vcard-active-language)))
+  (should (with-temp-buffer
+            (insert "#+STARTUP: overview\n")
+            (insert "#+CONTACTS_LANGUAGE: en\n")
+            (insert "#+CONSTANTS: a=1\n")
+            (insert "#+CONTACTS_LANGUAGE: en_AU\n")
+            (org-vcard-set-active-settings)
+            (string= "en_AU" org-vcard-active-language)))
+  (should (with-temp-buffer
+            (insert "#+STARTUP: overview\n")
+            (insert "#+CONTACTS_LANGUAGE: en\n")
+            (insert "#+CONSTANTS: a=1\n")
+            (insert "#+CONTACTS_LANGUAGE: en_AU\n")
+            (insert "#+CONSTANTS: b=2\n")
+            (org-vcard-set-active-settings)
+            (string= "en_AU" org-vcard-active-language)))
+  (should (with-temp-buffer
+            (insert "#+CONTACTS_LANGUAGE: en\n")
+            (insert "#+VCARD_VERSION: 4.0\n")
+            (org-vcard-set-active-settings)
+            (string= "en" org-vcard-active-language)))
+  (should (with-temp-buffer
+            (insert "#+VCARD_VERSION: 4.0\n")
+            (insert "#+CONTACTS_LANGUAGE: en\n")
+            (org-vcard-set-active-settings)
+            (string= "en" org-vcard-active-language)))
+
+  (should-error (with-temp-buffer
+                  (insert "#+CONTACTS_LANGUAGE: syzygy\n")
+                  (org-vcard-set-active-settings))))
+
+
+(ert-deftest org-vcard-test-set-active-settings-version ()
+  "Test the org-vcard-set-active-settings function with
+the VCARD_VERSION in-buffer setting."
+  :tags '(org-vcard)
 
   (should (with-temp-buffer
             (insert "#+VCARD_VERSION: 4.0\n")
