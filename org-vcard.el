@@ -66,11 +66,26 @@
 (require 'org)
 
 ;;
-;; Internal variables.
+;; Setup.
 ;;
+
+(defgroup org-vcard nil
+  "vCard support for Org mode."
+  :group 'org
+  :prefix "org-vcard-")
 
 (defconst org-vcard-elisp-dir (file-name-directory load-file-name)
   "Absolute path of the directory containing org-vcard.el.")
+
+(defcustom org-vcard-custom-styles-dir "~/.emacs.d/org-vcard-styles/"
+  "The default file to export to."
+  :type 'directory
+  :group 'org-vcard)
+
+(defvar org-vcard-styles-dirs
+  `(,(file-name-as-directory (concat org-vcard-elisp-dir "styles"))
+    ,org-vcard-custom-styles-dir)
+  "Internal variable; list of directories containing org-vcard styles.")
 
 (defvar org-vcard-active-style ""
   "The currently-active contacts style.")
@@ -86,21 +101,21 @@
 the org-vcard 'styles' directory, suitable for use by
 the org-vcard-styles-functions defvar."
   (let ((the-list) '())
-    (dolist (style (directory-files
-                    (file-name-as-directory
-                     (concat org-vcard-elisp-dir "styles"))
-                    t))
-      (if (and (not (string= "." (file-name-nondirectory style)))
-             (not (string= ".." (file-name-nondirectory style))))
-          (progn
-            (load (concat
-                   (file-name-as-directory style)
-                   "functions.el"))
-            (add-to-list 'the-list
-                         `(,(file-name-nondirectory style)
-                           ,(list
-                             (intern (concat "org-vcard-export-from-" (file-name-nondirectory style)))
-                             (intern (concat "org-vcard-import-to-" (file-name-nondirectory style)))))))))
+    (dolist (style-dir org-vcard-styles-dirs)
+      (if (not (file-exists-p style-dir))
+          (make-directory style-dir))
+      (dolist (style (directory-files style-dir))
+        (if (and (not (string= "." (file-name-nondirectory style)))
+               (not (string= ".." (file-name-nondirectory style))))
+            (progn
+              (load (concat
+                     (file-name-as-directory (concat style-dir style))
+                     "functions.el"))
+              (add-to-list 'the-list
+                           `(,(file-name-nondirectory style)
+                             ,(list
+                               (intern (concat "org-vcard-export-from-" (file-name-nondirectory style)))
+                               (intern (concat "org-vcard-import-to-" (file-name-nondirectory style))))))))))
     (sort the-list #'(lambda (a b)
                        (if (string< (car a) (car b))
                            t
@@ -110,64 +125,54 @@ the org-vcard-styles-functions defvar."
     "org-vcard internal variable, containing available styles and
 their associated export and import functions.")
 
-
-;;
-;; Customisation setup.
-;;
-
-
-(defgroup org-vcard nil
-  "vCard support for Org mode."
-  :group 'org
-  :prefix "org-vcard-")
-
 (defun org-vcard-create-styles-languages-mappings ()
   "Function to create a data structure from the contents of
 the org-vcard 'styles' directory, suitable for use by
 the org-vcard-styles-languages-mappings defcustom."
-  (let ((styles-dir (file-name-as-directory
-                     (concat org-vcard-elisp-dir "styles")))
-        (style-mappings '()))
-    (dolist (style
-             ;; Reverse the list so that the repeated calls to
-             ;; add-to-list will produce a lexicographically-sorted
-             ;; list.
-             (sort (directory-files styles-dir) #'(lambda (a b)
-                                                    (if (not (string< a b))
-                                                        t
-                                                      nil))))
-      (if (and (not (string= "." style))
-             (not (string= ".." style)))
-          (progn
-            (let ((language-mapping '()))
-              (dolist (mapping
-                       ;; Reverse the list so that the repeated calls to
-                       ;; add-to-list will produce a lexicographically-sorted
-                       ;; list.
-                       (sort (directory-files
-                              (file-name-as-directory
-                               (concat
+  (let ((style-mappings '()))
+    (dolist (style-dir org-vcard-styles-dirs)
+      (if (not (file-exists-p style-dir))
+          (make-directory style-dir))
+      (dolist (style
+               ;; Reverse the list so that the repeated calls to
+               ;; add-to-list will produce a lexicographically-sorted
+               ;; list.
+               (sort (directory-files style-dir) #'(lambda (a b)
+                                                     (if (not (string< a b))
+                                                         t
+                                                       nil))))
+        (if (and (not (string= "." style))
+               (not (string= ".." style)))
+            (progn
+              (let ((language-mapping '()))
+                (dolist (mapping
+                         ;; Reverse the list so that the repeated calls to
+                         ;; add-to-list will produce a lexicographically-sorted
+                         ;; list.
+                         (sort (directory-files
                                 (file-name-as-directory
-                                 (concat styles-dir style))
-                                "mappings"))
-                              t) #'(lambda (a b)
-                                     (if (not (string< a b))
-                                         t
-                                       nil))))
-                (if (and (not (string= "." (file-name-nondirectory mapping)))
-                       (not (string= ".." (file-name-nondirectory mapping))))
-                    (progn
-                      (add-to-list 'language-mapping
-                                   `(,(file-name-nondirectory mapping)
-                                     ,@(list (car
-                                              (read-from-string
-                                                (with-temp-buffer
-                                                  (insert-file-contents-literally mapping)
-                                                  (buffer-string))))))))))
-              (setq language-mapping (list language-mapping))
-              (add-to-list 'style-mappings
-                           `(,style
-                             ,@language-mapping))))))
+                                 (concat
+                                  (file-name-as-directory
+                                   (concat style-dir style))
+                                  "mappings"))
+                                t) #'(lambda (a b)
+                                       (if (not (string< a b))
+                                           t
+                                         nil))))
+                  (if (and (not (string= "." (file-name-nondirectory mapping)))
+                         (not (string= ".." (file-name-nondirectory mapping))))
+                      (progn
+                        (add-to-list 'language-mapping
+                                     `(,(file-name-nondirectory mapping)
+                                       ,@(list (car
+                                                (read-from-string
+                                                 (with-temp-buffer
+                                                   (insert-file-contents-literally mapping)
+                                                   (buffer-string))))))))))
+                (setq language-mapping (list language-mapping))
+                (add-to-list 'style-mappings
+                             `(,style
+                               ,@language-mapping)))))))
     style-mappings))
 
 (defcustom org-vcard-styles-languages-mappings (org-vcard-create-styles-languages-mappings)
