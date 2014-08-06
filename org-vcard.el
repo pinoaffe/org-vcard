@@ -81,7 +81,10 @@
 (defvar org-vcard-active-version ""
   "The currently-active version of vCard.")
 
-(defvar org-vcard-styles-functions
+(defun org-vcard-create-styles-functions ()
+  "Function to create a data structure from the contents of
+the org-vcard 'styles' directory, suitable for use by
+the org-vcard-styles-functions defvar."
   (let ((the-list) '())
     (dolist (style (directory-files
                     (file-name-as-directory
@@ -101,7 +104,9 @@
     (sort the-list #'(lambda (a b)
                        (if (string< (car a) (car b))
                            t
-                         nil))))
+                         nil)))))
+
+(defvar org-vcard-styles-functions (org-vcard-create-styles-functions)
     "org-vcard internal variable, containing available styles and
 their associated export and import functions.")
 
@@ -540,6 +545,7 @@ variable. DIRECTION must be either the symbol 'export or the symbol
 (defun org-vcard-reload-styles ()
   "Reload the styles listed in the org-vcard 'styles' directory."
   (interactive)
+  (setq org-vcard-styles-functions (org-vcard-create-styles-functions))
   (setq org-vcard-styles-languages-mappings (org-vcard-create-styles-languages-mappings)))
 
 
