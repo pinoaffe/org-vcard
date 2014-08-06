@@ -116,7 +116,10 @@ their associated export and import functions.")
   :group 'org
   :prefix "org-vcard-")
 
-(defcustom org-vcard-styles-languages-mappings
+(defun org-vcard-create-styles-languages-mappings ()
+  "Function to create a data structure from the contents of
+the org-vcard 'styles' directory, suitable for use by
+the org-vcard-styles-languages-mappings defcustom."
   (let ((styles-dir (file-name-as-directory
                      (concat org-vcard-elisp-dir "styles")))
         (style-mappings '()))
@@ -160,7 +163,9 @@ their associated export and import functions.")
               (add-to-list 'style-mappings
                            `(,style
                              ,@language-mapping))))))
-    style-mappings)
+    style-mappings))
+
+(defcustom org-vcard-styles-languages-mappings (org-vcard-create-styles-languages-mappings)
   "Details of the available styles and their associated mappings."
   :type '(repeat (list string (repeat (list string (repeat (list string (repeat (cons string string))))))))
   :group 'org-vcard)
@@ -439,7 +444,6 @@ variable. DIRECTION must be either the symbol 'export or the symbol
 
 
 ;;;###autoload
-
 (defun org-vcard-export (source destination)
   "User command to export to vCard."
   (interactive (list
@@ -526,6 +530,17 @@ variable. DIRECTION must be either the symbol 'export or the symbol
          (setq import (append import `(,style-list)))))
        import)
     ["Customize" (customize-group 'org-vcard) t]))
+
+
+;;
+;; User-facing general commands.
+;;
+
+
+(defun org-vcard-reload-styles ()
+  "Reload the styles listed in the org-vcard 'styles' directory."
+  (interactive)
+  (setq org-vcard-styles-languages-mappings (org-vcard-create-styles-languages-mappings)))
 
 
 ;; --
