@@ -198,7 +198,7 @@ Initially set to \"flat\"."
   :type 'string
   :group 'org-vcard)
 
-;;
+;; The in-buffer setting #+CONTACT_LANGUAGE.
 
 (defcustom org-vcard-default-language "en"
   "Default language to use.
