@@ -55,7 +55,12 @@ DESTINATION must be either \"buffer\" or \"file\"."
             (setq output (concat output content)))
           (if search-result
               (re-search-backward "\\s *:FIELDTYPE:\\s *name")))
-        (org-vcard-write-to-destination output destination)))))
+        (org-vcard-write-to-destination output destination)
+        (cond
+         ((string= "buffer" destination)
+          (message "Exported contacts data to *org-vcard-export* buffer."))
+         ((string= "file" destination)
+          (message "Exported contacts data to file.")))))))
 
 
 (defun org-vcard-import-to-tree (source destination)
@@ -103,4 +108,9 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                                 (car (rassoc property tree-style-properties))
                                 "\n"
                                 ":END:\n"))))
-          (setq card (delq (assoc property card) card)))))))
+          (setq card (delq (assoc property card) card))))))
+  (cond
+     ((string= "buffer" destination)
+      (message "Imported contacts data to *org-vcard-import* buffer."))
+     ((string= "file" destination)
+      (message "Imported contacts data to file."))))
