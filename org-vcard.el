@@ -503,43 +503,47 @@ variable. DIRECTION must be either the symbol 'export or the symbol
     (org-vcard-transfer-helper source destination style language version 'import)))
 
 
-(easy-menu-define org-vcard-menu org-vcard-mode-keymap "Menu bar entry for org-vcard"
-  `("Org-vCard"
-    ,(let ((export '("Export")))
-       (let ((style-list '()))
-         (dolist (style (sort (mapcar 'car org-vcard-styles-languages-mappings) 'string<))
-           (setq style-list (list (concat "from " style)))
-           (let ((language-list '()))
-             (dolist (language (sort (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) 'string<))
-               (setq language-list (list language))
-               (let ((version-list '()))
-                 (dolist (version (sort (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) 'string<))
-                   (setq version-list (append version-list
-                                              (list (vector
-                                                     (concat "to vCard " version)
-                                                     `(org-vcard-export-via-menu ,style ,language ,version) t)))))
-                 (setq language-list (append language-list version-list)))
-             (setq style-list (append style-list `(,language-list)))))
-         (setq export (append export `(,style-list)))))
-       export)
-    ,(let ((import '("Import")))
-       (let ((style-list '()))
-         (dolist (style (sort (mapcar 'car org-vcard-styles-languages-mappings) 'string<))
-           (setq style-list (list (concat "to " style)))
-           (let ((language-list '()))
-             (dolist (language (sort (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) 'string<))
-               (setq language-list (list language))
-               (let ((version-list '()))
-                 (dolist (version (sort (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) 'string<))
-                   (setq version-list (append version-list
-                                              (list (vector
-                                                     (concat "from vCard " version)
-                                                     `(org-vcard-import-via-menu ,style ,language ,version) t)))))
-                 (setq language-list (append language-list version-list)))
-             (setq style-list (append style-list `(,language-list)))))
-         (setq import (append import `(,style-list)))))
-       import)
-    ["Customize" (customize-group 'org-vcard) t]))
+(defun org-vcard-create-org-vcard-mode-menu ()
+  "Internal function to create or recreate the org-vcard-mode menu."
+  (easy-menu-define org-vcard-menu org-vcard-mode-keymap "Menu bar entry for org-vcard"
+    `("Org-vCard"
+      ,(let ((export '("Export")))
+         (let ((style-list '()))
+           (dolist (style (sort (mapcar 'car org-vcard-styles-languages-mappings) 'string<))
+             (setq style-list (list (concat "from " style)))
+             (let ((language-list '()))
+               (dolist (language (sort (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) 'string<))
+                 (setq language-list (list language))
+                 (let ((version-list '()))
+                   (dolist (version (sort (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) 'string<))
+                     (setq version-list (append version-list
+                                                (list (vector
+                                                       (concat "to vCard " version)
+                                                       `(org-vcard-export-via-menu ,style ,language ,version) t)))))
+                   (setq language-list (append language-list version-list)))
+                 (setq style-list (append style-list `(,language-list)))))
+             (setq export (append export `(,style-list)))))
+         export)
+      ,(let ((import '("Import")))
+         (let ((style-list '()))
+           (dolist (style (sort (mapcar 'car org-vcard-styles-languages-mappings) 'string<))
+             (setq style-list (list (concat "to " style)))
+             (let ((language-list '()))
+               (dolist (language (sort (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) 'string<))
+                 (setq language-list (list language))
+                 (let ((version-list '()))
+                   (dolist (version (sort (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) 'string<))
+                     (setq version-list (append version-list
+                                                (list (vector
+                                                       (concat "from vCard " version)
+                                                       `(org-vcard-import-via-menu ,style ,language ,version) t)))))
+                   (setq language-list (append language-list version-list)))
+                 (setq style-list (append style-list `(,language-list)))))
+             (setq import (append import `(,style-list)))))
+         import)
+      ["Customize" (customize-group 'org-vcard) t])))
+
+(org-vcard-create-org-vcard-mode-menu)
 
 
 ;;
@@ -551,7 +555,8 @@ variable. DIRECTION must be either the symbol 'export or the symbol
   "Reload the styles listed in the org-vcard 'styles' directory."
   (interactive)
   (setq org-vcard-styles-functions (org-vcard-create-styles-functions))
-  (setq org-vcard-styles-languages-mappings (org-vcard-create-styles-languages-mappings)))
+  (setq org-vcard-styles-languages-mappings (org-vcard-create-styles-languages-mappings))
+  (org-vcard-create-org-vcard-mode-menu))
 
 
 ;; --
