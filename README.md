@@ -114,6 +114,8 @@ As the 'tree' style uses a heading's FIELDTYPE property to associate fields with
 
 ## TODO
 
+* Factor out Org data parsing into a separate library.
+
 * Add support for multi-line field values.
 
 * Add support for vCard PREFERRED / TYPE=pref.
