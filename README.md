@@ -58,6 +58,7 @@ The structure of the 'tree' contacts style is:
     *** [Information value]
     :PROPERTIES:
     :FIELDTYPE: [Field type]
+    [:PREFERRED:]
     :END:
 ```
 
@@ -79,6 +80,7 @@ Here's an example:
     **** address1@hidden
     :PROPERTIES:
     :FIELDTYPE: email-work
+    :PREFERRED:
     :END:
     *** Home
     **** address2@hidden
@@ -105,6 +107,7 @@ As the 'tree' style uses a heading's FIELDTYPE property to associate fields with
     **** address1@hidden
     :PROPERTIES:
     :FIELDTYPE: email-work
+    :PREFERRED:
     :END:
     **** address2@hidden
     :PROPERTIES:
@@ -114,11 +117,9 @@ As the 'tree' style uses a heading's FIELDTYPE property to associate fields with
 
 ## TODO
 
-* Factor out Org data parsing into a separate library.
-
 * Add support for multi-line field values.
 
-* Add support for vCard PREFERRED / TYPE=pref.
+* Add support for vCard PREF for style 'flat'.
 
 * Add support for vCard KINDs 'group' and 'org'.
 

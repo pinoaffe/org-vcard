@@ -45,10 +45,24 @@ DESTINATION must be either \"buffer\" or \"file\"."
                       (not end-vcard))
               (let ((fieldtype (match-string 1)))
                 (if (not (string= "name" (downcase fieldtype)))
-                    (setq content (concat content
-                                          (org-vcard-export-line
-                                           (cdr (assoc (downcase fieldtype) tree-style-properties))
-                                           (org-get-heading t t))))
+                    (let ((property (cdr (assoc (downcase fieldtype) tree-style-properties))))
+                      (save-excursion
+                        (forward-line)
+                        (beginning-of-line)
+                        (if (looking-at "\\s *:PREFERRED:")
+                            (cond
+                             ((string= "4.0" org-vcard-active-version)
+                              (setq property (concat property ";PREF=1")))
+                             ((string= "3.0" org-vcard-active-version)
+                              (if (string-match "TYPE=" property)
+                                  (setq property (concat property ",pref"))
+                                (setq property (concat property ";TYPE=pref"))))
+                             ((string= "2.1" org-vcard-active-version)
+                              (setq property (concat property ";PREF"))))))                             
+                      (setq content (concat content
+                                            (org-vcard-export-line
+                                             property
+                                             (org-get-heading t t)))))
                   (setq end-vcard t))))
             (setq content (concat content
                                   (org-vcard-export-line "END:VCARD" "" t)))
@@ -100,15 +114,33 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                                     ":END:\n"))
         (setq sorted-card-properties (sort (mapcar 'car card) 'string<))
         (dolist (property sorted-card-properties)
-          (if (not (member property '("FN" "KIND" "VERSION")))
-              (progn
-                (insert (concat "** " (cdr (assoc property card)) "\n"))
-                (insert (concat ":PROPERTIES:\n"
-                                ":FIELDTYPE: "
-                                (car (rassoc property tree-style-properties))
-                                "\n"
-                                ":END:\n"))))
-          (setq card (delq (assoc property card) card))))))
+          (let ((property-original property)
+                    (case-fold-search t)
+                    (preferred nil))
+            (if (not (member property '("FN" "KIND" "VERSION")))
+                (progn
+                  (cond
+                   ((or (string= "4.0" org-vcard-active-version)
+                       (string= "2.1" org-vcard-active-version))
+                    (setq property (replace-regexp-in-string ";PREF\\(?:=\\w+\\)?" "" property)))
+                   ((string= "3.0" org-vcard-active-version)
+                    (progn
+                      (setq property (replace-regexp-in-string ",?pref" "" property))
+                      (if (string-match ";TYPE=\\(?:;\\|$\\)" property)
+                          (setq property (replace-regexp-in-string ";TYPE=" "" property))))))
+                  (if (not (string= property-original property))
+                      ;; Contents of 'property' were changed by replace-regexp-in-string,
+                      ;; so it must have contained a 'PREF'.
+                      (setq preferred t))
+                  (insert (concat "** " (cdr (assoc property-original card)) "\n"))
+                  (insert (concat ":PROPERTIES:\n"
+                                  ":FIELDTYPE: "
+                                  (car (rassoc property tree-style-properties))
+                                  "\n"
+                                  (if preferred
+                                      ":PREFERRED:\n")
+                                  ":END:\n"))))
+            (setq card (delq (assoc property-original card) card)))))))
   (cond
      ((string= "buffer" destination)
       (message "Imported contacts data to *org-vcard-import* buffer."))

@@ -22,8 +22,8 @@
 *** Email
 **** joan@example.com
 :PROPERTIES:
-:PREFERRED: 
 :FIELDTYPE: email
+:PREFERRED: 
 :END:
 *** Email
 **** joan.2@example.com
@@ -49,8 +49,8 @@
 **** Work
 ***** john@example.com
 :PROPERTIES:
-:PREFERRED: 
 :FIELDTYPE: email-work
+:PREFERRED: 
 :END:
 **** Home
 ***** john.2@example.com

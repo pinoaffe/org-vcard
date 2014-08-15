@@ -483,7 +483,7 @@ the VCARD_VERSION in-buffer setting."
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "vcard-source-4_0.vcf"))
+                                                           "flat-vcard-source-4_0.vcf"))
                    (org-vcard-import-to-flat "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-import*")
                    (buffer-string))))
@@ -524,7 +524,7 @@ the VCARD_VERSION in-buffer setting."
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "vcard-source-3_0.vcf"))
+                                                           "flat-vcard-source-3_0.vcf"))
                    (org-vcard-import-to-flat "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-import*")
                    (buffer-string))))
@@ -565,7 +565,7 @@ the VCARD_VERSION in-buffer setting."
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "vcard-source-2_1.vcf"))
+                                                           "flat-vcard-source-2_1.vcf"))
                    (org-vcard-import-to-flat "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-import*")
                    (buffer-string))))
@@ -596,7 +596,7 @@ the VCARD_VERSION in-buffer setting."
                          "FN:Joan Smith" crlf
                          "TEL;TYPE=voice:00 9999 9999" crlf
                          "TEL;TYPE=cell:0000 999 999" crlf
-                         "EMAIL:joan@example.com" crlf
+                         "EMAIL;PREF=1:joan@example.com" crlf
                          "EMAIL:joan.2@example.com" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
@@ -604,7 +604,7 @@ the VCARD_VERSION in-buffer setting."
                          "FN:John" crlf
                          "TEL;TYPE=voice:01 9999 9999" crlf
                          "TEL;TYPE=cell:0001 999 999" crlf
-                         "EMAIL;TYPE=work:john@example.com" crlf
+                         "EMAIL;TYPE=work;PREF=1:john@example.com" crlf
                          "EMAIL;TYPE=home:john.2@example.com" crlf
                          "END:VCARD" crlf)
                  (progn
@@ -638,7 +638,7 @@ the VCARD_VERSION in-buffer setting."
                          "N:" crlf
                          "TEL;TYPE=voice:00 9999 9999" crlf
                          "TEL;TYPE=cell:0000 999 999" crlf
-                         "EMAIL:joan@example.com" crlf
+                         "EMAIL;TYPE=pref:joan@example.com" crlf
                          "EMAIL:joan.2@example.com" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
@@ -647,7 +647,7 @@ the VCARD_VERSION in-buffer setting."
                          "N:" crlf
                          "TEL;TYPE=voice:01 9999 9999" crlf
                          "TEL;TYPE=cell:0001 999 999" crlf
-                         "EMAIL;TYPE=work:john@example.com" crlf
+                         "EMAIL;TYPE=work,pref:john@example.com" crlf
                          "EMAIL;TYPE=home:john.2@example.com" crlf
                          "END:VCARD" crlf)
                  (progn
@@ -681,7 +681,7 @@ the VCARD_VERSION in-buffer setting."
                          "N:" crlf
                          "TEL;VOICE:00 9999 9999" crlf
                          "TEL;CELL:0000 999 999" crlf
-                         "EMAIL:joan@example.com" crlf
+                         "EMAIL;PREF:joan@example.com" crlf
                          "EMAIL:joan.2@example.com" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
@@ -690,7 +690,7 @@ the VCARD_VERSION in-buffer setting."
                          "N:" crlf
                          "TEL;VOICE:01 9999 9999" crlf
                          "TEL;CELL:0001 999 999" crlf
-                         "EMAIL;WORK:john@example.com" crlf
+                         "EMAIL;WORK;PREF:john@example.com" crlf
                          "EMAIL;HOME:john.2@example.com" crlf
                          "END:VCARD" crlf)
                  (progn
@@ -723,13 +723,14 @@ the VCARD_VERSION in-buffer setting."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
-                         "** joan@example.com" lf
-                         ":PROPERTIES:" lf
-                         ":FIELDTYPE: email" lf
-                         ":END:" lf
                          "** joan.2@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email" lf
+                         ":END:" lf
+                         "** joan@example.com" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: email" lf
+                         ":PREFERRED:" lf
                          ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
@@ -751,6 +752,7 @@ the VCARD_VERSION in-buffer setting."
                          "** john@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-work" lf
+                         ":PREFERRED:" lf
                          ":END:" lf
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
@@ -763,7 +765,7 @@ the VCARD_VERSION in-buffer setting."
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "vcard-source-4_0.vcf"))
+                                                           "tree-vcard-source-4_0.vcf"))
                    (org-vcard-import-to-tree "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-import*")
                    (buffer-string))))
@@ -789,13 +791,14 @@ the VCARD_VERSION in-buffer setting."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
-                         "** joan@example.com" lf
-                         ":PROPERTIES:" lf
-                         ":FIELDTYPE: email" lf
-                         ":END:" lf
                          "** joan.2@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email" lf
+                         ":END:" lf
+                         "** joan@example.com" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: email" lf
+                         ":PREFERRED:" lf
                          ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
@@ -817,6 +820,7 @@ the VCARD_VERSION in-buffer setting."
                          "** john@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-work" lf
+                         ":PREFERRED:" lf
                          ":END:" lf
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
@@ -829,7 +833,7 @@ the VCARD_VERSION in-buffer setting."
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "vcard-source-3_0.vcf"))
+                                                           "tree-vcard-source-3_0.vcf"))
                    (org-vcard-import-to-tree "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-import*")
                    (buffer-string))))
@@ -855,13 +859,14 @@ the VCARD_VERSION in-buffer setting."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
-                         "** joan@example.com" lf
-                         ":PROPERTIES:" lf
-                         ":FIELDTYPE: email" lf
-                         ":END:" lf
                          "** joan.2@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email" lf
+                         ":END:" lf
+                         "** joan@example.com" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: email" lf
+                         ":PREFERRED:" lf
                          ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
@@ -883,6 +888,7 @@ the VCARD_VERSION in-buffer setting."
                          "** john@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-work" lf
+                         ":PREFERRED:" lf
                          ":END:" lf
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
@@ -895,7 +901,7 @@ the VCARD_VERSION in-buffer setting."
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "vcard-source-2_1.vcf"))
+                                                           "tree-vcard-source-2_1.vcf"))
                    (org-vcard-import-to-tree "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-import*")
                    (buffer-string))))
