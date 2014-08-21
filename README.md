@@ -32,7 +32,7 @@
 
 ## Installation
 
-Install `org-vcard` from [MELPA](http://melpa.milkbox.net/#/), or put the file `org-vcard.el` in your load-path and do a `(require 'org-vcard)`.
+Install `org-vcard` from [MELPA](http://melpa.milkbox.net/#/), or put the `org-vcard` folder in your load-path and do a `(require 'org-vcard)`.
 
 ## Usage
 
