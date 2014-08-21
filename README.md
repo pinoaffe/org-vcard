@@ -42,6 +42,8 @@ The main user commands are `org-vcard-export` and `org-vcard-import`. Enabling `
 
 For a list of the properties available by default for each contacts style and related vCard versions, visit the "Org Vcard Styles Languages Mappings" setting in the Org Vcard customize group, or examine the value of the `org-vcard-styles-languages-mappings` variable.
 
+**Note!** The default mappings might need to be tweaked for particular use-cases. For example, some systems create vCards with a bare `TEL` property, whereas others use `TEL;TYPE=voice`; but both are mapped to the Org `PHONE` property (for 'flat' style) or `phone` FIELDTYPE (for 'tree' style). In this case, the `customize` interface could be used to delete whichever of the two mappings is unwanted.
+
 <a name="tree"></a>
 
 ### The 'tree' contacts style
