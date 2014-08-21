@@ -30,9 +30,10 @@
 ;; org-vcard is a package for exporting and importing vCards from
 ;; within Emacs' Org mode.
 
-;; The main user commands are org-vcard-export and org-vcard-import.
-;; Enabling org-vcard-mode will add an 'Org-vCard' menu to the menu
-;; bar, from which one can access the various export, import and
+;; The main user commands are org-vcard-export and org-vcard-import,
+;; both of which are intended to be called interactively. Enabling
+;; org-vcard-mode will add an 'Org-vCard' menu to the menu bar,
+;; from which one can access the various export, import and
 ;; customisation options.
 
 ;; This package is working towards full compliance with the
@@ -455,7 +456,9 @@ variable. DIRECTION must be either the symbol 'export or the symbol
 
 ;;;###autoload
 (defun org-vcard-export (source destination)
-  "User command to export to vCard."
+  "User command to export to vCard.
+
+Only intended for interactive use."
   (interactive (list
                 (completing-read "Source: " '(buffer region subtree))
                 (completing-read "Destination: " '(file buffer))))
@@ -470,7 +473,9 @@ variable. DIRECTION must be either the symbol 'export or the symbol
 
 ;;;###autoload
 (defun org-vcard-import (source destination)
-  "User command to import from vCard."
+  "User command to import from vCard.
+
+Only intended for interactive use."
   (interactive (list
                 (completing-read "Source: " '(file buffer region))
                 (completing-read "Destination: " '(file buffer))))
