@@ -44,6 +44,9 @@ For a list of the properties available by default for each contacts style and re
 
 **Note!** The default mappings might need to be tweaked for particular use-cases. For example, some systems create vCards with a bare `TEL` property, whereas others use `TEL;TYPE=voice`; but both are mapped to the Org `PHONE` property (for 'flat' style) or `phone` FIELDTYPE (for 'tree' style). In this case, the `customize` interface could be used to delete whichever of the two mappings is unwanted.
 
+The value of the `org-vcard-include-import-unknowns` (boolean) variable specifies whether the import process should include vCard properties not listed in
+the mapping being used.
+
 If you wish to use `org-vcard` in Emacs Lisp code, the primary function to work with is the `org-vcard-transfer-helper` function. 
 
 <a name="tree"></a>

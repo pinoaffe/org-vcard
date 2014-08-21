@@ -115,8 +115,8 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (setq sorted-card-properties (sort (mapcar 'car card) 'string<))
         (dolist (property sorted-card-properties)
           (let ((property-original property)
-                    (case-fold-search t)
-                    (preferred nil))
+                (case-fold-search t)
+                (preferred nil))
             (if (not (member property '("FN" "KIND" "VERSION")))
                 (progn
                   (cond
@@ -132,14 +132,25 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                       ;; Contents of 'property' were changed by replace-regexp-in-string,
                       ;; so it must have contained a 'PREF'.
                       (setq preferred t))
-                  (insert (concat "** " (cdr (assoc property-original card)) "\n"))
-                  (insert (concat ":PROPERTIES:\n"
-                                  ":FIELDTYPE: "
-                                  (car (rassoc property tree-style-properties))
-                                  "\n"
-                                  (if preferred
-                                      ":PREFERRED:\n")
-                                  ":END:\n"))))
+                  (if (car (rassoc property tree-style-properties))
+                      (progn
+                        (insert (concat "** " (cdr (assoc property-original card)) "\n"))
+                        (insert (concat ":PROPERTIES:\n"
+                                        ":FIELDTYPE: "
+                                        (car (rassoc property tree-style-properties))
+                                        "\n"
+                                        (if preferred
+                                            ":PREFERRED:\n")
+                                        ":END:\n")))
+                    (if org-vcard-include-import-unknowns
+                        (progn
+                          (insert (concat "** " (cdr (assoc property-original card)) "\n"))
+                          (insert (concat ":PROPERTIES:\n"
+                                          ":FIELDTYPE: "
+                                          property-original "\n"
+                                          (if preferred
+                                              ":PREFERRED:\n")
+                                          ":END:\n")))))))
             (setq card (delq (assoc property-original card) card)))))))
   (cond
      ((string= "buffer" destination)

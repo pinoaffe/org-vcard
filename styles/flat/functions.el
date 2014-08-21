@@ -106,12 +106,19 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (insert ":PROPERTIES:\n")
         (dolist (entry card)
           (if (not (string= vcard-property-for-heading (car entry)))
-              (insert (concat ":"
-                              (car (rassoc (car entry) flat-style-properties))
-                              ": "
-                              (cdr entry)
-                              "\n"))))
-      (insert ":END:\n")))
+              (if (car (rassoc (car entry) flat-style-properties))              
+                  (insert (concat ":"
+                                  (car (rassoc (car entry) flat-style-properties))
+                                  ": "
+                                  (cdr entry)
+                                  "\n"))
+                (if org-vcard-include-import-unknowns
+                    (insert (concat ":"
+                                    (car entry)
+                                    ": "
+                                    (cdr entry)
+                                    "\n"))))))
+        (insert ":END:\n")))
     (if (string= "file" destination)
         (write-file filename)))
   (cond

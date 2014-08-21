@@ -191,6 +191,12 @@ the org-vcard-styles-languages-mappings defcustom."
   :type 'file
   :group 'org-vcard)
 
+(defcustom org-vcard-include-import-unknowns nil
+  "Whether the import process should include vCard properties not
+listed in the mapping being used."
+  :type 'boolean
+  :group 'org-vcard)
+
 ;; The in-buffer setting #+CONTACT_STYLE.
 
 (defcustom org-vcard-default-style "flat"
