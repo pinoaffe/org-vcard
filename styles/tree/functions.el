@@ -132,25 +132,29 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                       ;; Contents of 'property' were changed by replace-regexp-in-string,
                       ;; so it must have contained a 'PREF'.
                       (setq preferred t))
-                  (if (car (rassoc property tree-style-properties))
-                      (progn
-                        (insert (concat "** " (cdr (assoc property-original card)) "\n"))
-                        (insert (concat ":PROPERTIES:\n"
-                                        ":FIELDTYPE: "
-                                        (car (rassoc property tree-style-properties))
-                                        "\n"
-                                        (if preferred
-                                            ":PREFERRED:\n")
-                                        ":END:\n")))
-                    (if org-vcard-include-import-unknowns
+                  (let ((property-value (cdr (assoc property-original card))))
+                    (if (string= "N" property-original)
+                      ;; Remove leading and trailing semicolons from value of "N" property.
+                      (setq property-value (replace-regexp-in-string "^;\\|;$" "" property-value)))
+                    (if (car (rassoc property tree-style-properties))
                         (progn
-                          (insert (concat "** " (cdr (assoc property-original card)) "\n"))
+                          (insert (concat "** " property-value "\n"))
                           (insert (concat ":PROPERTIES:\n"
                                           ":FIELDTYPE: "
-                                          property-original "\n"
+                                          (car (rassoc property tree-style-properties))
+                                          "\n"
                                           (if preferred
                                               ":PREFERRED:\n")
-                                          ":END:\n")))))))
+                                          ":END:\n")))
+                      (if org-vcard-include-import-unknowns
+                          (progn
+                            (insert (concat "** " property-value "\n"))
+                            (insert (concat ":PROPERTIES:\n"
+                                            ":FIELDTYPE: "
+                                            property-original "\n"
+                                            (if preferred
+                                                ":PREFERRED:\n")
+                                            ":END:\n"))))))))
             (setq card (delq (assoc property-original card) card)))))))
   (cond
      ((string= "buffer" destination)

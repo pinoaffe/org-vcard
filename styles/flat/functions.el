@@ -106,18 +106,23 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (insert ":PROPERTIES:\n")
         (dolist (entry card)
           (if (not (string= vcard-property-for-heading (car entry)))
-              (if (car (rassoc (car entry) flat-style-properties))              
-                  (insert (concat ":"
-                                  (car (rassoc (car entry) flat-style-properties))
-                                  ": "
-                                  (cdr entry)
-                                  "\n"))
-                (if org-vcard-include-import-unknowns
+              (let ((property-name (car entry))
+                    (property-value (cdr entry)))
+                (if (string= "N" property-name)
+                    ;; Remove leading and trailing semicolons from value of "N" property.
+                    (setq property-value (replace-regexp-in-string "^;\\|;$" "" property-value)))
+                (if (car (rassoc property-name flat-style-properties))              
                     (insert (concat ":"
-                                    (car entry)
+                                    (car (rassoc property-name flat-style-properties))
                                     ": "
-                                    (cdr entry)
-                                    "\n"))))))
+                                    property-value
+                                    "\n"))
+                  (if org-vcard-include-import-unknowns
+                      (insert (concat ":"
+                                      property-name
+                                      ": "
+                                      property-value
+                                      "\n")))))))
         (insert ":END:\n")))
     (if (string= "file" destination)
         (write-file filename)))
