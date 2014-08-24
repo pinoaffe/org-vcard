@@ -3,8 +3,8 @@ VERSION:4.0
 FN:Joan Smith
 EMAIL:joan@example.com
 EMAIL:joan.2@example.com
-TEL;TYPE=cell:0000 999 999
-TEL;TYPE=voice:00 9999 9999
+TEL;TYPE="cell":0000 999 999
+TEL;TYPE="voice":00 9999 9999
 END:VCARD
 BEGIN:VCARD
 VERSION:4.0

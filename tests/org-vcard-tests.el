@@ -253,8 +253,180 @@ the VCARD_VERSION in-buffer setting."
                   (org-vcard-set-active-settings))))
 
 
+(ert-deftest org-vcard-test-canonicalise-property-name ()
+  "Test the org-vcard-canonicalise-property-name function."
+  :tags '(org-vcard)
+
+  (let ((org-vcard-active-version "4.0"))
+    
+    (should (string= "TEL"
+                     (org-vcard-canonicalise-property-name "TEL")))
+
+    (should (string= "TEL;TYPE=\"cell\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"CELL\"")))
+    (should (string= "TEL;TYPE=\"cell\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"VOICE,CELL\"")))
+    (should (string= "TEL;TYPE=\"cell,home\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"CELL,HOME\"")))
+    (should (string= "TEL;TYPE=\"cell,work\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"CELL,WORK\"")))
+    (should (string= "TEL;TYPE=\"cell,home\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"VOICE,CELL,HOME\"")))
+    (should (string= "TEL;TYPE=\"cell,work\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"voice,CELL,WORK\"")))
+    (should (string= "TEL;TYPE=\"cell,home\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"HOME,CELL\"")))
+    (should (string= "TEL;TYPE=\"cell,work\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK,CELL\"")))
+    (should (string= "TEL;TYPE=\"cell,home\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"home,VOICE,CELL\"")))
+    (should (string= "TEL;TYPE=\"cell,work\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK,voice,CELL\"")))
+
+    (should (string= "TEL;TYPE=\"voice\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"VOICE\"")))
+    (should (string= "TEL;TYPE=\"voice,home\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"HOME\"")))
+    (should (string= "TEL;TYPE=\"voice,work\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK\"")))
+    (should (string= "TEL;TYPE=\"voice,home\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"voice,HOME\"")))
+    (should (string= "TEL;TYPE=\"voice,work\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK,voice\"")))
+
+    (should (string= "TEL;TYPE=\"FAX\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"FAX\"")))
+    (should (string= "TEL;TYPE=\"PAGER\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"PAGER\"")))
+    (should (string= "TEL;TYPE=\"fax\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"fax\"")))
+    (should (string= "TEL;TYPE=\"pager\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"pager\"")))
+
+    (should (string= "EMAIL"
+                     (org-vcard-canonicalise-property-name "EMAIL")))
+    (should (string= "EMAIL;TYPE=\"work\""
+                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=work")))
+    (should (string= "EMAIL;TYPE=\"home\""
+                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=\"home\"")))
+    (should (string= "EMAIL;PREF=1"
+                     (org-vcard-canonicalise-property-name "EMAIL;PREF=1")))
+    (should (string= "EMAIL;TYPE=\"home\";PREF=1"
+                     (org-vcard-canonicalise-property-name "EMAIL;PREF=1;TYPE=\"home\""))))
+
+  (let ((org-vcard-active-version "3.0"))
+    
+    (should (string= "TEL"
+                     (org-vcard-canonicalise-property-name "TEL")))
+
+    (should (string= "TEL;TYPE=cell"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=CELL")))
+    (should (string= "TEL;TYPE=cell"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=VOICE,CELL")))
+    (should (string= "TEL;TYPE=cell,home"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=CELL,HOME")))
+    (should (string= "TEL;TYPE=cell,work"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=CELL,WORK")))
+    (should (string= "TEL;TYPE=cell,home"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=VOICE,CELL,HOME")))
+    (should (string= "TEL;TYPE=cell,work"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=voice,CELL,WORK")))
+    (should (string= "TEL;TYPE=cell,home"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=HOME,CELL")))
+    (should (string= "TEL;TYPE=cell,work"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=WORK,CELL")))
+    (should (string= "TEL;TYPE=cell,home"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=home,VOICE,CELL")))
+    (should (string= "TEL;TYPE=cell,work"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=WORK,voice,CELL")))
+
+    (should (string= "TEL;TYPE=voice"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=VOICE")))
+    (should (string= "TEL;TYPE=voice,home"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=HOME")))
+    (should (string= "TEL;TYPE=voice,work"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=WORK")))
+    (should (string= "TEL;TYPE=voice,home"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=voice,HOME")))
+    (should (string= "TEL;TYPE=voice,work"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=WORK,voice")))
+
+    (should (string= "TEL;TYPE=FAX"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=FAX")))
+    (should (string= "TEL;TYPE=PAGER"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=PAGER")))
+    (should (string= "TEL;TYPE=fax"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=fax")))
+    (should (string= "TEL;TYPE=pager"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=pager")))
+
+    (should (string= "EMAIL"
+                     (org-vcard-canonicalise-property-name "EMAIL")))
+    (should (string= "EMAIL;TYPE=work"
+                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=work")))
+    (should (string= "EMAIL;TYPE=home"
+                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=home")))
+    (should (string= "EMAIL;TYPE=pref"
+                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=PREF")))
+    (should (string= "EMAIL;TYPE=home,pref"
+                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=pref,home"))))
+
+  (let ((org-vcard-active-version "2.1"))
+    
+    (should (string= "TEL"
+                     (org-vcard-canonicalise-property-name "TEL")))
+
+    (should (string= "TEL;CELL"
+                     (org-vcard-canonicalise-property-name "TEL;CELL")))
+    (should (string= "TEL;CELL"
+                     (org-vcard-canonicalise-property-name "TEL;VOICE;CELL")))
+    (should (string= "TEL;CELL;HOME"
+                     (org-vcard-canonicalise-property-name "TEL;CELL;HOME")))
+    (should (string= "TEL;CELL;WORK"
+                     (org-vcard-canonicalise-property-name "TEL;CELL;WORK")))
+    (should (string= "TEL;CELL;HOME"
+                     (org-vcard-canonicalise-property-name "TEL;VOICE;CELL;HOME")))
+    (should (string= "TEL;CELL;WORK"
+                     (org-vcard-canonicalise-property-name "TEL;VOICE;CELL;WORK")))
+    (should (string= "TEL;CELL;HOME"
+                     (org-vcard-canonicalise-property-name "TEL;HOME;CELL")))
+    (should (string= "TEL;CELL;WORK"
+                     (org-vcard-canonicalise-property-name "TEL;WORK;CELL")))
+    (should (string= "TEL;CELL;HOME"
+                     (org-vcard-canonicalise-property-name "TEL;HOME;VOICE;CELL")))
+    (should (string= "TEL;CELL;WORK"
+                     (org-vcard-canonicalise-property-name "TEL;WORK;VOICE;CELL")))
+
+    (should (string= "TEL"
+                     (org-vcard-canonicalise-property-name "TEL;VOICE")))
+    (should (string= "TEL;HOME"
+                     (org-vcard-canonicalise-property-name "TEL;HOME")))
+    (should (string= "TEL;WORK"
+                     (org-vcard-canonicalise-property-name "TEL;WORK")))
+    (should (string= "TEL;HOME"
+                     (org-vcard-canonicalise-property-name "TEL;VOICE;HOME")))
+    (should (string= "TEL;WORK"
+                     (org-vcard-canonicalise-property-name "TEL;VOICE;WORK")))
+
+    (should (string= "TEL;FAX"
+                     (org-vcard-canonicalise-property-name "TEL;FAX")))
+    (should (string= "TEL;PAGER"
+                     (org-vcard-canonicalise-property-name "TEL;PAGER")))
+
+    (should (string= "EMAIL"
+                     (org-vcard-canonicalise-property-name "EMAIL")))
+    (should (string= "EMAIL;HOME"
+                     (org-vcard-canonicalise-property-name "EMAIL;HOME")))
+    (should (string= "EMAIL;WORK"
+                     (org-vcard-canonicalise-property-name "EMAIL;WORK")))
+    (should (string= "EMAIL;PREF"
+                     (org-vcard-canonicalise-property-name "EMAIL;PREF")))
+    (should (string= "EMAIL;HOME;PREF"
+                     (org-vcard-canonicalise-property-name "EMAIL;PREF;HOME")))))
+
+
 (ert-deftest org-vcard-test-import-parser ()
-  "Test the org-vcard-test-import-parser function."
+  "Test the org-vcard-import-parser function."
   :tags '(org-vcard)
 
   (should (with-temp-buffer
@@ -336,18 +508,18 @@ the VCARD_VERSION in-buffer setting."
                  (concat "BEGIN:VCARD" crlf
                          "VERSION:4.0" crlf
                          "FN:Joan Smith" crlf
-                         "TEL;TYPE=voice:00 9999 9999" crlf
-                         "TEL;TYPE=cell:0000 999 999" crlf
+                         "TEL;TYPE=\"voice\":00 9999 9999" crlf
+                         "TEL;TYPE=\"cell\":0000 999 999" crlf
                          "EMAIL:joan@example.com" crlf
                          "EMAIL:joan.2@example.com" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:4.0" crlf
                          "FN:John" crlf
-                         "TEL;TYPE=voice:01 9999 9999" crlf
-                         "TEL;TYPE=cell:0001 999 999" crlf
-                         "EMAIL;TYPE=work:john@example.com" crlf
-                         "EMAIL;TYPE=home:john.2@example.com" crlf
+                         "TEL;TYPE=\"voice\":01 9999 9999" crlf
+                         "TEL;TYPE=\"cell\":0001 999 999" crlf
+                         "EMAIL;TYPE=\"work\":john@example.com" crlf
+                         "EMAIL;TYPE=\"home\":john.2@example.com" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -552,7 +724,7 @@ the VCARD_VERSION in-buffer setting."
                          ":EMAIL: joan@example.com" lf
                          ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
-                         ":LANDLINE: 00 9999 9999" lf
+                         ":PHONE: 00 9999 9999" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -560,7 +732,7 @@ the VCARD_VERSION in-buffer setting."
                          ":EMAIL_WORK: john@example.com" lf
                          ":EMAIL_HOME: john.2@example.com" lf
                          ":CELL: 0001 999 999" lf
-                         ":LANDLINE: 01 9999 9999" lf
+                         ":PHONE: 01 9999 9999" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -594,18 +766,18 @@ the VCARD_VERSION in-buffer setting."
                  (concat "BEGIN:VCARD" crlf
                          "VERSION:4.0" crlf
                          "FN:Joan Smith" crlf
-                         "TEL;TYPE=voice:00 9999 9999" crlf
-                         "TEL;TYPE=cell:0000 999 999" crlf
+                         "TEL;TYPE=\"voice\":00 9999 9999" crlf
+                         "TEL;TYPE=\"cell\":0000 999 999" crlf
                          "EMAIL;PREF=1:joan@example.com" crlf
                          "EMAIL:joan.2@example.com" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:4.0" crlf
                          "FN:John" crlf
-                         "TEL;TYPE=voice:01 9999 9999" crlf
-                         "TEL;TYPE=cell:0001 999 999" crlf
-                         "EMAIL;TYPE=work;PREF=1:john@example.com" crlf
-                         "EMAIL;TYPE=home:john.2@example.com" crlf
+                         "TEL;TYPE=\"voice\":01 9999 9999" crlf
+                         "TEL;TYPE=\"cell\":0001 999 999" crlf
+                         "EMAIL;TYPE=\"work\";PREF=1:john@example.com" crlf
+                         "EMAIL;TYPE=\"home\":john.2@example.com" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -868,13 +1040,13 @@ the VCARD_VERSION in-buffer setting."
                          ":FIELDTYPE: email" lf
                          ":PREFERRED:" lf
                          ":END:" lf
+                         "** 00 9999 9999" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: phone" lf
+                         ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
-                         ":END:" lf
-                         "** 00 9999 9999" lf
-                         ":PROPERTIES:" lf
-                         ":FIELDTYPE: landline" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -890,13 +1062,13 @@ the VCARD_VERSION in-buffer setting."
                          ":FIELDTYPE: email-work" lf
                          ":PREFERRED:" lf
                          ":END:" lf
+                         "** 01 9999 9999" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: phone" lf
+                         ":END:" lf
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
-                         ":END:" lf
-                         "** 01 9999 9999" lf
-                         ":PROPERTIES:" lf
-                         ":FIELDTYPE: landline" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")

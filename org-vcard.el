@@ -367,6 +367,150 @@ variables."
         (setq org-vcard-active-version org-vcard-default-version))))))
 
 
+(defun org-vcard-canonicalise-property-name (property-name)
+  "Canonicalise a vCard property name to enable it to be looked up in
+an org-vcard mapping.
+
+PROPERTY-NAME must be a string containing the vCard property name."
+  (if (not (string-match ";" property-name))
+      ;; No need to do anything, return property-name unchanged.
+      property-name
+    ;; Property has qualifiers.
+    (if (or (and (not (string-match "^EMAIL" property-name))
+              (not (string-match "^TEL" property-name)))
+           (and (string-match "^TEL" property-name)
+              (or (string-match "FAX" property-name)
+                 (string-match "PAGER" property-name))))
+        ;; We currently only canonicalise the EMAIL and TEL properties,
+        ;; and don't handle FAX and PAGER types within the latter, so
+        ;; return property-name unchanged when not dealing with
+        ;; EMAIL or TEL, or when dealing with FAX or PAGER.
+        property-name
+      ;; Canonicalise.
+      (let* ((property-canonicalised "")
+             (property-type-data '())
+             (case-fold-search t)
+             (preferred (if (string-match "PREF" property-name)
+                            t
+                          nil)))
+        (cond
+         ((string-match "^EMAIL" property-name)
+          (progn
+            (setq property-canonicalised "EMAIL")
+            (if (string-match "HOME" property-name)
+                (cond
+                 ((string= "4.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("home"))))
+                 ((string= "3.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("home"))))
+                 ((string= "2.1" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '(";HOME"))))))
+            (if (string-match "WORK" property-name)
+                (cond
+                 ((string= "4.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("work"))))
+                 ((string= "3.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("work"))))
+                 ((string= "2.1" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '(";WORK"))))))))
+         ((string-match "^TEL" property-name)
+          (progn
+            (setq property-canonicalised "TEL")
+            (if (string-match "CELL" property-name)
+                (cond
+                 ((string= "4.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("cell"))))
+                 ((string= "3.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("cell"))))
+                 ((string= "2.1" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '(";CELL"))))))
+            (if (and (not (string-match "CELL" property-name))
+                   (not (string-match "MSG" property-name)))
+                (cond
+                 ((string= "4.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("voice"))))
+                 ((string= "3.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("voice"))))))
+            (if (string-match "HOME" property-name)
+                (cond
+                 ((string= "4.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("home"))))
+                 ((string= "3.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("home"))))
+                 ((string= "2.1" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '(";HOME"))))))
+            (if (string-match "WORK" property-name)
+                (cond
+                 ((string= "4.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("work"))))
+                 ((string= "3.0" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '("work"))))
+                 ((string= "2.1" org-vcard-active-version)
+                  (setq property-type-data (append property-type-data
+                                                   '(";WORK")))))))))
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (progn
+            (if property-type-data
+                (progn
+                  (setq property-canonicalised (concat property-canonicalised
+                                                       ";TYPE=\""))
+                  (let ((processed-one nil))
+                    (dolist (type property-type-data)
+                      (if processed-one
+                          (setq property-canonicalised (concat property-canonicalised "," type))
+                        (progn
+                          (setq property-canonicalised (concat property-canonicalised type))
+                          (setq processed-one t)))))
+                  (setq property-canonicalised (concat property-canonicalised
+                                                       "\""))))
+            (if preferred
+                (setq property-canonicalised (concat property-canonicalised
+                                                     ";PREF=1")))))
+         ((string= "3.0" org-vcard-active-version)
+          (progn
+            (if property-type-data
+                (progn
+                  (setq property-canonicalised (concat property-canonicalised
+                                                 ";TYPE="))
+                  (let ((processed-one nil))
+                    (dolist (type property-type-data)
+                      (if processed-one
+                          (setq property-canonicalised (concat property-canonicalised "," type))
+                        (progn
+                          (setq property-canonicalised (concat property-canonicalised type))
+                          (setq processed-one t)))))))
+            (if preferred
+                (if property-type-data
+                    (setq property-canonicalised (concat property-canonicalised
+                                                         ",pref"))
+                  (setq property-canonicalised (concat property-canonicalised
+                                                       ";TYPE=pref"))))))
+         ((string= "2.1" org-vcard-active-version)
+          (progn
+            (dolist (type property-type-data)
+              (setq property-canonicalised (concat property-canonicalised type)))
+            (if preferred
+                (setq property-canonicalised (concat property-canonicalised ";PREF"))))))
+        property-canonicalised))))
+
+
 (defun org-vcard-import-parser (source)
   "Utility function to read from SOURCE and return a list of
 vCards, each in the form of a list of cons cells, with each
@@ -399,6 +543,7 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
         (string-match "\\([^:]+\\): *\\(.*?\\)\\(?:\u000D\\|\015\\)?$" current-line)
         (setq property (match-string 1 current-line))
         (setq value (match-string 2 current-line))
+        (setq property (org-vcard-canonicalise-property-name property))
         (setq current-card (append current-card (list (cons property value))))
         (forward-line))
       (setq cards (append cards (list current-card))))
