@@ -36,7 +36,9 @@ Install `org-vcard` from [MELPA](http://melpa.milkbox.net/#/), or put the `org-v
 
 ## Usage
 
-The main user commands are `org-vcard-export` and `org-vcard-import`, both of which are intended to be called interactively. Enabling `org-vcard-mode` will add an 'Org-vCard' menu to the menu bar, from which one can access the various export, import and customisation options.
+The main user commands are `org-vcard-export` and `org-vcard-import`, which are intended to be called interactively; both are wrappers around the `org-vcard-transfer-helper` function. `org-vcard-transfer-helper` can be used to export and import programatically (i.e. via Emacs Lisp).
+
+Enabling `org-vcard-mode` will add an 'Org-vCard' menu to the menu bar, from which one can access the various export, import and customisation options.
 
 **Note!** When exporting to vCard using the source 'buffer', narrowing is respected. If you wish to export the entire buffer without restriction, remove any narrowing in effect.
 
@@ -46,8 +48,6 @@ For a list of the properties available by default for each contacts style and re
 
 The value of the `org-vcard-include-import-unknowns` (boolean) variable specifies whether the import process should include vCard properties not listed in
 the mapping being used.
-
-If you wish to use `org-vcard` in Emacs Lisp code, the primary function to work with is the `org-vcard-transfer-helper` function. 
 
 <a name="tree"></a>
 

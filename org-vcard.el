@@ -31,9 +31,13 @@
 ;; within Emacs' Org mode.
 
 ;; The main user commands are org-vcard-export and org-vcard-import,
-;; both of which are intended to be called interactively. Enabling
-;; org-vcard-mode will add an 'Org-vCard' menu to the menu bar,
-;; from which one can access the various export, import and
+;; which are intended to be called interactively; both are wrappers
+;; around the org-vcard-transfer-helper function.
+;; org-vcard-transfer-helper can be used to export and import
+;; programatically (i.e. via Emacs Lisp).
+
+;; Enabling org-vcard-mode will add an 'Org-vCard' menu to the menu
+;; bar, from which one can access the various export, import and
 ;; customisation options.
 
 ;; This package is working towards full compliance with the
