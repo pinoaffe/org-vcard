@@ -36,7 +36,9 @@ Install `org-vcard` from [MELPA](http://melpa.milkbox.net/#/), or put the `org-v
 
 ## Usage
 
-The main user commands are `org-vcard-export` and `org-vcard-import`, which are intended to be called interactively; both are wrappers around the `org-vcard-transfer-helper` function. `org-vcard-transfer-helper` can be used to export and import programatically (i.e. via Emacs Lisp).
+The main user commands are `org-vcard-export` and `org-vcard-import`, which are intended to be called interactively; you can press TAB at many of the minibuffer prompts to get a list of the available options for a prompt.
+
+Both `org-vcard-export` and `org-vcard-import `are wrappers around the `org-vcard-transfer-helper` function. `org-vcard-transfer-helper` can be used to export and import programatically (i.e. via Emacs Lisp).
 
 Enabling `org-vcard-mode` will add an 'Org-vCard' menu to the menu bar, from which one can access the various export, import and customisation options.
 
