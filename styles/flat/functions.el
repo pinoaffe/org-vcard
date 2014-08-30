@@ -100,9 +100,11 @@ DESTINATION must be one of \"buffer\" or \"file\"."
             (setq org-vcard-active-version (cdr (assoc "VERSION" card)))
           (setq org-vcard-active-version org-vcard-default-version))
         (setq vcard-property-for-heading
-              (cdr
-               (assoc "[HEADING]" flat-style-properties)))
-        (setq heading (cdr (assoc vcard-property-for-heading card)))
+              (cdr (assoc "[HEADING]" flat-style-properties)))
+        (setq heading
+              (or (cdr (assoc vcard-property-for-heading card))
+                  (replace-regexp-in-string "^;\\|;$" ""
+                                            (cdr (assoc "N" card)))))
         (insert (concat "* " heading "\n"))
         (insert ":PROPERTIES:\n")
         (dolist (entry card)

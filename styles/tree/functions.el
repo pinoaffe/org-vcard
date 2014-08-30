@@ -106,7 +106,9 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (if (assoc "VERSION" card)
             (setq org-vcard-active-version (cdr (assoc "VERSION" card)))
           (setq org-vcard-active-version org-vcard-default-version))
-        (insert (concat "* " (cdr (assoc "FN" card)) "\n"
+        (insert (concat "* " (or (cdr (assoc "FN" card))
+                                 (replace-regexp-in-string "^;\\|;$" ""
+                                                           (cdr (assoc "N" card)))) "\n"
                         ":PROPERTIES:\n"
                         ":KIND: " (if (assoc "KIND" card)
                                       (cdr (assoc "KIND" card))
