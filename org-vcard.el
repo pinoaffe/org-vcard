@@ -449,7 +449,10 @@ PROPERTY-NAME must be a string containing a vCard property name."
                                            '("voice"))))
          ((string= "3.0" org-vcard-active-version)
           (setq property-type-data (append property-type-data
-                                           '("voice"))))))
+                                           '("voice"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";VOICE"))))))
     (if (string-match "HOME" property-name)
         (cond
          ((string= "4.0" org-vcard-active-version)

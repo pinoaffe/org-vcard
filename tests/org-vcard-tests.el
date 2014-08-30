@@ -427,16 +427,16 @@ vCard 2.1."
     (should (string= "TEL;FAX;WORK"
                      (org-vcard-canonicalise-property-name "TEL;WORK;FAX")))
     
-    (should (string= "TEL"
+    (should (string= "TEL;VOICE"
                      (org-vcard-canonicalise-property-name "TEL;VOICE")))
-    (should (string= "TEL;HOME"
+    (should (string= "TEL;VOICE;HOME"
                      (org-vcard-canonicalise-property-name "TEL;HOME")))
-    (should (string= "TEL;WORK"
+    (should (string= "TEL;VOICE;WORK"
                      (org-vcard-canonicalise-property-name "TEL;WORK")))
-    (should (string= "TEL;HOME"
-                     (org-vcard-canonicalise-property-name "TEL;VOICE;HOME")))
-    (should (string= "TEL;WORK"
-                     (org-vcard-canonicalise-property-name "TEL;VOICE;WORK")))
+    (should (string= "TEL;VOICE;HOME"
+                     (org-vcard-canonicalise-property-name "TEL;HOME;VOICE")))
+    (should (string= "TEL;VOICE;WORK"
+                     (org-vcard-canonicalise-property-name "TEL;WORK;VOICE")))
 
     (should (string= "EMAIL"
                      (org-vcard-canonicalise-property-name "EMAIL")))
@@ -758,7 +758,7 @@ vCard 2.1."
                          ":EMAIL: joan@example.com" lf
                          ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
-                         ":PHONE: 00 9999 9999" lf
+                         ":LANDLINE: 00 9999 9999" lf
                          ":FAX: 00 9999 9998" lf
                          ":END:" lf
                          "* John" lf
@@ -767,7 +767,7 @@ vCard 2.1."
                          ":EMAIL_WORK: john@example.com" lf
                          ":EMAIL_HOME: john.2@example.com" lf
                          ":CELL: 0001 999 999" lf
-                         ":PHONE: 01 9999 9999" lf
+                         ":LANDLINE: 01 9999 9999" lf
                          ":FAX_HOME: 01 9999 9998" lf
                          ":FAX_WORK: 01 9999 9997" lf
                          ":END:" lf)
@@ -1101,10 +1101,6 @@ vCard 2.1."
                          ":FIELDTYPE: email" lf
                          ":PREFERRED:" lf
                          ":END:" lf
-                         "** 00 9999 9999" lf
-                         ":PROPERTIES:" lf
-                         ":FIELDTYPE: phone" lf
-                         ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
@@ -1112,6 +1108,10 @@ vCard 2.1."
                          "** 00 9999 9998" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: fax" lf
+                         ":END:" lf
+                         "** 00 9999 9999" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: landline" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -1127,10 +1127,6 @@ vCard 2.1."
                          ":FIELDTYPE: email-work" lf
                          ":PREFERRED:" lf
                          ":END:" lf
-                         "** 01 9999 9999" lf
-                         ":PROPERTIES:" lf
-                         ":FIELDTYPE: phone" lf
-                         ":END:" lf
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
@@ -1142,6 +1138,10 @@ vCard 2.1."
                          "** 01 9999 9997" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: fax-work" lf
+                         ":END:" lf
+                         "** 01 9999 9999" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: landline" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
