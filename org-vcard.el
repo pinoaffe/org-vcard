@@ -662,8 +662,8 @@ variable. DIRECTION must be either the symbol 'export or the symbol
 
 Only intended for interactive use."
   (interactive (list
-                (completing-read "Source: " '(buffer region subtree))
-                (completing-read "Destination: " '(file buffer))))
+                (completing-read "Source: " '("buffer" "region" "subtree"))
+                (completing-read "Destination: " '("file" "buffer"))))
   (let ((style "")
         (language "")
         (version ""))
@@ -679,8 +679,8 @@ Only intended for interactive use."
 
 Only intended for interactive use."
   (interactive (list
-                (completing-read "Source: " '(file buffer region))
-                (completing-read "Destination: " '(file buffer))))
+                (completing-read "Source: " '("file" "buffer" "region"))
+                (completing-read "Destination: " '("file" "buffer"))))
   (let ((style "")
         (language "")
         (version ""))
@@ -695,8 +695,8 @@ Only intended for interactive use."
   "User command for exporting to vCard via Emacs' menu bar."
   (let ((source nil)
         (destination nil))
-    (setq source (completing-read "Source: " '(buffer region subtree)))
-    (setq destination (completing-read "Destination: " '(file buffer)))
+    (setq source (completing-read "Source: " '("buffer" "region" "subtree")))
+    (setq destination (completing-read "Destination: " '("file" "buffer")))
     (org-vcard-transfer-helper source destination style language version 'export)))
 
 
@@ -705,8 +705,8 @@ Only intended for interactive use."
   "User command for importing from vCard via Emacs' menu bar."
   (let ((source nil)
         (destination nil))
-    (setq source (completing-read "Source: " '(file buffer region)))
-    (setq destination (completing-read "Destination: " '(file buffer)))
+    (setq source (completing-read "Source: " '("file" "buffer" "region")))
+    (setq destination (completing-read "Destination: " '("file" "buffer")))
     (org-vcard-transfer-helper source destination style language version 'import)))
 
 
