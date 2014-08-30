@@ -85,14 +85,18 @@ OUTPUT to DESTINATION.
 SOURCE must be one of \"buffer\", \"file\" or \"region\".
 DESTINATION must be one of \"buffer\" or \"file\"."
   (let ((cards (org-vcard-import-parser source))
+        (import-buffer nil)
         (filename "")
         (sorted-card-properties nil))
     (if (not (member source '("buffer" "file" "region")))
         (error "Invalid source type"))
     (cond
      ((string= "buffer" destination)
-      (generate-new-buffer "*org-vcard-import*")
-      (set-buffer "*org-vcard-import*"))
+      (progn
+        (if org-vcard-append-to-existing-import-buffer
+            (setq import-buffer (get-buffer-create "*org-vcard-import*"))
+          (setq import-buffer (generate-new-buffer "*org-vcard-import*")))
+        (set-buffer import-buffer)))
      ((string= "file" destination)
       (setq filename (read-from-minibuffer "Filename? " "org-vcard-import.org"))
       (find-file filename))
@@ -158,9 +162,9 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                                             (if preferred
                                                 ":PREFERRED:\n")
                                             ":END:\n"))))))))
-            (setq card (delq (assoc property-original card) card)))))))
-  (cond
+            (setq card (delq (assoc property-original card) card))))))
+    (cond
      ((string= "buffer" destination)
-      (message "Imported contacts data to *org-vcard-import* buffer."))
+      (message (concat "Imported contacts data to buffer " (buffer-name import-buffer) ".")))
      ((string= "file" destination)
-      (message "Imported contacts data to file."))))
+      (message "Imported contacts data to file.")))))

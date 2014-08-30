@@ -205,6 +205,12 @@ listed in the mapping being used."
   :type 'boolean
   :group 'org-vcard)
 
+(defcustom org-vcard-append-to-existing-import-buffer t
+  "Whether the import process should append to any existing import
+buffer. If not, create a new import buffer per import."
+  :type 'boolean
+  :group 'org-vcard)
+
 ;; The in-buffer setting #+CONTACT_STYLE.
 
 (defcustom org-vcard-default-style "flat"
