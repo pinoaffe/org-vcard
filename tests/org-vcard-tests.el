@@ -253,8 +253,9 @@ the VCARD_VERSION in-buffer setting."
                   (org-vcard-set-active-settings))))
 
 
-(ert-deftest org-vcard-test-canonicalise-property-name ()
-  "Test the org-vcard-canonicalise-property-name function."
+(ert-deftest org-vcard-test-canonicalise-property-name-vcard-40 ()
+  "Test the org-vcard-canonicalise-property-name function with
+vCard 4.0."
   :tags '(org-vcard)
 
   (let ((org-vcard-active-version "4.0"))
@@ -283,6 +284,15 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "TEL;TYPE=\"cell,work\""
                      (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK,voice,CELL\"")))
 
+    (should (string= "TEL;TYPE=\"fax\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"FAX\"")))
+    (should (string= "TEL;TYPE=\"fax\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"fax\"")))
+    (should (string= "TEL;TYPE=\"fax,home\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"FAX,HOME\"")))
+    (should (string= "TEL;TYPE=\"fax,work\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"work,fax\"")))
+
     (should (string= "TEL;TYPE=\"voice\""
                      (org-vcard-canonicalise-property-name "TEL;TYPE=\"VOICE\"")))
     (should (string= "TEL;TYPE=\"voice,home\""
@@ -294,15 +304,6 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "TEL;TYPE=\"voice,work\""
                      (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK,voice\"")))
 
-    (should (string= "TEL;TYPE=\"FAX\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"FAX\"")))
-    (should (string= "TEL;TYPE=\"PAGER\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"PAGER\"")))
-    (should (string= "TEL;TYPE=\"fax\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"fax\"")))
-    (should (string= "TEL;TYPE=\"pager\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"pager\"")))
-
     (should (string= "EMAIL"
                      (org-vcard-canonicalise-property-name "EMAIL")))
     (should (string= "EMAIL;TYPE=\"work\""
@@ -312,8 +313,19 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "EMAIL;PREF=1"
                      (org-vcard-canonicalise-property-name "EMAIL;PREF=1")))
     (should (string= "EMAIL;TYPE=\"home\";PREF=1"
-                     (org-vcard-canonicalise-property-name "EMAIL;PREF=1;TYPE=\"home\""))))
+                     (org-vcard-canonicalise-property-name "EMAIL;PREF=1;TYPE=\"home\"")))
 
+    (should (string= "TEL;TYPE=\"PAGER\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"PAGER\"")))
+    (should (string= "TEL;TYPE=\"pager\""
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"pager\"")))))
+
+  
+(ert-deftest org-vcard-test-canonicalise-property-name-vcard-30 ()
+  "Test the org-vcard-canonicalise-property-name function with
+vCard 3.0."
+  :tags '(org-vcard)
+  
   (let ((org-vcard-active-version "3.0"))
     
     (should (string= "TEL"
@@ -340,6 +352,15 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "TEL;TYPE=cell,work"
                      (org-vcard-canonicalise-property-name "TEL;TYPE=WORK,voice,CELL")))
 
+    (should (string= "TEL;TYPE=fax"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=fax")))
+    (should (string= "TEL;TYPE=fax"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=FAX")))
+    (should (string= "TEL;TYPE=fax,home"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=FAX,HOME")))
+    (should (string= "TEL;TYPE=fax,work"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=work,fax")))
+    
     (should (string= "TEL;TYPE=voice"
                      (org-vcard-canonicalise-property-name "TEL;TYPE=VOICE")))
     (should (string= "TEL;TYPE=voice,home"
@@ -351,15 +372,6 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "TEL;TYPE=voice,work"
                      (org-vcard-canonicalise-property-name "TEL;TYPE=WORK,voice")))
 
-    (should (string= "TEL;TYPE=FAX"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=FAX")))
-    (should (string= "TEL;TYPE=PAGER"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=PAGER")))
-    (should (string= "TEL;TYPE=fax"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=fax")))
-    (should (string= "TEL;TYPE=pager"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=pager")))
-
     (should (string= "EMAIL"
                      (org-vcard-canonicalise-property-name "EMAIL")))
     (should (string= "EMAIL;TYPE=work"
@@ -369,7 +381,18 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "EMAIL;TYPE=pref"
                      (org-vcard-canonicalise-property-name "EMAIL;TYPE=PREF")))
     (should (string= "EMAIL;TYPE=home,pref"
-                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=pref,home"))))
+                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=pref,home")))
+
+    (should (string= "TEL;TYPE=PAGER"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=PAGER")))
+    (should (string= "TEL;TYPE=pager"
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=pager")))))
+
+
+(ert-deftest org-vcard-test-canonicalise-property-name-vcard-21 ()
+  "Test the org-vcard-canonicalise-property-name function with
+vCard 2.1."
+  :tags '(org-vcard)
 
   (let ((org-vcard-active-version "2.1"))
     
@@ -397,6 +420,13 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "TEL;CELL;WORK"
                      (org-vcard-canonicalise-property-name "TEL;WORK;VOICE;CELL")))
 
+    (should (string= "TEL;FAX"
+                     (org-vcard-canonicalise-property-name "TEL;FAX")))
+    (should (string= "TEL;FAX;HOME"
+                     (org-vcard-canonicalise-property-name "TEL;FAX;HOME")))
+    (should (string= "TEL;FAX;WORK"
+                     (org-vcard-canonicalise-property-name "TEL;WORK;FAX")))
+    
     (should (string= "TEL"
                      (org-vcard-canonicalise-property-name "TEL;VOICE")))
     (should (string= "TEL;HOME"
@@ -408,11 +438,6 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "TEL;WORK"
                      (org-vcard-canonicalise-property-name "TEL;VOICE;WORK")))
 
-    (should (string= "TEL;FAX"
-                     (org-vcard-canonicalise-property-name "TEL;FAX")))
-    (should (string= "TEL;PAGER"
-                     (org-vcard-canonicalise-property-name "TEL;PAGER")))
-
     (should (string= "EMAIL"
                      (org-vcard-canonicalise-property-name "EMAIL")))
     (should (string= "EMAIL;HOME"
@@ -422,7 +447,10 @@ the VCARD_VERSION in-buffer setting."
     (should (string= "EMAIL;PREF"
                      (org-vcard-canonicalise-property-name "EMAIL;PREF")))
     (should (string= "EMAIL;HOME;PREF"
-                     (org-vcard-canonicalise-property-name "EMAIL;PREF;HOME")))))
+                     (org-vcard-canonicalise-property-name "EMAIL;PREF;HOME")))
+
+    (should (string= "TEL;PAGER"
+                     (org-vcard-canonicalise-property-name "TEL;PAGER")))))
 
 
 (ert-deftest org-vcard-test-import-parser ()
@@ -643,6 +671,7 @@ the VCARD_VERSION in-buffer setting."
                          ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
                          ":LANDLINE: 00 9999 9999" lf
+                         ":FAX: 00 9999 9998" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -651,6 +680,8 @@ the VCARD_VERSION in-buffer setting."
                          ":EMAIL_HOME: john.2@example.com" lf
                          ":CELL: 0001 999 999" lf
                          ":LANDLINE: 01 9999 9999" lf
+                         ":FAX_HOME: 01 9999 9998" lf
+                         ":FAX_WORK: 01 9999 9997" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -684,6 +715,7 @@ the VCARD_VERSION in-buffer setting."
                          ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
                          ":LANDLINE: 00 9999 9999" lf
+                         ":FAX: 00 9999 9998" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -692,6 +724,8 @@ the VCARD_VERSION in-buffer setting."
                          ":EMAIL_HOME: john.2@example.com" lf
                          ":CELL: 0001 999 999" lf
                          ":LANDLINE: 01 9999 9999" lf
+                         ":FAX_HOME: 01 9999 9998" lf
+                         ":FAX_WORK: 01 9999 9997" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -725,6 +759,7 @@ the VCARD_VERSION in-buffer setting."
                          ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
                          ":PHONE: 00 9999 9999" lf
+                         ":FAX: 00 9999 9998" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -733,6 +768,8 @@ the VCARD_VERSION in-buffer setting."
                          ":EMAIL_HOME: john.2@example.com" lf
                          ":CELL: 0001 999 999" lf
                          ":PHONE: 01 9999 9999" lf
+                         ":FAX_HOME: 01 9999 9998" lf
+                         ":FAX_WORK: 01 9999 9997" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -908,6 +945,10 @@ the VCARD_VERSION in-buffer setting."
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
                          ":END:" lf
+                         "** 00 9999 9998" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax" lf
+                         ":END:" lf
                          "** 00 9999 9999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: landline" lf
@@ -929,6 +970,14 @@ the VCARD_VERSION in-buffer setting."
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
+                         ":END:" lf
+                         "** 01 9999 9998" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax-home" lf
+                         ":END:" lf
+                         "** 01 9999 9997" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax-work" lf
                          ":END:" lf
                          "** 01 9999 9999" lf
                          ":PROPERTIES:" lf
@@ -976,6 +1025,10 @@ the VCARD_VERSION in-buffer setting."
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
                          ":END:" lf
+                         "** 00 9999 9998" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax" lf
+                         ":END:" lf
                          "** 00 9999 9999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: landline" lf
@@ -997,6 +1050,14 @@ the VCARD_VERSION in-buffer setting."
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
+                         ":END:" lf
+                         "** 01 9999 9998" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax-home" lf
+                         ":END:" lf
+                         "** 01 9999 9997" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax-work" lf
                          ":END:" lf
                          "** 01 9999 9999" lf
                          ":PROPERTIES:" lf
@@ -1048,6 +1109,10 @@ the VCARD_VERSION in-buffer setting."
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
                          ":END:" lf
+                         "** 00 9999 9998" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax" lf
+                         ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
                          ":KIND: individual" lf
@@ -1069,6 +1134,14 @@ the VCARD_VERSION in-buffer setting."
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
+                         ":END:" lf
+                         "** 01 9999 9998" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax-home" lf
+                         ":END:" lf
+                         "** 01 9999 9997" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: fax-work" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")

@@ -5,6 +5,7 @@ EMAIL:joan@example.com
 EMAIL:joan.2@example.com
 TEL;TYPE=cell:0000 999 999
 TEL;TYPE=voice:00 9999 9999
+TEL;TYPE=fax:00 9999 9998
 END:VCARD
 BEGIN:VCARD
 VERSION:3.0
@@ -13,4 +14,6 @@ EMAIL;TYPE=work:john@example.com
 EMAIL;TYPE=home:john.2@example.com
 TEL;TYPE=cell:0001 999 999
 TEL;TYPE=voice:01 9999 9999
+TEL;TYPE=fax,home:01 9999 9998
+TEL;TYPE=fax,work:01 9999 9997
 END:VCARD

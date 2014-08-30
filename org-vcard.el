@@ -375,6 +375,106 @@ variables."
         (setq org-vcard-active-version org-vcard-default-version))))))
 
 
+(defun org-vcard-canonicalise-email-property (property-name)
+  "Internal function to canonicalise a vCard EMAIL property, intended
+to be called by the org-vcard-canonicalise-property-name function.
+
+PROPERTY-NAME must be a string containing a vCard property name."
+  (let ((property-canonicalised "EMAIL")
+        (property-type-data '())
+        (case-fold-search t))
+    (if (string-match "HOME" property-name)
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("home"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("home"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";HOME"))))))
+    (if (string-match "WORK" property-name)
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("work"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("work"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";WORK"))))))
+    `(,property-canonicalised ,property-type-data)))
+
+
+(defun org-vcard-canonicalise-tel-property (property-name)
+  "Internal function to canonicalise a vCard TEL property, intended
+to be called by the org-vcard-canonicalise-property-name functionon.
+
+PROPERTY-NAME must be a string containing a vCard property name."
+  (let ((property-canonicalised "TEL")
+        (property-type-data '())
+        (case-fold-search t))
+    (if (string-match "CELL" property-name)
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("cell"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("cell"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";CELL"))))))
+    (if (string-match "FAX" property-name)
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("fax"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("fax"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";FAX"))))))
+    ;; Assume the TEL is for VOICE if other qualifiers
+    ;; don't specify otherwise.
+    (if (and (not (string-match "CELL" property-name))
+             (not (string-match "FAX" property-name))
+             (not (string-match "MSG" property-name)))
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("voice"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("voice"))))))
+    (if (string-match "HOME" property-name)
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("home"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("home"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";HOME"))))))
+    (if (string-match "WORK" property-name)
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("work"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("work"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";WORK"))))))
+      `(,property-canonicalised ,property-type-data)))
+
+
 (defun org-vcard-canonicalise-property-name (property-name)
   "Canonicalise a vCard property name to enable it to be looked up in
 an org-vcard mapping.
@@ -385,93 +485,33 @@ PROPERTY-NAME must be a string containing the vCard property name."
       property-name
     ;; Property has qualifiers.
     (if (or (and (not (string-match "^EMAIL" property-name))
-              (not (string-match "^TEL" property-name)))
-           (and (string-match "^TEL" property-name)
-              (or (string-match "FAX" property-name)
-                 (string-match "PAGER" property-name))))
+                 (not (string-match "^TEL" property-name)))
+            (and (string-match "^TEL" property-name)
+                 (string-match "PAGER" property-name)))
         ;; We currently only canonicalise the EMAIL and TEL properties,
-        ;; and don't handle FAX and PAGER types within the latter, so
+        ;; and don't handle the PAGER type within the latter, so
         ;; return property-name unchanged when not dealing with
-        ;; EMAIL or TEL, or when dealing with FAX or PAGER.
+        ;; EMAIL or TEL, or when dealing with PAGER.
         property-name
       ;; Canonicalise.
       (let* ((property-canonicalised "")
              (property-type-data '())
+             (retval '())
              (case-fold-search t)
              (preferred (if (string-match "PREF" property-name)
                             t
                           nil)))
         (cond
          ((string-match "^EMAIL" property-name)
-          (progn
-            (setq property-canonicalised "EMAIL")
-            (if (string-match "HOME" property-name)
-                (cond
-                 ((string= "4.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("home"))))
-                 ((string= "3.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("home"))))
-                 ((string= "2.1" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '(";HOME"))))))
-            (if (string-match "WORK" property-name)
-                (cond
-                 ((string= "4.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("work"))))
-                 ((string= "3.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("work"))))
-                 ((string= "2.1" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '(";WORK"))))))))
+          (progn 
+            (setq retval (org-vcard-canonicalise-email-property property-name))
+            (setq property-canonicalised (car retval))
+            (setq property-type-data (cadr retval))))
          ((string-match "^TEL" property-name)
-          (progn
-            (setq property-canonicalised "TEL")
-            (if (string-match "CELL" property-name)
-                (cond
-                 ((string= "4.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("cell"))))
-                 ((string= "3.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("cell"))))
-                 ((string= "2.1" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '(";CELL"))))))
-            (if (and (not (string-match "CELL" property-name))
-                   (not (string-match "MSG" property-name)))
-                (cond
-                 ((string= "4.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("voice"))))
-                 ((string= "3.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("voice"))))))
-            (if (string-match "HOME" property-name)
-                (cond
-                 ((string= "4.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("home"))))
-                 ((string= "3.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("home"))))
-                 ((string= "2.1" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '(";HOME"))))))
-            (if (string-match "WORK" property-name)
-                (cond
-                 ((string= "4.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("work"))))
-                 ((string= "3.0" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '("work"))))
-                 ((string= "2.1" org-vcard-active-version)
-                  (setq property-type-data (append property-type-data
-                                                   '(";WORK")))))))))
+          (progn 
+            (setq retval (org-vcard-canonicalise-tel-property property-name))
+            (setq property-canonicalised (car retval))
+            (setq property-type-data (cadr retval)))))
         (cond
          ((string= "4.0" org-vcard-active-version)
           (progn
