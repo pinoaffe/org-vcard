@@ -554,7 +554,6 @@ vCard 2.1."
                    (switch-to-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
                                                            "flat-contacts-4_0.org"))
-                   (org-mode)
                    (org-vcard-export-from-flat "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-export*")
                    (buffer-string))))
@@ -598,7 +597,6 @@ vCard 2.1."
                    (switch-to-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
                                                            "flat-contacts-3_0.org"))
-                   (org-mode)
                    (org-vcard-export-from-flat "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-export*")
                    (buffer-string))))
@@ -642,7 +640,6 @@ vCard 2.1."
                    (switch-to-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
                                                            "flat-contacts-2_1.org"))
-                   (org-mode)
                    (org-vcard-export-from-flat "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-export*")
                    (buffer-string))))
@@ -820,7 +817,6 @@ vCard 2.1."
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
                                                            "tree-contacts-4_0.org"))
-                   (org-mode)
                    (org-vcard-export-from-tree "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-export*")
                    (buffer-string))))
@@ -863,7 +859,6 @@ vCard 2.1."
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
                                                            "tree-contacts-3_0.org"))
-                   (org-mode)
                    (org-vcard-export-from-tree "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-export*")
                    (buffer-string))))
@@ -906,7 +901,6 @@ vCard 2.1."
                    (generate-new-buffer "*org-vcard-test*")
                    (insert-file-contents-literally (concat org-vcard-tests-data-dir
                                                            "tree-contacts-2_1.org"))
-                   (org-mode)
                    (org-vcard-export-from-tree "buffer" "buffer")
                    (switch-to-buffer "*org-vcard-export*")
                    (buffer-string))))

@@ -17,6 +17,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
          (output (encode-coding-string "" encoding)))
     (if (not (member source '("buffer" "region" "subtree")))
         (error "Invalid source type"))
+    (org-mode)
     (save-excursion
       (let ((search-result nil))
         (cond

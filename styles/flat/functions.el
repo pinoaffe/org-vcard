@@ -14,6 +14,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
                     ((string= "3.0" org-vcard-active-version) 'utf-8)
                     ((string= "2.1" org-vcard-active-version) 'us-ascii)))
          (output (encode-coding-string "" encoding)))
+    (org-mode)
     (org-map-entries
      (lambda ()
        (let ((properties (org-entry-properties))
