@@ -612,11 +612,11 @@ CONTENT must be a string. DESTINATION must be either \"buffer\" or \"file\"."
     (progn
       (generate-new-buffer "*org-vcard-export*")
       (set-buffer "*org-vcard-export*")
-      (insert content)))
+      (insert (string-as-multibyte content))))
    ((string= "file" destination)
     (let ((filename (read-from-minibuffer "Filename? " org-vcard-default-export-file)))
         (with-temp-buffer
-          (insert content)
+          (insert (string-as-multibyte content))
           (when (file-writable-p filename)
             (write-region (point-min)
                           (point-max)
