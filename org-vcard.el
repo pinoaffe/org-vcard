@@ -211,6 +211,40 @@ buffer. If not, create a new import buffer per import."
   :type 'boolean
   :group 'org-vcard)
 
+(defcustom org-vcard-character-set-mapping '(("Big5" . big5)
+                                             ("EUC-JP" . euc-jp)
+                                             ("EUC-KR" . euc-kr)
+                                             ("GB2312" . gb2312)
+                                             ("ISO-2022-JP" . iso-2022-jp)
+                                             ("ISO-2022-JP-2" . iso-2022-jp-2)
+                                             ("ISO-2022-KR" . iso-2022-kr)
+                                             ("ISO-8859-1" . iso-8859-1)
+                                             ("ISO-8859-2" . iso-8859-2)
+                                             ("ISO-8859-3" . iso-8859-3)
+                                             ("ISO-8859-4" . iso-8859-4)
+                                             ("ISO-8859-5" . iso-8859-5)
+                                             ("ISO-8859-6" . iso-8859-6)
+                                             ("ISO-8859-6-E" . iso-8859-6-e)
+                                             ("ISO-8859-6-I" . iso-8859-6-i)
+                                             ("ISO-8859-7" . iso-8859-7)
+                                             ("ISO-8859-8" . iso-8859-8)
+                                             ("ISO-8859-8-E" . iso-8859-8-e)
+                                             ("ISO-8859-8-I" . iso-8859-8-i)
+                                             ("ISO-8859-9" . iso-8859-9)
+                                             ("ISO-8859-10" . iso-8859-10)
+                                             ("KOI8-R" . koi8-r)
+                                             ("Shift_JIS" . shift_jis)
+                                             ("US-ASCII" . us-ascii)
+                                             ("UTF-8" . utf-8)
+                                             ("UTF-16" . utf-16))
+  "Association list, mapping IANA MIME names for character sets to
+Emacs coding systems.
+
+Derived from:
+http://www.iana.org/assignments/character-sets/character-sets.xhtml"
+  :type '(repeat (cons string symbol))
+  :group 'org-vcard)
+
 ;; The in-buffer setting #+CONTACT_STYLE.
 
 (defcustom org-vcard-default-style "flat"
@@ -600,6 +634,23 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
         (string-match "\\([^:]+\\): *\\(.*?\\)\\(?:\u000D\\|\015\\)?$" current-line)
         (setq property (match-string 1 current-line))
         (setq value (match-string 2 current-line))
+        (if (string-match ";CHARSET=\\([^;:]+\\)" property)
+            (let ((encoding (match-string 1 property)))
+              (setq property (replace-regexp-in-string ";CHARSET=[^;:]+" "" property))
+              (cond
+               ((or (string= "4.0" org-vcard-active-version)
+                    (string= "3.0" org-vcard-active-version))
+                ;; vCard 4.0 mandates UTF-8 as the only possible encoding,
+                ;; and 3.0 mandates encoding not per-property, but via the
+                ;; CHARSET parameter on the containing MIME object. So we
+                ;; just ignore the presence and/or value of the CHARSET
+                ;; modifier in 4.0 and 3.0 contexts.
+                t)
+               ((string= "2.1" org-vcard-active-version)
+                (setq value (string-as-multibyte
+                             (encode-coding-string
+                              value
+                              (cdr (assoc encoding org-vcard-character-set-mapping)))))))))
         (setq property (org-vcard-canonicalise-property-name property))
         (setq current-card (append current-card (list (cons property value))))
         (forward-line))
