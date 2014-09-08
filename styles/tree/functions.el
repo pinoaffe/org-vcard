@@ -28,7 +28,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
         (goto-char (point-min))
         (setq case-fold-search t)
         (while (re-search-forward "\\s *:FIELDTYPE:\\s *name" nil t)
-          (let ((content (concat (org-vcard-export-line "BEGIN:VCARD" "" t)
+          (let ((content (concat (org-vcard-export-line "BEGIN" "VCARD")
                                  (org-vcard-export-line "VERSION" org-vcard-active-version)))
                 (end-vcard nil))
             (setq content (concat content
@@ -66,7 +66,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
                                              (org-get-heading t t)))))
                   (setq end-vcard t))))
             (setq content (concat content
-                                  (org-vcard-export-line "END:VCARD" "" t)))
+                                  (org-vcard-export-line "END" "VCARD")))
             (setq output (concat output content)))
           (if search-result
               (re-search-backward "\\s *:FIELDTYPE:\\s *name")))

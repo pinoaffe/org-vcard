@@ -84,7 +84,7 @@
              (org-vcard-export-line "FN" "word"))))
   (should (let ((org-vcard-active-version "2.1"))
             (string=
-             "FN:word\015\012"
+             "FN;CHARSET=US-ASCII:word\015\012"
              (org-vcard-export-line "FN" "word"))))
   (should (let ((org-vcard-active-version "4.0"))
             (string=
@@ -96,7 +96,7 @@
              (org-vcard-export-line "FN" "word word"))))
   (should (let ((org-vcard-active-version "2.1"))
             (string=
-             "FN:word word\015\012"
+             "FN;CHARSET=US-ASCII:word word\015\012"
              (org-vcard-export-line "FN" "word word"))))
 
   ;; Tests for when NOSEPARATOR is non-nil.
@@ -111,7 +111,7 @@
              (org-vcard-export-line "FN" "word" t))))
   (should (let ((org-vcard-active-version "2.1"))
             (string=
-             "FNword\015\012"
+             "FN;CHARSET=US-ASCIIword\015\012"
              (org-vcard-export-line "FN" "word" t)))))
 
 
@@ -619,21 +619,21 @@ vCard 2.1."
         (should (string=
                  (concat "BEGIN:VCARD" crlf
                          "VERSION:2.1" crlf
-                         "FN:Joan Smith" crlf
-                         "N:" crlf
-                         "TEL;VOICE:00 9999 9999" crlf
-                         "TEL;CELL:0000 999 999" crlf
-                         "EMAIL:joan@example.com" crlf
-                         "EMAIL:joan.2@example.com" crlf
+                         "FN;CHARSET=US-ASCII:Joan Smith" crlf
+                         "N;CHARSET=US-ASCII:" crlf
+                         "TEL;VOICE;CHARSET=US-ASCII:00 9999 9999" crlf
+                         "TEL;CELL;CHARSET=US-ASCII:0000 999 999" crlf
+                         "EMAIL;CHARSET=US-ASCII:joan@example.com" crlf
+                         "EMAIL;CHARSET=US-ASCII:joan.2@example.com" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:2.1" crlf
-                         "FN:John" crlf
-                         "N:" crlf
-                         "TEL;VOICE:01 9999 9999" crlf
-                         "TEL;CELL:0001 999 999" crlf
-                         "EMAIL;WORK:john@example.com" crlf
-                         "EMAIL;HOME:john.2@example.com" crlf
+                         "FN;CHARSET=US-ASCII:John" crlf
+                         "N;CHARSET=US-ASCII:" crlf
+                         "TEL;VOICE;CHARSET=US-ASCII:01 9999 9999" crlf
+                         "TEL;CELL;CHARSET=US-ASCII:0001 999 999" crlf
+                         "EMAIL;WORK;CHARSET=US-ASCII:john@example.com" crlf
+                         "EMAIL;HOME;CHARSET=US-ASCII:john.2@example.com" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -881,21 +881,21 @@ vCard 2.1."
         (should (string=
                  (concat "BEGIN:VCARD" crlf
                          "VERSION:2.1" crlf
-                         "FN:Joan Smith" crlf
-                         "N:" crlf
-                         "TEL;VOICE:00 9999 9999" crlf
-                         "TEL;CELL:0000 999 999" crlf
-                         "EMAIL;PREF:joan@example.com" crlf
-                         "EMAIL:joan.2@example.com" crlf
+                         "FN;CHARSET=US-ASCII:Joan Smith" crlf
+                         "N;CHARSET=US-ASCII:" crlf
+                         "TEL;VOICE;CHARSET=US-ASCII:00 9999 9999" crlf
+                         "TEL;CELL;CHARSET=US-ASCII:0000 999 999" crlf
+                         "EMAIL;PREF;CHARSET=US-ASCII:joan@example.com" crlf
+                         "EMAIL;CHARSET=US-ASCII:joan.2@example.com" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:2.1" crlf
-                         "FN:John" crlf
-                         "N:" crlf
-                         "TEL;VOICE:01 9999 9999" crlf
-                         "TEL;CELL:0001 999 999" crlf
-                         "EMAIL;WORK;PREF:john@example.com" crlf
-                         "EMAIL;HOME:john.2@example.com" crlf
+                         "FN;CHARSET=US-ASCII:John" crlf
+                         "N;CHARSET=US-ASCII:" crlf
+                         "TEL;VOICE;CHARSET=US-ASCII:01 9999 9999" crlf
+                         "TEL;CELL;CHARSET=US-ASCII:0001 999 999" crlf
+                         "EMAIL;WORK;PREF;CHARSET=US-ASCII:john@example.com" crlf
+                         "EMAIL;HOME;CHARSET=US-ASCII:john.2@example.com" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")

@@ -245,6 +245,14 @@ http://www.iana.org/assignments/character-sets/character-sets.xhtml"
   :type '(repeat (cons string symbol))
   :group 'org-vcard)
 
+(defcustom org-vcard-default-vcard-21-character-set 'us-ascii
+  "Value of the vCard 2.1 CHARSET modifier which will be applied to
+all vCard properties when exporting to vCard 2.1."
+  :type `(radio ,@(mapcar #'(lambda (entry)
+                               `(const :tag ,(car entry) ,(cdr entry)))
+                           org-vcard-character-set-mapping))
+  :group 'org-vcard)
+
 ;; The in-buffer setting #+CONTACT_STYLE.
 
 (defcustom org-vcard-default-style "flat"
@@ -364,12 +372,15 @@ from VALUE."
       ;; In values, escape semicolons.
       ;; End line with CRLF.
       ;; Output ASCII.
-      (encode-coding-string (concat
-                             property
-                             separator
-                             (org-vcard-escape-value-string '(";") value)
-                             "\015\012")
-                            'us-ascii)))))
+      (concat
+       (encode-coding-string property 'us-ascii)
+       (unless (or (string= "BEGIN" property)
+                   (string= "VERSION" property)
+                   (string= "END" property))
+           (encode-coding-string (concat ";CHARSET=" (car (rassoc org-vcard-default-vcard-21-character-set org-vcard-character-set-mapping))) 'us-ascii))
+       (encode-coding-string separator 'us-ascii)
+       (encode-coding-string (org-vcard-escape-value-string '(";") value) org-vcard-default-vcard-21-character-set)      
+       (encode-coding-string "\015\012" 'us-ascii))))))
 
 
 (defun org-vcard-set-active-settings ()
