@@ -121,9 +121,12 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                                     ":END:\n"))
         (setq sorted-card-properties (sort (mapcar 'car card) 'string<))
         (dolist (property sorted-card-properties)
-          (let ((property-original property)
-                (case-fold-search t)
-                (preferred nil))
+          (let* ((property-original property)
+                 (property-name (progn
+                                  (string-match "^[^;:]+" property-original)
+                                  (match-string 0 property-original)))
+                 (case-fold-search t)
+                 (preferred nil))
             (if (not (member property '("FN" "KIND" "VERSION")))
                 (progn
                   (cond
@@ -140,9 +143,10 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                       ;; so it must have contained a 'PREF'.
                       (setq preferred t))
                   (let ((property-value (cdr (assoc property-original card))))
-                    (if (string= "N" property-original)
-                      ;; Remove leading and trailing semicolons from value of "N" property.
-                      (setq property-value (replace-regexp-in-string "^;\\|;$" "" property-value)))
+                    (if (and org-vcard-remove-external-semicolons
+                             (member property-name org-vcard-compound-properties))
+                      ;; Remove leading and trailing semicolons from value of property.
+                      (setq property-value (replace-regexp-in-string "^[;]+\\|[;]+$" "" property-value)))
                     (if (car (rassoc property tree-style-properties))
                         (progn
                           (insert (concat "** " property-value "\n"))

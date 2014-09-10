@@ -21,8 +21,8 @@ DESTINATION must be either \"buffer\" or \"file\"."
              (in-contact-entry nil)
              (flat-style-properties
               (or (cadr (assoc org-vcard-active-version
-                             (cadr (assoc org-vcard-active-language
-                                          (cadr (assoc "flat" org-vcard-styles-languages-mappings))))))
+                               (cadr (assoc org-vcard-active-language
+                                            (cadr (assoc "flat" org-vcard-styles-languages-mappings))))))
                  (error "No mapping available for specified vCard version")))
              (content (encode-coding-string "" encoding)))
          ;; Does this entry contain a PROPERTY listed in
@@ -38,13 +38,14 @@ DESTINATION must be either \"buffer\" or \"file\"."
            ;; http://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
            ;; - so we just create an empty 'N' property.
            (if (and (or (string= "3.0" org-vcard-active-version)
-                     (string= "2.1" org-vcard-active-version))
-                  (not (member "N" properties)))
+                        (string= "2.1" org-vcard-active-version))
+                    (not (member "N" (mapcar 'car properties))))
                (setq content (concat
                               content
                               (org-vcard-export-line "N" ""))))
            (dolist (p properties)
-             (if (assoc (car p) flat-style-properties)
+             (if (and (not (string= "VERSION" (car p)))
+                      (assoc (car p) flat-style-properties))
                  (setq content (concat
                                 content
                                 (org-vcard-export-line
@@ -113,20 +114,24 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (insert ":PROPERTIES:\n")
         (dolist (entry card)
           (if (not (string= vcard-property-for-heading (car entry)))
-              (let ((property-name (car entry))
-                    (property-value (cdr entry)))
-                (if (string= "N" property-name)
-                    ;; Remove leading and trailing semicolons from value of "N" property.
-                    (setq property-value (replace-regexp-in-string "^;\\|;$" "" property-value)))
-                (if (car (rassoc property-name flat-style-properties))              
+              (let* ((property (car entry))
+                     (property-name (progn
+                                      (string-match "^[^;:]+" property)
+                                      (match-string 0 property)))
+                     (property-value (cdr entry)))
+                (if (and org-vcard-remove-external-semicolons
+                         (member property-name org-vcard-compound-properties))
+                    ;; Remove leading and trailing semicolons from value of property.
+                    (setq property-value (replace-regexp-in-string "^[;]+\\|[;]+$" "" property-value)))
+                (if (car (rassoc property flat-style-properties))              
                     (insert (concat ":"
-                                    (car (rassoc property-name flat-style-properties))
+                                    (car (rassoc property flat-style-properties))
                                     ": "
                                     property-value
                                     "\n"))
                   (if org-vcard-include-import-unknowns
                       (insert (concat ":"
-                                      property-name
+                                      property
                                       ": "
                                       property-value
                                       "\n")))))))

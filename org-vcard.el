@@ -105,6 +105,11 @@
 (defvar org-vcard-active-version ""
   "The currently-active version of vCard.")
 
+(defvar org-vcard-compound-properties '("ADR" "N")
+  "List of vCard properties which can have a compound value, i.e.
+a value containing multiple components, with each component
+separated by a semicolon.")
+
 (defun org-vcard-create-styles-functions ()
   "Function to create a data structure from the contents of
 the org-vcard 'styles' directory, suitable for use by
@@ -115,7 +120,7 @@ the org-vcard-styles-functions defvar."
           (make-directory style-dir))
       (dolist (style (directory-files style-dir))
         (if (and (not (string= "." (file-name-nondirectory style)))
-               (not (string= ".." (file-name-nondirectory style))))
+                 (not (string= ".." (file-name-nondirectory style))))
             (progn
               (load (concat
                      (file-name-as-directory (concat style-dir style))
@@ -151,7 +156,7 @@ the org-vcard-styles-languages-mappings defcustom."
                                                          t
                                                        nil))))
         (if (and (not (string= "." style))
-               (not (string= ".." style)))
+                 (not (string= ".." style)))
             (progn
               (let ((language-mapping '()))
                 (dolist (mapping
@@ -169,7 +174,7 @@ the org-vcard-styles-languages-mappings defcustom."
                                            t
                                          nil))))
                   (if (and (not (string= "." (file-name-nondirectory mapping)))
-                         (not (string= ".." (file-name-nondirectory mapping))))
+                           (not (string= ".." (file-name-nondirectory mapping))))
                       (progn
                         (add-to-list 'language-mapping
                                      `(,(file-name-nondirectory mapping)
@@ -208,6 +213,17 @@ listed in the mapping being used."
 (defcustom org-vcard-append-to-existing-import-buffer t
   "Whether the import process should append to any existing import
 buffer. If not, create a new import buffer per import."
+  :type 'boolean
+  :group 'org-vcard)
+
+(defcustom org-vcard-remove-external-semicolons nil
+  "Whether the import process should remove any leading and/or
+trailing semicolons from properties with compound values.
+
+NB! Since the components of compound values are positional,
+removing such semicolons will change the meaning of the value
+if/when it is subsequently exported to vCard. If in doubt, leave
+this set to nil."
   :type 'boolean
   :group 'org-vcard)
 
@@ -355,7 +371,9 @@ from VALUE."
       (encode-coding-string (concat
                              property
                              separator
-                             (org-vcard-escape-value-string '("," ";" "\134") value)
+                             (if (not (member property org-vcard-compound-properties))
+                                 (org-vcard-escape-value-string '("," ";" "\134") value)
+                               (org-vcard-escape-value-string '("," "\134") value))
                              "\u000D\u000A")
                             'utf-8))
      ((string= org-vcard-active-version "3.0")
@@ -365,7 +383,9 @@ from VALUE."
       (encode-coding-string (concat
                              property
                              separator
-                             (org-vcard-escape-value-string '("," ";") value)
+                             (if (not (member property org-vcard-compound-properties))
+                                 (org-vcard-escape-value-string '("," ";") value)
+                               (org-vcard-escape-value-string '(",") value))
                              "\015\012")
                             'utf-8))
      ((string= org-vcard-active-version "2.1")
@@ -379,7 +399,9 @@ from VALUE."
                    (string= "END" property))
            (encode-coding-string (concat ";CHARSET=" (car (rassoc org-vcard-default-vcard-21-character-set org-vcard-character-set-mapping))) 'us-ascii))
        (encode-coding-string separator 'us-ascii)
-       (encode-coding-string (org-vcard-escape-value-string '(";") value) org-vcard-default-vcard-21-character-set)      
+       (if (not (member property org-vcard-compound-properties))
+           (encode-coding-string (org-vcard-escape-value-string '(";") value) org-vcard-default-vcard-21-character-set)
+         (encode-coding-string value org-vcard-default-vcard-21-character-set))
        (encode-coding-string "\015\012" 'us-ascii))))))
 
 
