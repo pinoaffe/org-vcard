@@ -70,12 +70,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
             (setq output (concat output content)))
           (if search-result
               (re-search-backward "\\s *:FIELDTYPE:\\s *name")))
-        (org-vcard-write-to-destination output destination)
-        (cond
-         ((string= "buffer" destination)
-          (message "Exported contacts data to *org-vcard-export* buffer."))
-         ((string= "file" destination)
-          (message "Exported contacts data to file.")))))))
+        (org-vcard-transfer-write 'export output destination)))))
 
 
 (defun org-vcard-import-to-tree (source destination)
@@ -84,24 +79,13 @@ OUTPUT to DESTINATION.
 
 SOURCE must be one of \"buffer\", \"file\" or \"region\".
 DESTINATION must be one of \"buffer\" or \"file\"."
-  (let ((cards (org-vcard-import-parser source))
+  (let ((content "")
+        (cards (org-vcard-import-parse source))
         (import-buffer nil)
         (filename "")
         (sorted-card-properties nil))
     (if (not (member source '("buffer" "file" "region")))
         (error "Invalid source type"))
-    (cond
-     ((string= "buffer" destination)
-      (progn
-        (if org-vcard-append-to-existing-import-buffer
-            (setq import-buffer (get-buffer-create "*org-vcard-import*"))
-          (setq import-buffer (generate-new-buffer "*org-vcard-import*")))
-        (set-buffer import-buffer)))
-     ((string= "file" destination)
-      (setq filename (read-from-minibuffer "Filename? " "org-vcard-import.org"))
-      (find-file filename))
-     (t
-      (error "Invalid destination type")))
     (let ((tree-style-properties
           (or (cadr (assoc org-vcard-active-version
                            (cadr (assoc org-vcard-active-language
@@ -110,15 +94,19 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (if (assoc "VERSION" card)
             (setq org-vcard-active-version (cdr (assoc "VERSION" card)))
           (setq org-vcard-active-version org-vcard-default-version))
-        (insert (concat "* " (or (cdr (assoc "FN" card))
-                                 (replace-regexp-in-string "^;\\|;$" ""
-                                                           (cdr (assoc "N" card)))) "\n"
-                        ":PROPERTIES:\n"
-                        ":KIND: " (if (assoc "KIND" card)
-                                      (cdr (assoc "KIND" card))
-                                    "individual") "\n"
-                                    ":FIELDTYPE: name\n"
-                                    ":END:\n"))
+        (setq content
+              (concat content
+                      "* "
+                      (or (cdr (assoc "FN" card))
+                          (replace-regexp-in-string
+                           "^;\\|;$" ""
+                           (cdr (assoc "N" card)))) "\n"
+                           ":PROPERTIES:\n"
+                           ":KIND: " (if (assoc "KIND" card)
+                                         (cdr (assoc "KIND" card))
+                                       "individual") "\n"
+                                       ":FIELDTYPE: name\n"
+                                       ":END:\n"))
         (setq sorted-card-properties (sort (mapcar 'car card) 'string<))
         (dolist (property sorted-card-properties)
           (let* ((property-original property)
@@ -149,26 +137,30 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                       (setq property-value (replace-regexp-in-string "^[;]+\\|[;]+$" "" property-value)))
                     (if (car (rassoc property tree-style-properties))
                         (progn
-                          (insert (concat "** " property-value "\n"))
-                          (insert (concat ":PROPERTIES:\n"
-                                          ":FIELDTYPE: "
-                                          (car (rassoc property tree-style-properties))
-                                          "\n"
-                                          (if preferred
-                                              ":PREFERRED:\n")
-                                          ":END:\n")))
+                          (setq content
+                                (concat content
+                                        "** " property-value "\n"))
+                          (setq content
+                                (concat content
+                                        ":PROPERTIES:\n"
+                                        ":FIELDTYPE: "
+                                        (car (rassoc property tree-style-properties))
+                                        "\n"
+                                        (if preferred
+                                            ":PREFERRED:\n")
+                                        ":END:\n")))
                       (if org-vcard-include-import-unknowns
                           (progn
-                            (insert (concat "** " property-value "\n"))
-                            (insert (concat ":PROPERTIES:\n"
-                                            ":FIELDTYPE: "
-                                            property-original "\n"
-                                            (if preferred
-                                                ":PREFERRED:\n")
-                                            ":END:\n"))))))))
+                            (setq content
+                                  (concat content
+                                          "** " property-value "\n"))
+                            (setq content
+                                  (concat content
+                                          ":PROPERTIES:\n"
+                                          ":FIELDTYPE: "
+                                          property-original "\n"
+                                          (if preferred
+                                              ":PREFERRED:\n")
+                                          ":END:\n"))))))))
             (setq card (delq (assoc property-original card) card))))))
-    (cond
-     ((string= "buffer" destination)
-      (message (concat "Imported contacts data to buffer " (buffer-name import-buffer) ".")))
-     ((string= "file" destination)
-      (message "Imported contacts data to file.")))))
+    (org-vcard-transfer-write 'import content destination)))

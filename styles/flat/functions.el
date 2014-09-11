@@ -62,7 +62,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
                   content
                   (org-vcard-export-line "END" "VCARD"))))))
      nil scope)
-    (org-vcard-write-to-destination output destination)))
+    (org-vcard-transfer-write 'export output destination)))
 
 
 (defun org-vcard-import-to-flat (source destination)
@@ -71,25 +71,14 @@ OUTPUT to DESTINATION.
 
 SOURCE must be one of \"buffer\", \"file\" or \"region\".
 DESTINATION must be one of \"buffer\" or \"file\"."
-  (let ((cards (org-vcard-import-parser source))
+  (let ((content "")
+        (cards (org-vcard-import-parse source))
         (import-buffer nil)
         (filename "")
         (vcard-property-for-heading "")
         (heading ""))
     (if (not (member source '("buffer" "file" "region")))
         (error "Invalid source type"))
-    (cond
-     ((string= "buffer" destination)
-      (progn
-        (if org-vcard-append-to-existing-import-buffer
-            (setq import-buffer (get-buffer-create "*org-vcard-import*"))
-          (setq import-buffer (generate-new-buffer "*org-vcard-import*")))
-        (set-buffer import-buffer)))
-     ((string= "file" destination)
-      (setq filename (read-from-minibuffer "Filename? " "org-vcard-import.org"))
-      (find-file filename))
-     (t
-      (error "Invalid destination type")))
     (let ((flat-style-properties
            (or (cadr (assoc org-vcard-active-version
                            (cadr (assoc org-vcard-active-language
@@ -105,8 +94,9 @@ DESTINATION must be one of \"buffer\" or \"file\"."
               (or (cdr (assoc vcard-property-for-heading card))
                   (replace-regexp-in-string "^;\\|;$" ""
                                             (cdr (assoc "N" card)))))
-        (insert (concat "* " heading "\n"))
-        (insert ":PROPERTIES:\n")
+        (setq content (concat content
+                              "* " heading "\n"
+                              ":PROPERTIES:\n"))
         (dolist (entry card)
           (if (not (string= vcard-property-for-heading (car entry)))
               (let* ((property (car entry))
@@ -119,22 +109,18 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                     ;; Remove leading and trailing semicolons from value of property.
                     (setq property-value (replace-regexp-in-string "^[;]+\\|[;]+$" "" property-value)))
                 (if (car (rassoc property flat-style-properties))              
-                    (insert (concat ":"
-                                    (car (rassoc property flat-style-properties))
-                                    ": "
-                                    property-value
-                                    "\n"))
+                    (setq content (concat content
+                                          ":"
+                                          (car (rassoc property flat-style-properties))
+                                          ": "
+                                          property-value
+                                          "\n"))
                   (if org-vcard-include-import-unknowns
-                      (insert (concat ":"
-                                      property
-                                      ": "
-                                      property-value
-                                      "\n")))))))
-        (insert ":END:\n")))
-    (if (string= "file" destination)
-        (write-file filename))
-    (cond
-     ((string= "buffer" destination)
-      (message (concat "Imported contacts data to buffer '" (buffer-name import-buffer) "'.")))
-     ((string= "file" destination)
-      (message "Imported contacts data to file.")))))
+                      (setq content (concat content
+                                            ":"
+                                            property
+                                            ": "
+                                            property-value
+                                            "\n")))))))
+        (setq content (concat content ":END:\n"))))
+    (org-vcard-transfer-write 'import content destination)))

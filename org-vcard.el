@@ -683,7 +683,7 @@ PROPERTY-NAME must be a string containing the vCard property name."
         property-canonicalised))))
 
 
-(defun org-vcard-import-parser (source)
+(defun org-vcard-import-parse (source)
   "Utility function to read from SOURCE and return a list of
 vCards, each in the form of a list of cons cells, with each
 cell containing the vCard property in the car, and the value
@@ -739,33 +739,62 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
    cards))
 
 
-(defun org-vcard-write-to-destination (content destination)
-  "Utility function to write CONTENT to DESTINATION.
+(defun org-vcard-transfer-write (direction content destination)
+  "Utility function for the import process; write CONTENT to
+DESTINATION.
 
-CONTENT must be a string. DESTINATION must be either \"buffer\" or \"file\"."
+DIRECTION must be either the symbol 'import or the symbol
+'export. CONTENT must be a string. DESTINATION must be either
+\"buffer\" or \"file\"."
+  (if (not (or (eq 'import direction)
+               (eq 'export direction)))
+      (error "DIRECTION must be either 'import or 'export"))
   (if (not (stringp content))
       (error "Received non-string as CONTENT"))
-  (let ((export-buffer nil))
+  (let ((the-buffer nil)
+        (direction-string (cond
+                           ((eq 'import direction)
+                            "Imported")
+                           ((eq 'export direction)
+                            "Exported"))))
     (cond
      ((string= "buffer" destination)
       (progn
-        (if org-vcard-append-to-existing-export-buffer
-            (setq export-buffer (get-buffer-create "*org-vcard-export*"))
-          (setq export-buffer (generate-new-buffer "*org-vcard-export*")))
-        (set-buffer export-buffer)
+        (cond
+         ((eq 'import direction)
+          (if org-vcard-append-to-existing-import-buffer
+              (setq the-buffer (get-buffer-create (concat "*org-vcard-import*")))
+            (setq the-buffer (generate-new-buffer "*org-vcard-import*"))))
+         ((eq 'export direction)
+          (if org-vcard-append-to-existing-export-buffer
+              (setq the-buffer (get-buffer-create (concat "*org-vcard-export*")))
+            (setq the-buffer (generate-new-buffer "*org-vcard-export*")))))
+        (set-buffer the-buffer)
         (insert (string-as-multibyte content))
-        (message (concat "Exported contacts data to buffer '" (buffer-name export-buffer) "'."))))
+        (message (concat
+                  direction-string
+                  " contacts data to buffer '"
+                  (buffer-name the-buffer)
+                  "'."))))
      ((string= "file" destination)
-      (let ((filename (read-from-minibuffer "Filename? " org-vcard-default-export-file)))
+      (let ((filename (read-from-minibuffer "Filename? " (cond
+                                                          ((eq 'import direction)
+                                                           org-vcard-default-import-file)
+                                                          ((eq 'export direction)
+                                                           org-vcard-default-export-file)))))
         (with-temp-buffer
           (insert (string-as-multibyte content))
           (when (file-writable-p filename)
             (write-region (point-min)
                           (point-max)
                           filename)))
-        (message (concat "Exported contacts data to file '" filename "'."))))
+        (message (concat
+                  direction-string
+                  " contacts data to file '"
+                  filename
+                  "'."))))
      (t
-      (error "Invalid destination type")))))
+      (error "Invalid DESTINATION type")))))
 
 
 (defun org-vcard-transfer-helper (source destination style language version direction)

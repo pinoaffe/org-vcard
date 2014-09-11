@@ -684,7 +684,8 @@ vCard 2.1."
   (let ((lf "\n")
         (org-vcard-active-style "flat")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "4.0"))
+        (org-vcard-active-version "4.0")
+        (org-vcard-append-to-existing-import-buffer nil))
 
     (unwind-protect
         (should (string=
@@ -728,7 +729,8 @@ vCard 2.1."
   (let ((lf "\n")
         (org-vcard-active-style "flat")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "3.0"))
+        (org-vcard-active-version "3.0")
+        (org-vcard-append-to-existing-import-buffer nil))
 
     (unwind-protect
         (should (string=
@@ -772,7 +774,8 @@ vCard 2.1."
   (let ((lf "\n")
         (org-vcard-active-style "flat")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "2.1"))
+        (org-vcard-active-version "2.1")
+        (org-vcard-append-to-existing-import-buffer nil))
 
     (unwind-protect
         (should (string=
@@ -944,7 +947,8 @@ vCard 2.1."
   
   (let ((lf "\n")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "4.0"))
+        (org-vcard-active-version "4.0")
+        (org-vcard-append-to-existing-import-buffer nil))
 
     (unwind-protect
         (should (string=
@@ -1024,7 +1028,8 @@ vCard 2.1."
   
   (let ((lf "\n")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "3.0"))
+        (org-vcard-active-version "3.0")
+        (org-vcard-append-to-existing-import-buffer nil))
 
     (unwind-protect
         (should (string=
@@ -1104,7 +1109,8 @@ vCard 2.1."
   
   (let ((lf "\n")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "2.1"))
+        (org-vcard-active-version "2.1")
+        (org-vcard-append-to-existing-import-buffer nil))
 
     (unwind-protect
         (should (string=
