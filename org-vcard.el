@@ -210,6 +210,12 @@ listed in the mapping being used."
   :type 'boolean
   :group 'org-vcard)
 
+(defcustom org-vcard-append-to-existing-export-buffer t
+  "Whether the export process should append to any existing export
+buffer. If not, create a new export buffer per export."
+  :type 'boolean
+  :group 'org-vcard)
+
 (defcustom org-vcard-append-to-existing-import-buffer t
   "Whether the import process should append to any existing import
 buffer. If not, create a new import buffer per import."
@@ -700,22 +706,27 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
 CONTENT must be a string. DESTINATION must be either \"buffer\" or \"file\"."
   (if (not (stringp content))
       (error "Received non-string as CONTENT"))
-  (cond
-   ((string= "buffer" destination)
-    (progn
-      (generate-new-buffer "*org-vcard-export*")
-      (set-buffer "*org-vcard-export*")
-      (insert (string-as-multibyte content))))
-   ((string= "file" destination)
-    (let ((filename (read-from-minibuffer "Filename? " org-vcard-default-export-file)))
+  (let ((export-buffer nil))
+    (cond
+     ((string= "buffer" destination)
+      (progn
+        (if org-vcard-append-to-existing-export-buffer
+            (setq export-buffer (get-buffer-create "*org-vcard-export*"))
+          (setq export-buffer (generate-new-buffer "*org-vcard-export*")))
+        (set-buffer export-buffer)
+        (insert (string-as-multibyte content))
+        (message (concat "Exported contacts data to buffer '" (buffer-name export-buffer) "'."))))
+     ((string= "file" destination)
+      (let ((filename (read-from-minibuffer "Filename? " org-vcard-default-export-file)))
         (with-temp-buffer
           (insert (string-as-multibyte content))
           (when (file-writable-p filename)
             (write-region (point-min)
                           (point-max)
-                          filename)))))
-   (t
-    (error "Invalid destination type"))))
+                          filename)))
+        (message (concat "Exported contacts data to file '" filename "'."))))
+     (t
+      (error "Invalid destination type")))))
 
 
 (defun org-vcard-transfer-helper (source destination style language version direction)

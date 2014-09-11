@@ -62,12 +62,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
                   content
                   (org-vcard-export-line "END" "VCARD"))))))
      nil scope)
-    (org-vcard-write-to-destination output destination)
-    (cond
-     ((string= "buffer" destination)
-      (message "Exported contacts data to *org-vcard-export* buffer."))
-     ((string= "file" destination)
-      (message "Exported contacts data to file.")))))
+    (org-vcard-write-to-destination output destination)))
 
 
 (defun org-vcard-import-to-flat (source destination)
@@ -140,6 +135,6 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (write-file filename))
     (cond
      ((string= "buffer" destination)
-      (message (concat "Imported contacts data to buffer " (buffer-name import-buffer) ".")))
+      (message (concat "Imported contacts data to buffer '" (buffer-name import-buffer) "'.")))
      ((string= "file" destination)
       (message "Imported contacts data to file.")))))

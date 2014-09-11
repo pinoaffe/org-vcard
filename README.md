@@ -51,8 +51,7 @@ For a list of the properties available by default for each contacts style and re
 The value of the `org-vcard-include-import-unknowns` (boolean) variable specifies whether the import process should include vCard properties not listed in
 the mapping being used.
 
-The value of the `org-vcard-append-to-existing-import-buffer` (boolean) variable specifies whether the import process should append to any existing import
-buffer. If not, a new import buffer is created for each import.
+The value of the `org-vcard-append-to-existing-import-buffer` and `org-vcard-append-to-existing-export-buffer` (boolean) variables specify whether the import/export process should append to any existing import/export buffer. If not, a new import/export buffer is created for each import/export.
 
 <a name="tree"></a>
 
