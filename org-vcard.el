@@ -360,7 +360,10 @@ for each vCard version.
 PROPERTY is the vCard property/type to output, VALUE its value.
 If NOSEPARATOR is non-nil, don't output colon to separate PROPERTY
 from VALUE."
-  (let ((separator ":"))
+  (let ((separator ":")
+        (property-name (progn
+                         (string-match "^[^;:]+" property)
+                         (match-string 0 property))))
     (if noseparator
         (setq separator ""))
     (cond
@@ -371,7 +374,7 @@ from VALUE."
       (encode-coding-string (concat
                              property
                              separator
-                             (if (not (member property org-vcard-compound-properties))
+                             (if (not (member property-name org-vcard-compound-properties))
                                  (org-vcard-escape-value-string '("," ";" "\134") value)
                                (org-vcard-escape-value-string '("," "\134") value))
                              "\u000D\u000A")
@@ -383,7 +386,7 @@ from VALUE."
       (encode-coding-string (concat
                              property
                              separator
-                             (if (not (member property org-vcard-compound-properties))
+                             (if (not (member property-name org-vcard-compound-properties))
                                  (org-vcard-escape-value-string '("," ";") value)
                                (org-vcard-escape-value-string '(",") value))
                              "\015\012")
@@ -397,9 +400,9 @@ from VALUE."
        (unless (or (string= "BEGIN" property)
                    (string= "VERSION" property)
                    (string= "END" property))
-           (encode-coding-string (concat ";CHARSET=" (car (rassoc org-vcard-default-vcard-21-character-set org-vcard-character-set-mapping))) 'us-ascii))
+         (encode-coding-string (concat ";CHARSET=" (car (rassoc org-vcard-default-vcard-21-character-set org-vcard-character-set-mapping))) 'us-ascii))
        (encode-coding-string separator 'us-ascii)
-       (if (not (member property org-vcard-compound-properties))
+       (if (not (member property-name org-vcard-compound-properties))
            (encode-coding-string (org-vcard-escape-value-string '(";") value) org-vcard-default-vcard-21-character-set)
          (encode-coding-string value org-vcard-default-vcard-21-character-set))
        (encode-coding-string "\015\012" 'us-ascii))))))

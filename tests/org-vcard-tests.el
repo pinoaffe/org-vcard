@@ -529,7 +529,8 @@ vCard 2.1."
   
   (let ((crlf "\u000D\u000A")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "4.0"))
+        (org-vcard-active-version "4.0")
+        (org-vcard-remove-external-semicolons nil))
 
     (unwind-protect
         (should (string=
@@ -538,6 +539,7 @@ vCard 2.1."
                          "FN:Joan Smith" crlf
                          "TEL;TYPE=\"voice\":00 9999 9999" crlf
                          "TEL;TYPE=\"cell\":0000 999 999" crlf
+                         "ADR;TYPE=\"work\":;123 Main Street;Any Town;;;" crlf
                          "EMAIL:joan@example.com" crlf
                          "EMAIL:joan.2@example.com" crlf
                          "END:VCARD" crlf
@@ -570,7 +572,8 @@ vCard 2.1."
 
   (let ((crlf "\015\012")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "3.0"))
+        (org-vcard-active-version "3.0")
+        (org-vcard-remove-external-semicolons nil))
 
     (unwind-protect
         (should (string=
@@ -580,6 +583,7 @@ vCard 2.1."
                          "N:" crlf
                          "TEL;TYPE=voice:00 9999 9999" crlf
                          "TEL;TYPE=cell:0000 999 999" crlf
+                         "ADR;TYPE=work:;123 Main Street;Any Town;;;" crlf
                          "EMAIL:joan@example.com" crlf
                          "EMAIL:joan.2@example.com" crlf
                          "END:VCARD" crlf
@@ -613,7 +617,8 @@ vCard 2.1."
 
   (let ((crlf "\015\012")
         (org-vcard-active-language "en")
-        (org-vcard-active-version "2.1"))
+        (org-vcard-active-version "2.1")
+        (org-vcard-remove-external-semicolons nil))
 
     (unwind-protect
         (should (string=
@@ -623,6 +628,7 @@ vCard 2.1."
                          "N;CHARSET=US-ASCII:" crlf
                          "TEL;VOICE;CHARSET=US-ASCII:00 9999 9999" crlf
                          "TEL;CELL;CHARSET=US-ASCII:0000 999 999" crlf
+                         "ADR;WORK;CHARSET=US-ASCII:;123 Main Street;Any Town;;;" crlf
                          "EMAIL;CHARSET=US-ASCII:joan@example.com" crlf
                          "EMAIL;CHARSET=US-ASCII:joan.2@example.com" crlf
                          "END:VCARD" crlf
