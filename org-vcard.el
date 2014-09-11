@@ -457,6 +457,39 @@ variables."
         (setq org-vcard-active-version org-vcard-default-version))))))
 
 
+(defun org-vcard-canonicalise-adr-property (property-name)
+  "Internal function to canonicalise a vCard ADR property, intended
+to be called by the org-vcard-canonicalise-property-name function.
+
+PROPERTY-NAME must be a string containing a vCard property name."
+  (let ((property-canonicalised "ADR")
+        (property-type-data '())
+        (case-fold-search t))
+    (if (string-match "HOME" property-name)
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("home"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("home"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";HOME"))))))
+    (if (string-match "WORK" property-name)
+        (cond
+         ((string= "4.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("work"))))
+         ((string= "3.0" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '("work"))))
+         ((string= "2.1" org-vcard-active-version)
+          (setq property-type-data (append property-type-data
+                                           '(";WORK"))))))
+      `(,property-canonicalised ,property-type-data)))
+
+
 (defun org-vcard-canonicalise-email-property (property-name)
   "Internal function to canonicalise a vCard EMAIL property, intended
 to be called by the org-vcard-canonicalise-property-name function.
@@ -492,7 +525,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
 
 (defun org-vcard-canonicalise-tel-property (property-name)
   "Internal function to canonicalise a vCard TEL property, intended
-to be called by the org-vcard-canonicalise-property-name functionon.
+to be called by the org-vcard-canonicalise-property-name function.
 
 PROPERTY-NAME must be a string containing a vCard property name."
   (let ((property-canonicalised "TEL")
@@ -569,14 +602,15 @@ PROPERTY-NAME must be a string containing the vCard property name."
       ;; No need to do anything, return property-name unchanged.
       property-name
     ;; Property has qualifiers.
-    (if (or (and (not (string-match "^EMAIL" property-name))
+    (if (or (and (not (string-match "^ADR" property-name))
+                 (not (string-match "^EMAIL" property-name))
                  (not (string-match "^TEL" property-name)))
             (and (string-match "^TEL" property-name)
                  (string-match "PAGER" property-name)))
-        ;; We currently only canonicalise the EMAIL and TEL properties,
-        ;; and don't handle the PAGER type within the latter, so
-        ;; return property-name unchanged when not dealing with
-        ;; EMAIL or TEL, or when dealing with PAGER.
+        ;; We currently only canonicalise the ADR, EMAIL and TEL
+        ;; properties, and don't handle the PAGER type within the
+        ;; latter, so return property-name unchanged when not dealing
+        ;; with ADR, EMAIL or TEL, or when dealing with PAGER.
         property-name
       ;; Canonicalise.
       (let* ((property-canonicalised "")
@@ -587,6 +621,11 @@ PROPERTY-NAME must be a string containing the vCard property name."
                             t
                           nil)))
         (cond
+         ((string-match "^ADR" property-name)
+          (progn 
+            (setq retval (org-vcard-canonicalise-adr-property property-name))
+            (setq property-canonicalised (car retval))
+            (setq property-type-data (cadr retval))))
          ((string-match "^EMAIL" property-name)
           (progn 
             (setq retval (org-vcard-canonicalise-email-property property-name))

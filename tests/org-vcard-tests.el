@@ -318,7 +318,14 @@ vCard 4.0."
     (should (string= "TEL;TYPE=\"PAGER\""
                      (org-vcard-canonicalise-property-name "TEL;TYPE=\"PAGER\"")))
     (should (string= "TEL;TYPE=\"pager\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"pager\"")))))
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"pager\"")))
+
+    (should (string= "ADR"
+                     (org-vcard-canonicalise-property-name "ADR")))
+    (should (string= "ADR;TYPE=\"work\""
+                     (org-vcard-canonicalise-property-name "ADR;TYPE=WORK")))
+    (should (string= "ADR;TYPE=\"home\""
+                     (org-vcard-canonicalise-property-name "ADR;TYPE=\"home\"")))))
 
   
 (ert-deftest org-vcard-test-canonicalise-property-name-vcard-30 ()
@@ -386,7 +393,14 @@ vCard 3.0."
     (should (string= "TEL;TYPE=PAGER"
                      (org-vcard-canonicalise-property-name "TEL;TYPE=PAGER")))
     (should (string= "TEL;TYPE=pager"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=pager")))))
+                     (org-vcard-canonicalise-property-name "TEL;TYPE=pager")))
+
+    (should (string= "ADR"
+                     (org-vcard-canonicalise-property-name "ADR")))
+    (should (string= "ADR;TYPE=work"
+                     (org-vcard-canonicalise-property-name "ADR;TYPE=WORK")))
+    (should (string= "ADR;TYPE=home"
+                     (org-vcard-canonicalise-property-name "ADR;TYPE=home")))))
 
 
 (ert-deftest org-vcard-test-canonicalise-property-name-vcard-21 ()
@@ -450,7 +464,14 @@ vCard 2.1."
                      (org-vcard-canonicalise-property-name "EMAIL;PREF;HOME")))
 
     (should (string= "TEL;PAGER"
-                     (org-vcard-canonicalise-property-name "TEL;PAGER")))))
+                     (org-vcard-canonicalise-property-name "TEL;PAGER")))
+
+    (should (string= "ADR"
+                     (org-vcard-canonicalise-property-name "ADR")))
+    (should (string= "ADR;HOME"
+                     (org-vcard-canonicalise-property-name "ADR;home")))
+    (should (string= "ADR;WORK"
+                     (org-vcard-canonicalise-property-name "ADR;WORK")))))
 
 
 (ert-deftest org-vcard-test-import-parser ()
