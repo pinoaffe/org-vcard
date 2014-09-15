@@ -549,6 +549,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((crlf "\u000D\u000A")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "4.0")
         (org-vcard-remove-external-semicolons nil))
@@ -592,6 +593,7 @@ vCard 2.1."
   :tags '(org-vcard)
 
   (let ((crlf "\015\012")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "3.0")
         (org-vcard-remove-external-semicolons nil))
@@ -637,6 +639,7 @@ vCard 2.1."
   :tags '(org-vcard)
 
   (let ((crlf "\015\012")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "2.1")
         (org-vcard-remove-external-semicolons nil))
@@ -682,6 +685,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-style "flat")
         (org-vcard-active-language "en")
         (org-vcard-active-version "4.0")
@@ -727,6 +731,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-style "flat")
         (org-vcard-active-language "en")
         (org-vcard-active-version "3.0")
@@ -772,6 +777,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-style "flat")
         (org-vcard-active-language "en")
         (org-vcard-active-version "2.1")
@@ -822,6 +828,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((crlf "\u000D\u000A")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "4.0"))
 
@@ -862,6 +869,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((crlf "\015\012")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "3.0"))
 
@@ -904,6 +912,7 @@ vCard 2.1."
   :tags '(org-vcard)
 
   (let ((crlf "\015\012")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "2.1"))
 
@@ -946,6 +955,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "4.0")
         (org-vcard-append-to-existing-import-buffer nil))
@@ -1027,6 +1037,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "3.0")
         (org-vcard-append-to-existing-import-buffer nil))
@@ -1108,6 +1119,7 @@ vCard 2.1."
   :tags '(org-vcard)
   
   (let ((lf "\n")
+        (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
         (org-vcard-active-version "2.1")
         (org-vcard-append-to-existing-import-buffer nil))

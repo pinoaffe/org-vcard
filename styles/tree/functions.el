@@ -32,14 +32,15 @@ DESTINATION must be either \"buffer\" or \"file\"."
                                  (org-vcard-export-line "VERSION" org-vcard-active-version)))
                 (end-vcard nil))
             (setq content (concat content
-                                  (org-vcard-export-line "FN" (org-get-heading t t))))
+                                  (org-vcard-export-line org-vcard-default-property-for-heading (org-get-heading t t))))
             ;; vCard 2.1 and 3.0 require the 'N' property be present.
             ;; Trying to create this by parsing the heading which has
             ;; FIELDTYPE 'name' is fraught with challenges - cf.
             ;; http://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
             ;; - so we just create an empty 'N' property.
-            (if (or (string= "3.0" org-vcard-active-version)
-                   (string= "2.1" org-vcard-active-version))
+            (if (and (string= "FN" org-vcard-default-property-for-heading)
+                     (or (string= "3.0" org-vcard-active-version)
+                         (string= "2.1" org-vcard-active-version)))
                 (setq content (concat content
                                       (org-vcard-export-line "N" ""))))
             (while (and (setq search-result (re-search-forward "\\s *:FIELDTYPE:\\s *\\(\\(?:\\w\\|-\\)+\\)" nil t))
@@ -97,10 +98,12 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (setq content
               (concat content
                       "* "
-                      (or (cdr (assoc "FN" card))
+                      (or (cdr (assoc org-vcard-default-property-for-heading card))
                           (replace-regexp-in-string
                            "^;\\|;$" ""
-                           (cdr (assoc "N" card)))) "\n"
+                           (cdr (assoc (if (string= "FN" org-vcard-default-property-for-heading)
+                                           "N"
+                                         "FN") card)))) "\n"
                            ":PROPERTIES:\n"
                            ":KIND: " (if (assoc "KIND" card)
                                          (cdr (assoc "KIND" card))
@@ -115,7 +118,7 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                                   (match-string 0 property-original)))
                  (case-fold-search t)
                  (preferred nil))
-            (if (not (member property '("FN" "KIND" "VERSION")))
+            (if (not (member property `(,org-vcard-default-property-for-heading "KIND" "VERSION")))
                 (progn
                   (cond
                    ((or (string= "4.0" org-vcard-active-version)

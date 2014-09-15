@@ -275,6 +275,13 @@ all vCard properties when exporting to vCard 2.1."
                            org-vcard-character-set-mapping))
   :group 'org-vcard)
 
+(defcustom org-vcard-default-property-for-heading "FN"
+  "The vCard property whose value should be used in the Org heading
+for a contact."
+  :type '(radio (const :tag "FN" "FN")
+                (const :tag "N" "N"))
+  :group 'org-vcard)
+
 ;; The in-buffer setting #+CONTACT_STYLE.
 
 (defcustom org-vcard-default-style "flat"

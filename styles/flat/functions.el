@@ -37,7 +37,8 @@ DESTINATION must be either \"buffer\" or \"file\"."
            ;; fraught with challenges - cf.
            ;; http://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
            ;; - so we just create an empty 'N' property.
-           (if (and (or (string= "3.0" org-vcard-active-version)
+           (if (and (string= "FN" org-vcard-default-property-for-heading)
+                    (or (string= "3.0" org-vcard-active-version)
                         (string= "2.1" org-vcard-active-version))
                     (not (member "N" (mapcar 'car properties))))
                (setq content (concat
@@ -56,9 +57,10 @@ DESTINATION must be either \"buffer\" or \"file\"."
                   output
                   (org-vcard-export-line "BEGIN" "VCARD")
                   (org-vcard-export-line "VERSION" org-vcard-active-version)
-                  (org-vcard-export-line "FN" (plist-get
-                                               (nth 1 (org-element-headline-parser (line-end-position)))
-                                               :raw-value))
+                  (org-vcard-export-line org-vcard-default-property-for-heading
+                                         (plist-get
+                                          (nth 1 (org-element-headline-parser (line-end-position)))
+                                          :raw-value))
                   content
                   (org-vcard-export-line "END" "VCARD"))))))
      nil scope)
@@ -75,7 +77,6 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (cards (org-vcard-import-parse source))
         (import-buffer nil)
         (filename "")
-        (vcard-property-for-heading "")
         (heading ""))
     (if (not (member source '("buffer" "file" "region")))
         (error "Invalid source type"))
@@ -88,17 +89,17 @@ DESTINATION must be one of \"buffer\" or \"file\"."
         (if (assoc "VERSION" card)
             (setq org-vcard-active-version (cdr (assoc "VERSION" card)))
           (setq org-vcard-active-version org-vcard-default-version))
-        (setq vcard-property-for-heading
-              (cdr (assoc "[HEADING]" flat-style-properties)))
         (setq heading
-              (or (cdr (assoc vcard-property-for-heading card))
+              (or (cdr (assoc org-vcard-default-property-for-heading card))
                   (replace-regexp-in-string "^;\\|;$" ""
-                                            (cdr (assoc "N" card)))))
+                                            (cdr (assoc (if (string= org-vcard-default-property-for-heading "FN")
+                                                            "N"
+                                                          "FN") card)))))
         (setq content (concat content
                               "* " heading "\n"
                               ":PROPERTIES:\n"))
         (dolist (entry card)
-          (if (not (string= vcard-property-for-heading (car entry)))
+          (if (not (string= org-vcard-default-property-for-heading (car entry)))
               (let* ((property (car entry))
                      (property-name (progn
                                       (string-match "^[^;:]+" property)
