@@ -474,8 +474,8 @@ vCard 2.1."
                      (org-vcard-canonicalise-property-name "ADR;WORK")))))
 
 
-(ert-deftest org-vcard-test-import-parser ()
-  "Test the org-vcard-import-parser function."
+(ert-deftest org-vcard-test-import-parse ()
+  "Test the org-vcard-import-parse function."
   :tags '(org-vcard)
 
   (should (with-temp-buffer
@@ -483,47 +483,48 @@ vCard 2.1."
             (insert "FN:word\u000D\u000A")
             (insert "END:VCARD\u000D\u000A")
             (equal '((("FN" . "word")))
-                   (org-vcard-import-parser "buffer"))))
+                   (org-vcard-import-parse "buffer"))))
   (should (with-temp-buffer
             (insert "BEGIN:VCARD\015\012")
             (insert "FN:word\015\012")
             (insert "END:VCARD\015\012")
             (equal '((("FN" . "word")))
-                   (org-vcard-import-parser "buffer"))))
+                   (org-vcard-import-parse "buffer"))))
   (should (with-temp-buffer
             (insert "BEGIN:VCARD\u000D\u000A")
             (insert "FN:word\u000D\u000A")
             (insert "N:\u000D\u000A")
             (insert "END:VCARD\u000D\u000A")
             (equal '((("FN" . "word")("N" . "")))
-                   (org-vcard-import-parser "buffer"))))
+                   (org-vcard-import-parse "buffer"))))
   (should (with-temp-buffer
             (insert "BEGIN:VCARD\015\012")
             (insert "FN:word\015\012")
             (insert "N:\015\012")
             (insert "END:VCARD\015\012")
             (equal '((("FN" . "word")("N" . "")))
-                   (org-vcard-import-parser "buffer"))))
+                   (org-vcard-import-parse "buffer"))))
   (should (with-temp-buffer
             (insert "BEGIN:vcard\u000D\u000A")
             (insert "FN:word\u000D\u000A")
             (insert "END:VCARD\u000D\u000A")
             (equal '((("FN" . "word")))
-                   (org-vcard-import-parser "buffer")))))
+                   (org-vcard-import-parse "buffer")))))
 
 
-(ert-deftest org-vcard-test-write-to-destination ()
-  "Test the org-vcard-write-to-destination-function."
+(ert-deftest org-vcard-test-transfer-write ()
+  "Test the org-vcard-transfer-write function."
   :tags '(org-vcard)
 
   (progn
     (should (string= (concat "A line of text\u000D\u000A"
-                           "A second line of text\015\012"
-                           "A third line of text\u000D\012")
+                             "A second line of text\015\012"
+                             "A third line of text\u000D\012")
                    (progn
                      (if (get-buffer "*org-vcard-export*")
                          (kill-buffer "*org-vcard-export*"))
-                     (org-vcard-write-to-destination
+                     (org-vcard-transfer-write
+                      'export
                       (concat "A line of text\u000D\u000A"
                               "A second line of text\015\012"
                               "A third line of text\u000D\012")
@@ -532,7 +533,8 @@ vCard 2.1."
                      (buffer-string))))
     (kill-buffer "*org-vcard-export*"))
 
-  (should-error (org-vcard-write-to-destination
+  (should-error (org-vcard-transfer-write
+                 'export
                  '("A line of text\u000D\u000A"
                    "A second line of text\015\012"
                    "A third line of text\u000D\012")
