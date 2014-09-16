@@ -1,3 +1,6 @@
+(require 'org-vcard)
+
+
 (defun org-vcard-export-from-tree (source destination)
   "Export tree-style SOURCE to vCard format, sending output
 to DESTINATION.

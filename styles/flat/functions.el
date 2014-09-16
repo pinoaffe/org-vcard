@@ -1,3 +1,6 @@
+(require 'org-vcard)
+
+
 (defun org-vcard-export-from-flat (source destination)
   "Export flat-style SOURCE to vCard format, sending output
 to DESTINATION.
