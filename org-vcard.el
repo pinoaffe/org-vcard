@@ -1,6 +1,6 @@
 ;;; org-vcard.el --- org-mode support for vCard export and import.
 
-;; Copyright (C) 2014  Free Software Foundation, Inc.
+;; Copyright (C) 2014  Alexis <flexibeast@gmail.com>
 
 ;; Author: Alexis <flexibeast@gmail.com>
 ;; Maintainer: Alexis <flexibeast@gmail.com>
