@@ -136,7 +136,7 @@ the org-vcard-styles-functions defvar."
                          nil)))))
 
 (defvar org-vcard-styles-functions (org-vcard-create-styles-functions)
-    "org-vcard internal variable, containing available styles and
+  "org-vcard internal variable, containing available styles and
 their associated export and import functions.")
 
 (defun org-vcard-create-styles-languages-mappings ()
@@ -271,8 +271,8 @@ http://www.iana.org/assignments/character-sets/character-sets.xhtml"
   "Value of the vCard 2.1 CHARSET modifier which will be applied to
 all vCard properties when exporting to vCard 2.1."
   :type `(radio ,@(mapcar #'(lambda (entry)
-                               `(const :tag ,(car entry) ,(cdr entry)))
-                           org-vcard-character-set-mapping))
+                              `(const :tag ,(car entry) ,(cdr entry)))
+                          org-vcard-character-set-mapping))
   :group 'org-vcard)
 
 (defcustom org-vcard-default-property-for-heading "FN"
@@ -325,10 +325,10 @@ the mode, `toggle' toggles the state.
 
 When org-vcard mode is enabled, an Org-vCard entry is added
 to Emacs' menu bar."
-      nil                     ; The initial value.
-      nil                     ; The indicator for the mode line.
-      org-vcard-mode-keymap ; The minor mode bindings.
-      :group 'org-vcard)
+  nil                    ; The initial value.
+  nil                    ; The indicator for the mode line.
+  org-vcard-mode-keymap  ; The minor mode bindings.
+  :group 'org-vcard)
 
 
 ;;
