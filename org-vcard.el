@@ -86,7 +86,6 @@
 
 ;; The structure of the `tree' contacts style is:
 
-;;     ```
 ;;     * [Contact name]
 ;;     :PROPERTIES:
 ;;     :KIND: individual
@@ -98,11 +97,9 @@
 ;;     :FIELDTYPE: [Field type]
 ;;     [:PREFERRED:]
 ;;     :END:
-;;     ```
 
 ;; Here's an example:
 
-;;     ```
 ;;     * Joan Smith
 ;;     :PROPERTIES:
 ;;     :KIND: individual
@@ -125,11 +122,9 @@
 ;;     :PROPERTIES:
 ;;     :FIELDTYPE: email-home
 ;;     :END:
-;;     ```
 
 ;; As the `tree' style uses a heading's FIELDTYPE property to associate fields with their data, the above hierarchy is only one way to structure contacts; equivalently, one could do:
 
-;;     ```
 ;;     * People
 ;;     ** Joan Smith
 ;;     :PROPERTIES:
@@ -151,7 +146,6 @@
 ;;     :PROPERTIES:
 ;;     :FIELDTYPE: email-home
 ;;     :END:
-;;     ```
 
 ;; ## TODO
 

@@ -61,7 +61,6 @@ The value of the `org-vcard-append-to-existing-import-buffer` and `org-vcard-app
 
 The structure of the `tree` contacts style is:
 
-    ```
     * [Contact name]
     :PROPERTIES:
     :KIND: individual
@@ -73,11 +72,9 @@ The structure of the `tree` contacts style is:
     :FIELDTYPE: [Field type]
     [:PREFERRED:]
     :END:
-    ```
 
 Here's an example:
 
-    ```
     * Joan Smith
     :PROPERTIES:
     :KIND: individual
@@ -100,11 +97,9 @@ Here's an example:
     :PROPERTIES:
     :FIELDTYPE: email-home
     :END:
-    ```
 
 As the `tree` style uses a heading's FIELDTYPE property to associate fields with their data, the above hierarchy is only one way to structure contacts; equivalently, one could do:
 
-    ```
     * People
     ** Joan Smith
     :PROPERTIES:
@@ -126,7 +121,6 @@ As the `tree` style uses a heading's FIELDTYPE property to associate fields with
     :PROPERTIES:
     :FIELDTYPE: email-home
     :END:
-    ```
 
 ## TODO
 
@@ -162,7 +156,7 @@ please create a new issue with as much detail as possible, including:
 
 A basic test suite is located in the repository `tests` directory, in `org-vcard-tests.el`. To run the suite:
 
-1. Ensure `org-vcard.el` has been `load` ed, e.g. `(load "~/org-vcard/org-vcard.el")`.
+1. Ensure `org-vcard.el` has been loaded, e.g. `(load "~/org-vcard/org-vcard.el")`.
 2. Load the test suite: e.g. `(load "~/org-vcard/tests/org-vcard-tests.el")`.
 3. Run the tests by evaluating `(ert '(tag org-vcard))`.
 
