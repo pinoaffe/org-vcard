@@ -149,6 +149,8 @@
 
 ;; ## TODO
 
+;; * Add support for one-vCard-per-file export.
+
 ;; * Add support for multi-line field values.
 
 ;; * Add support for vCard PREF for style `flat'.
