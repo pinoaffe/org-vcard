@@ -1,4 +1,6 @@
 
+(require 'org-element)
+
 ;; Declare the variables and functions of library `org-vcard' that
 ;; we use, to avoid compiler warnings.
 ;;
