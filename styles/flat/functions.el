@@ -1,4 +1,26 @@
 
+;; Declare the variables and functions of library `org-vcard' that
+;; we use, to avoid compiler warnings.
+;;
+;; We can't simply `(require 'org-vcard)' as that would create a
+;; circular dependency.
+
+(defvar org-vcard-active-language)
+(defvar org-vcard-active-version)
+(defvar org-vcard-compound-properties)
+(defvar org-vcard-default-property-for-heading)
+(defvar org-vcard-default-version)
+(defvar org-vcard-include-import-unknowns)
+(defvar org-vcard-remove-external-semicolons)
+(defvar org-vcard-styles-languages-mappings)
+
+(declare-function org-vcard-export-line "org-vcard.el")
+(declare-function org-vcard-import-parse "org-vcard.el")
+(declare-function org-vcard-transfer-write "org-vcard.el")
+
+
+;;
+
 (defun org-vcard-export-from-flat (source destination)
   "Export flat-style SOURCE to vCard format, sending output
 to DESTINATION.
@@ -24,7 +46,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
               (or (cadr (assoc org-vcard-active-version
                                (cadr (assoc org-vcard-active-language
                                             (cadr (assoc "flat" org-vcard-styles-languages-mappings))))))
-                 (error "No mapping available for specified vCard version")))
+                  (error "No mapping available for specified vCard version")))
              (content (encode-coding-string "" encoding)))
          ;; Does this entry contain a PROPERTY listed in
          ;; the "flat" mapping? If so, assume we're in

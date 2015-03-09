@@ -1,4 +1,26 @@
 
+;; Declare the variables and functions of library `org-vcard' that
+;; we use, to avoid compiler warnings.
+;;
+;; We can't simply `(require 'org-vcard)' as that would create a
+;; circular dependency.
+
+(defvar org-vcard-active-language)
+(defvar org-vcard-active-version)
+(defvar org-vcard-compound-properties)
+(defvar org-vcard-default-property-for-heading)
+(defvar org-vcard-default-version)
+(defvar org-vcard-include-import-unknowns)
+(defvar org-vcard-remove-external-semicolons)
+(defvar org-vcard-styles-languages-mappings)
+
+(declare-function org-vcard-export-line "org-vcard.el")
+(declare-function org-vcard-import-parse "org-vcard.el")
+(declare-function org-vcard-transfer-write "org-vcard.el")
+
+
+;; 
+
 (defun org-vcard-export-from-tree (source destination)
   "Export tree-style SOURCE to vCard format, sending output
 to DESTINATION.
@@ -45,7 +67,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
                 (setq content (concat content
                                       (org-vcard-export-line "N" ""))))
             (while (and (setq search-result (re-search-forward "\\s *:FIELDTYPE:\\s *\\(\\(?:\\w\\|-\\)+\\)" nil t))
-                      (not end-vcard))
+                        (not end-vcard))
               (let ((fieldtype (match-string 1)))
                 (if (not (string= "name" (downcase fieldtype)))
                     (let ((property (cdr (assoc (downcase fieldtype) tree-style-properties))))
