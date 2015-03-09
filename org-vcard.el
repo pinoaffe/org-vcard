@@ -222,6 +222,7 @@
 
 (require 'org)
 
+
 ;;
 ;; Setup.
 ;;
@@ -1003,18 +1004,20 @@ argument of:
         (style org-vcard-default-style))
     (setq source (completing-read "Source: " '("buffer" "region" "subtree")))
     (setq destination (completing-read "Destination: " '("file" "buffer")))
-    (case arg
-      (1
-       (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) nil t org-vcard-default-version)))
-      (2
-       (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) nil t org-vcard-default-language)))
-      (3
-       (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions) nil t org-vcard-default-style)))
-      (4
-       (progn
-         (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) nil t org-vcard-default-version))
-         (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) nil t org-vcard-default-language))
-         (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions) nil t org-vcard-default-style)))))
+    (cond
+     ((eq nil arg)
+      t)
+     ((= 1 arg)
+      (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) nil t org-vcard-default-version)))
+     ((= 2 arg)
+      (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) nil t org-vcard-default-language)))
+     ((= 3 arg)
+      (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions) nil t org-vcard-default-style)))
+     ((= 4 arg)
+      (progn
+        (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) nil t org-vcard-default-version))
+        (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) nil t org-vcard-default-language))
+        (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions) nil t org-vcard-default-style)))))
     (org-vcard-transfer-helper source destination style language version 'export)))
 
 
@@ -1039,18 +1042,20 @@ argument of:
         (style org-vcard-default-style))
     (setq source (completing-read "Source: " '("buffer" "region" "subtree")))
     (setq destination (completing-read "Destination: " '("file" "buffer")))
-    (case arg
-      (1
-       (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) nil t org-vcard-default-version)))
-      (2
-       (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) nil t org-vcard-default-language)))
-      (3
-       (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions) nil t org-vcard-default-style)))
-      (4
-       (progn
-         (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) nil t org-vcard-default-version))
-         (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) nil t org-vcard-default-language))
-         (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions) nil t org-vcard-default-style)))))
+    (cond
+     ((eq nil arg)
+      t)
+     ((= 1 arg)
+      (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) nil t org-vcard-default-version)))
+     ((= 2 arg)
+      (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) nil t org-vcard-default-language)))
+     ((= 3 arg)
+      (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions) nil t org-vcard-default-style)))
+     ((= 4 arg)
+      (progn
+        (setq version (completing-read "Version: " (mapcar 'car (cadr (assoc language (cadr (assoc style org-vcard-styles-languages-mappings))))) nil t org-vcard-default-version))
+        (setq language (completing-read "Language: " (mapcar 'car (cadr (assoc style org-vcard-styles-languages-mappings))) nil t org-vcard-default-language))
+        (setq style (completing-read "Style: " (mapcar 'car org-vcard-styles-functions) nil t org-vcard-default-style)))))
     (org-vcard-transfer-helper source destination style language version 'import)))
 
 
