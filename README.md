@@ -1,5 +1,7 @@
 # org-vcard - org-mode support for vCard export and import
 
+[![Join the chat at https://gitter.im/flexibeast/org-vcard](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/flexibeast/org-vcard?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 *Author:* Alexis <flexibeast@gmail.com><br>
 *URL:* [https://github.com/flexibeast/org-vcard](https://github.com/flexibeast/org-vcard)<br>
 
