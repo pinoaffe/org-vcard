@@ -1041,7 +1041,7 @@ argument of:
         (version org-vcard-default-version)
         (language org-vcard-default-language)
         (style org-vcard-default-style))
-    (setq source (completing-read "Source: " '("buffer" "region" "subtree")))
+    (setq source (completing-read "Source: " '("file" "buffer" "region")))
     (setq destination (completing-read "Destination: " '("file" "buffer")))
     (cond
      ((eq nil arg)
