@@ -1,5 +1,8 @@
 BEGIN:VCARD
 VERSION:4.0
+NOTE:A
+  multiline
+	 comment.
 FN:Joan Smith
 EMAIL;PREF=1:joan@example.com
 EMAIL:joan.2@example.com

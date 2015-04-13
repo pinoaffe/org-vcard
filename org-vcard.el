@@ -151,7 +151,7 @@
 
 ;; * Add support for one-vCard-per-file export.
 
-;; * Add support for multi-line field values.
+;; * Add support for line folding when exporting.
 
 ;; * Add support for vCard PREF for style `flat'.
 
@@ -872,6 +872,15 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
         (string-match "\\([^:]+\\): *\\(.*?\\)\\(?:\u000D\\|\015\\)?$" current-line)
         (setq property (match-string 1 current-line))
         (setq value (match-string 2 current-line))
+        (forward-line)
+        (setq current-line
+              (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+        (while (not (string-match "^\\([^\u0009\u0020\011\040:]+\\):" current-line))
+          (string-match "^\\(?:\u0009\\|\u0020\\|\011\\|\040\\)\\(.*?\\)\\(?:\u000D\\|\015\\)?$" current-line)
+          (setq value (concat value (match-string 1 current-line)))
+          (forward-line)
+          (setq current-line
+                (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
         (if (string-match ";CHARSET=\\([^;:]+\\)" property)
             (let ((encoding (match-string 1 property)))
               (setq property (replace-regexp-in-string ";CHARSET=[^;:]+" "" property))
@@ -890,10 +899,9 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
                               value
                               (cdr (assoc encoding org-vcard-character-set-mapping)))))))))
         (setq property (org-vcard-canonicalise-property-name property))
-        (setq current-card (append current-card (list (cons property value))))
-        (forward-line))
+        (setq current-card (append current-card (list (cons property value)))))
       (setq cards (append cards (list current-card))))
-   cards))
+    cards))
 
 
 (defun org-vcard-transfer-write (direction content destination)

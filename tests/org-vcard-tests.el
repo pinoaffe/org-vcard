@@ -509,6 +509,12 @@ vCard 2.1."
             (insert "FN:word\u000D\u000A")
             (insert "END:VCARD\u000D\u000A")
             (equal '((("FN" . "word")))
+                   (org-vcard-import-parse "buffer"))))
+  (should (with-temp-buffer
+            (insert "BEGIN:vcard\u000D\u000A")
+            (insert "NOTE:A\u000D\u000A  multiline\u000D\u000A\u0009 comment.\u000D\u000A")
+            (insert "END:VCARD\u000D\u000A")
+            (equal '((("NOTE" . "A multiline comment.")))
                    (org-vcard-import-parse "buffer")))))
 
 
@@ -520,17 +526,17 @@ vCard 2.1."
     (should (string= (concat "A line of text\u000D\u000A"
                              "A second line of text\015\012"
                              "A third line of text\u000D\012")
-                   (progn
-                     (if (get-buffer "*org-vcard-export*")
-                         (kill-buffer "*org-vcard-export*"))
-                     (org-vcard-transfer-write
-                      'export
-                      (concat "A line of text\u000D\u000A"
-                              "A second line of text\015\012"
-                              "A third line of text\u000D\012")
-                      "buffer")
-                     (switch-to-buffer "*org-vcard-export*")
-                     (buffer-string))))
+                     (progn
+                       (if (get-buffer "*org-vcard-export*")
+                           (kill-buffer "*org-vcard-export*"))
+                       (org-vcard-transfer-write
+                        'export
+                        (concat "A line of text\u000D\u000A"
+                                "A second line of text\015\012"
+                                "A third line of text\u000D\012")
+                        "buffer")
+                       (switch-to-buffer "*org-vcard-export*")
+                       (buffer-string))))
     (kill-buffer "*org-vcard-export*"))
 
   (should-error (org-vcard-transfer-write
@@ -698,6 +704,7 @@ vCard 2.1."
                  (concat "* Joan Smith" lf
                          ":PROPERTIES:" lf
                          ":VERSION: 4.0" lf
+                         ":NOTE: A multiline comment." lf
                          ":EMAIL: joan@example.com" lf
                          ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
@@ -744,6 +751,7 @@ vCard 2.1."
                  (concat "* Joan Smith" lf
                          ":PROPERTIES:" lf
                          ":VERSION: 3.0" lf
+                         ":NOTE: A multiline comment." lf
                          ":EMAIL: joan@example.com" lf
                          ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
@@ -790,6 +798,7 @@ vCard 2.1."
                  (concat "* Joan Smith" lf
                          ":PROPERTIES:" lf
                          ":VERSION: 2.1" lf
+                         ":NOTE: A multiline comment." lf
                          ":EMAIL: joan@example.com" lf
                          ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
@@ -978,6 +987,10 @@ vCard 2.1."
                          ":FIELDTYPE: email" lf
                          ":PREFERRED:" lf
                          ":END:" lf
+                         "** A multiline comment." lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: note" lf
+                         ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
@@ -1060,6 +1073,10 @@ vCard 2.1."
                          ":FIELDTYPE: email" lf
                          ":PREFERRED:" lf
                          ":END:" lf
+                         "** A multiline comment." lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: note" lf
+                         ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: cell" lf
@@ -1141,6 +1158,10 @@ vCard 2.1."
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email" lf
                          ":PREFERRED:" lf
+                         ":END:" lf
+                         "** A multiline comment." lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: note" lf
                          ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
