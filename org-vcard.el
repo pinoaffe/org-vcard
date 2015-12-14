@@ -60,7 +60,7 @@
 
 ;; ## Installation
 
-;; Install [org-vcard from MELPA](http://melpa.org/#/org-vcard), or put the `org-vcard' folder in your load-path and do a `(require 'org-vcard)'.
+;; Install `org-vcard' from [MELPA](http://melpa.org/#/org-vcard), [MELPA Stable](http://stable.melpa.org/#/org-vcard), or put the `org-vcard' folder in your load-path and do a `(require 'org-vcard)'.
 
 ;; ## Usage
 
