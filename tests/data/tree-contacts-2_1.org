@@ -25,12 +25,9 @@
 :FIELDTYPE: email
 :PREFERRED: 
 :END:
-*** Email
-**** joan.2@example.com
 *** Role
 **** Manager
 :PROPERTIES:
-:FIELDTYPE: email
 :FIELDTYPE: role
 :END:
 *** Org

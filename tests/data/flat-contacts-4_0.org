@@ -10,7 +10,6 @@
 :MOBILE: 0000 999 999
 :ADDRESS_WORK: ;123 Main Street;Any Town;;;
 :EMAIL: joan@example.com
-:EMAIL: joan.2@example.com
 :ROLE: Manager
 :ORG: Example Inc.
 :CATEGORIES: category a, category b

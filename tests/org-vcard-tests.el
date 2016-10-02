@@ -567,19 +567,24 @@ vCard 2.1."
                  (concat "BEGIN:VCARD" crlf
                          "VERSION:4.0" crlf
                          "FN:Joan Smith" crlf
-                         "TEL;TYPE=\"voice\":00 9999 9999" crlf
-                         "TEL;TYPE=\"cell\":0000 999 999" crlf
-                         "ADR;TYPE=\"work\":;123 Main Street;Any Town;;;" crlf
+                         "CATEGORIES:category a, category b" crlf
+                         "ORG:Example Inc." crlf
+                         "ROLE:Manager" crlf
                          "EMAIL:joan@example.com" crlf
-                         "EMAIL:joan.2@example.com" crlf
+                         "ADR;TYPE=\"work\":;123 Main Street;Any Town;;;" crlf
+                         "TEL;TYPE=\"cell\":0000 999 999" crlf
+                         "TEL;TYPE=\"voice\":00 9999 9999" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:4.0" crlf
                          "FN:John" crlf
-                         "TEL;TYPE=\"voice\":01 9999 9999" crlf
-                         "TEL;TYPE=\"cell\":0001 999 999" crlf
-                         "EMAIL;TYPE=\"work\":john@example.com" crlf
+                         "CATEGORIES:category c" crlf
+                         "ORG:Example Inc.;Marketing" crlf
+                         "URL:http://www.example.com/" crlf
                          "EMAIL;TYPE=\"home\":john.2@example.com" crlf
+                         "EMAIL;TYPE=\"work\":john@example.com" crlf
+                         "TEL;TYPE=\"cell\":0001 999 999" crlf
+                         "TEL;TYPE=\"voice\":01 9999 9999" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -612,20 +617,25 @@ vCard 2.1."
                          "VERSION:3.0" crlf
                          "FN:Joan Smith" crlf
                          "N:" crlf
-                         "TEL;TYPE=voice:00 9999 9999" crlf
-                         "TEL;TYPE=cell:0000 999 999" crlf
-                         "ADR;TYPE=work:;123 Main Street;Any Town;;;" crlf
+                         "CATEGORIES:category a, category b" crlf
+                         "ORG:Example Inc." crlf
+                         "ROLE:Manager" crlf
                          "EMAIL:joan@example.com" crlf
-                         "EMAIL:joan.2@example.com" crlf
+                         "ADR;TYPE=work:;123 Main Street;Any Town;;;" crlf
+                         "TEL;TYPE=cell:0000 999 999" crlf
+                         "TEL;TYPE=voice:00 9999 9999" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:3.0" crlf
                          "FN:John" crlf
                          "N:" crlf
-                         "TEL;TYPE=voice:01 9999 9999" crlf
-                         "TEL;TYPE=cell:0001 999 999" crlf
-                         "EMAIL;TYPE=work:john@example.com" crlf
+                         "CATEGORIES:category c" crlf
+                         "ORG:Example Inc.;Marketing" crlf
+                         "URL:http://www.example.com/" crlf
                          "EMAIL;TYPE=home:john.2@example.com" crlf
+                         "EMAIL;TYPE=work:john@example.com" crlf
+                         "TEL;TYPE=cell:0001 999 999" crlf
+                         "TEL;TYPE=voice:01 9999 9999" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -658,20 +668,25 @@ vCard 2.1."
                          "VERSION:2.1" crlf
                          "FN;CHARSET=US-ASCII:Joan Smith" crlf
                          "N;CHARSET=US-ASCII:" crlf
-                         "TEL;VOICE;CHARSET=US-ASCII:00 9999 9999" crlf
-                         "TEL;CELL;CHARSET=US-ASCII:0000 999 999" crlf
-                         "ADR;WORK;CHARSET=US-ASCII:;123 Main Street;Any Town;;;" crlf
+                         "CATEGORIES;CHARSET=US-ASCII:category a, category b" crlf
+                         "ORG;CHARSET=US-ASCII:Example Inc." crlf
+                         "ROLE;CHARSET=US-ASCII:Manager" crlf
                          "EMAIL;CHARSET=US-ASCII:joan@example.com" crlf
-                         "EMAIL;CHARSET=US-ASCII:joan.2@example.com" crlf
+                         "ADR;WORK;CHARSET=US-ASCII:;123 Main Street;Any Town;;;" crlf
+                         "TEL;CELL;CHARSET=US-ASCII:0000 999 999" crlf
+                         "TEL;VOICE;CHARSET=US-ASCII:00 9999 9999" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:2.1" crlf
                          "FN;CHARSET=US-ASCII:John" crlf
                          "N;CHARSET=US-ASCII:" crlf
-                         "TEL;VOICE;CHARSET=US-ASCII:01 9999 9999" crlf
-                         "TEL;CELL;CHARSET=US-ASCII:0001 999 999" crlf
-                         "EMAIL;WORK;CHARSET=US-ASCII:john@example.com" crlf
+                         "CATEGORIES;CHARSET=US-ASCII:category c" crlf
+                         "ORG;CHARSET=US-ASCII:Example Inc.;Marketing" crlf
+                         "URL;CHARSET=US-ASCII:http://www.example.com/" crlf
                          "EMAIL;HOME;CHARSET=US-ASCII:john.2@example.com" crlf
+                         "EMAIL;WORK;CHARSET=US-ASCII:john@example.com" crlf
+                         "TEL;CELL;CHARSET=US-ASCII:0001 999 999" crlf
+                         "TEL;VOICE;CHARSET=US-ASCII:01 9999 9999" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -706,10 +721,12 @@ vCard 2.1."
                          ":VERSION: 4.0" lf
                          ":NOTE: A multiline comment." lf
                          ":EMAIL: joan@example.com" lf
-                         ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
                          ":LANDLINE: 00 9999 9999" lf
                          ":FAX: 00 9999 9998" lf
+                         ":ROLE: Manager" lf
+                         ":ORG: Example Inc." lf
+                         ":CATEGORIES: category a,category b" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -720,6 +737,9 @@ vCard 2.1."
                          ":LANDLINE: 01 9999 9999" lf
                          ":FAX_HOME: 01 9999 9998" lf
                          ":FAX_WORK: 01 9999 9997" lf
+                         ":URL: http://www.example.com/" lf
+                         ":ORG: Example Inc.;Marketing" lf
+                         ":CATEGORIES: category c" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -753,10 +773,12 @@ vCard 2.1."
                          ":VERSION: 3.0" lf
                          ":NOTE: A multiline comment." lf
                          ":EMAIL: joan@example.com" lf
-                         ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
                          ":LANDLINE: 00 9999 9999" lf
                          ":FAX: 00 9999 9998" lf
+                         ":ROLE: Manager" lf
+                         ":ORG: Example Inc." lf
+                         ":CATEGORIES: category a,category b" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -767,6 +789,9 @@ vCard 2.1."
                          ":LANDLINE: 01 9999 9999" lf
                          ":FAX_HOME: 01 9999 9998" lf
                          ":FAX_WORK: 01 9999 9997" lf
+                         ":URL: http://www.example.com/" lf
+                         ":ORG: Example Inc.;Marketing" lf
+                         ":CATEGORIES: category c" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -800,10 +825,12 @@ vCard 2.1."
                          ":VERSION: 2.1" lf
                          ":NOTE: A multiline comment." lf
                          ":EMAIL: joan@example.com" lf
-                         ":EMAIL: joan.2@example.com" lf
                          ":CELL: 0000 999 999" lf
                          ":LANDLINE: 00 9999 9999" lf
                          ":FAX: 00 9999 9998" lf
+                         ":ROLE: Manager" lf
+                         ":ORG: Example Inc." lf
+                         ":CATEGORIES: category a,category b" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -814,6 +841,9 @@ vCard 2.1."
                          ":LANDLINE: 01 9999 9999" lf
                          ":FAX_HOME: 01 9999 9998" lf
                          ":FAX_WORK: 01 9999 9997" lf
+                         ":URL: http://www.example.com/" lf
+                         ":ORG: Example Inc.;Marketing" lf
+                         ":CATEGORIES: category c" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -851,7 +881,9 @@ vCard 2.1."
                          "TEL;TYPE=\"voice\":00 9999 9999" crlf
                          "TEL;TYPE=\"cell\":0000 999 999" crlf
                          "EMAIL;PREF=1:joan@example.com" crlf
-                         "EMAIL:joan.2@example.com" crlf
+                         "ROLE:Manager" crlf
+                         "ORG:Example Inc." crlf
+                         "CATEGORIES:category a, category b" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:4.0" crlf
@@ -860,6 +892,9 @@ vCard 2.1."
                          "TEL;TYPE=\"cell\":0001 999 999" crlf
                          "EMAIL;TYPE=\"work\";PREF=1:john@example.com" crlf
                          "EMAIL;TYPE=\"home\":john.2@example.com" crlf
+                         "URL:http://www.example.com/" crlf
+                         "ORG:Example Inc.;Marketing" crlf
+                         "CATEGORIES:category c" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -893,7 +928,9 @@ vCard 2.1."
                          "TEL;TYPE=voice:00 9999 9999" crlf
                          "TEL;TYPE=cell:0000 999 999" crlf
                          "EMAIL;TYPE=pref:joan@example.com" crlf
-                         "EMAIL:joan.2@example.com" crlf
+                         "ROLE:Manager" crlf
+                         "ORG:Example Inc." crlf
+                         "CATEGORIES:category a, category b" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:3.0" crlf
@@ -903,6 +940,9 @@ vCard 2.1."
                          "TEL;TYPE=cell:0001 999 999" crlf
                          "EMAIL;TYPE=work,pref:john@example.com" crlf
                          "EMAIL;TYPE=home:john.2@example.com" crlf
+                         "URL:http://www.example.com/" crlf
+                         "ORG:Example Inc.;Marketing" crlf
+                         "CATEGORIES:category c" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -936,7 +976,9 @@ vCard 2.1."
                          "TEL;VOICE;CHARSET=US-ASCII:00 9999 9999" crlf
                          "TEL;CELL;CHARSET=US-ASCII:0000 999 999" crlf
                          "EMAIL;PREF;CHARSET=US-ASCII:joan@example.com" crlf
-                         "EMAIL;CHARSET=US-ASCII:joan.2@example.com" crlf
+                         "ROLE;CHARSET=US-ASCII:Manager" crlf
+                         "ORG;CHARSET=US-ASCII:Example Inc." crlf
+                         "CATEGORIES;CHARSET=US-ASCII:category a, category b" crlf
                          "END:VCARD" crlf
                          "BEGIN:VCARD" crlf
                          "VERSION:2.1" crlf
@@ -946,6 +988,9 @@ vCard 2.1."
                          "TEL;CELL;CHARSET=US-ASCII:0001 999 999" crlf
                          "EMAIL;WORK;PREF;CHARSET=US-ASCII:john@example.com" crlf
                          "EMAIL;HOME;CHARSET=US-ASCII:john.2@example.com" crlf
+                         "URL;CHARSET=US-ASCII:http://www.example.com/" crlf
+                         "ORG;CHARSET=US-ASCII:Example Inc.;Marketing" crlf
+                         "CATEGORIES;CHARSET=US-ASCII:category c" crlf
                          "END:VCARD" crlf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -978,9 +1023,9 @@ vCard 2.1."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
-                         "** joan.2@example.com" lf
+                         "** category a,category b" lf
                          ":PROPERTIES:" lf
-                         ":FIELDTYPE: email" lf
+                         ":FIELDTYPE: categories" lf
                          ":END:" lf
                          "** joan@example.com" lf
                          ":PROPERTIES:" lf
@@ -990,6 +1035,14 @@ vCard 2.1."
                          "** A multiline comment." lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: note" lf
+                         ":END:" lf
+                         "** Example Inc." lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: org" lf
+                         ":END:" lf
+                         "** Manager" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: role" lf
                          ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
@@ -1008,6 +1061,10 @@ vCard 2.1."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
+                         "** category c" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: categories" lf
+                         ":END:" lf
                          "** john.2@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-home" lf
@@ -1016,6 +1073,10 @@ vCard 2.1."
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-work" lf
                          ":PREFERRED:" lf
+                         ":END:" lf
+                         "** Example Inc.;Marketing" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: org" lf
                          ":END:" lf
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
@@ -1032,6 +1093,10 @@ vCard 2.1."
                          "** 01 9999 9999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: landline" lf
+                         ":END:" lf
+                         "** http://www.example.com/" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: url" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -1064,9 +1129,9 @@ vCard 2.1."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
-                         "** joan.2@example.com" lf
+                         "** category a,category b" lf
                          ":PROPERTIES:" lf
-                         ":FIELDTYPE: email" lf
+                         ":FIELDTYPE: categories" lf
                          ":END:" lf
                          "** joan@example.com" lf
                          ":PROPERTIES:" lf
@@ -1076,6 +1141,14 @@ vCard 2.1."
                          "** A multiline comment." lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: note" lf
+                         ":END:" lf
+                         "** Example Inc." lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: org" lf
+                         ":END:" lf
+                         "** Manager" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: role" lf
                          ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
@@ -1094,6 +1167,10 @@ vCard 2.1."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
+                         "** category c" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: categories"  lf
+                         ":END:" lf
                          "** john.2@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-home" lf
@@ -1102,6 +1179,10 @@ vCard 2.1."
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-work" lf
                          ":PREFERRED:" lf
+                         ":END:" lf
+                         "** Example Inc.;Marketing" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: org" lf
                          ":END:" lf
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
@@ -1118,6 +1199,10 @@ vCard 2.1."
                          "** 01 9999 9999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: landline" lf
+                         ":END:" lf
+                         "** http://www.example.com/" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: url" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")
@@ -1150,9 +1235,9 @@ vCard 2.1."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
-                         "** joan.2@example.com" lf
+                         "** category a,category b" lf
                          ":PROPERTIES:" lf
-                         ":FIELDTYPE: email" lf
+                         ":FIELDTYPE: categories" lf
                          ":END:" lf
                          "** joan@example.com" lf
                          ":PROPERTIES:" lf
@@ -1162,6 +1247,14 @@ vCard 2.1."
                          "** A multiline comment." lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: note" lf
+                         ":END:" lf
+                         "** Example Inc." lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: org" lf
+                         ":END:" lf
+                         "** Manager" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: role" lf
                          ":END:" lf
                          "** 0000 999 999" lf
                          ":PROPERTIES:" lf
@@ -1180,6 +1273,10 @@ vCard 2.1."
                          ":KIND: individual" lf
                          ":FIELDTYPE: name" lf
                          ":END:" lf
+                         "** category c" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: categories" lf
+                         ":END:" lf
                          "** john.2@example.com" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-home" lf
@@ -1188,6 +1285,10 @@ vCard 2.1."
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: email-work" lf
                          ":PREFERRED:" lf
+                         ":END:" lf
+                         "** Example Inc.;Marketing" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: org" lf
                          ":END:" lf
                          "** 0001 999 999" lf
                          ":PROPERTIES:" lf
@@ -1204,6 +1305,10 @@ vCard 2.1."
                          "** 01 9999 9999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: landline" lf
+                         ":END:" lf
+                         "** http://www.example.com/" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: url" lf
                          ":END:" lf)
                  (progn
                    (generate-new-buffer "*org-vcard-test*")

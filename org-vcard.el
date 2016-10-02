@@ -153,6 +153,8 @@
 
 ;; * Add support for line folding when exporting.
 
+;; * Add support for multiple instances of EMAIL property.
+
 ;; * Add support for vCard PREF for style `flat'.
 
 ;; * Add support for vCard KINDs `group' and `org'.
