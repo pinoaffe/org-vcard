@@ -11,6 +11,9 @@
 :ADDRESS_WORK: ;123 Main Street;Any Town;;;
 :EMAIL: joan@example.com
 :EMAIL: joan.2@example.com
+:ROLE: Manager
+:ORG: Example Inc.
+:CATEGORIES: category a, category b
 :END:
 ** John
 :PROPERTIES:
@@ -18,4 +21,7 @@
 :MOBILE: 0001 999 999
 :EMAIL_WORK: john@example.com
 :EMAIL_HOME: john.2@example.com
+:URL: http://www.example.com/
+:ORG: Example Inc.;Marketing
+:CATEGORIES: category c
 :END:

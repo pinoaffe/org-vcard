@@ -27,8 +27,21 @@
 :END:
 *** Email
 **** joan.2@example.com
+*** Role
+**** Manager
 :PROPERTIES:
 :FIELDTYPE: email
+:FIELDTYPE: role
+:END:
+*** Org
+**** Example Inc.
+:PROPERTIES:
+:FIELDTYPE: org
+:END:
+*** Categories
+**** category a, category b
+:PROPERTIES:
+:FIELDTYPE: categories
 :END:
 ** John
 :PROPERTIES:
@@ -56,4 +69,19 @@
 ***** john.2@example.com
 :PROPERTIES:
 :FIELDTYPE: email-home
+:END:
+*** URL
+**** http://www.example.com/
+:PROPERTIES:
+:FIELDTYPE: url
+:END:
+*** Org
+**** Example Inc.;Marketing
+:PROPERTIES:
+:FIELDTYPE: org
+:END:
+*** Categories
+**** category c
+:PROPERTIES:
+:FIELDTYPE: categories
 :END:
