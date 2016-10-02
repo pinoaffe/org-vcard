@@ -1,6 +1,6 @@
 (("4.0"
   (("address" . "ADR")
-  ("address-home" . "ADR;TYPE=\"home\"")
+   ("address-home" . "ADR;TYPE=\"home\"")
    ("address-work" . "ADR;TYPE=\"work\"")
    ("alias" . "NICKNAME")
    ("anniversary" . "ANNIVERSARY")
