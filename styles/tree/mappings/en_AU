@@ -35,6 +35,7 @@
    ("photo" . "PHOTO")
    ("role" . "ROLE")
    ("url" . "URL")
+   ("version" . "VERSION")))
  ("3.0"
   (("address" . "ADR")
    ("address-home" . "ADR;TYPE=home")
