@@ -33,6 +33,7 @@
    ("PHONE_WORK". "TEL;TYPE=\"voice,work\"")
    ("PHOTO" . "PHOTO")
    ("ROLE" . "ROLE")
+   ("TITLE" . "TITLE")
    ("URL" . "URL")
    ("VERSION" . "VERSION")))
  ("3.0"
@@ -68,6 +69,7 @@
    ("PHONE_WORK". "TEL;TYPE=voice,work")
    ("PHOTO" . "PHOTO")
    ("ROLE" . "ROLE")
+   ("TITLE" . "TITLE")
    ("URL" . "URL")
    ("VERSION" . "VERSION")))
  ("2.1"
@@ -98,5 +100,6 @@
    ("PHONE_WORK" . "TEL;VOICE;WORK")
    ("PHOTO" . "PHOTO")
    ("ROLE" . "ROLE")
+   ("TITLE" . "TITLE")
    ("URL" . "URL")
    ("VERSION" . "VERSION"))))
