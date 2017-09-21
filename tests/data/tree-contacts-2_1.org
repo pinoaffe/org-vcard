@@ -30,6 +30,11 @@
 :PROPERTIES:
 :FIELDTYPE: role
 :END:
+*** Title
+**** Manager
+:PROPERTIES:
+:FIELDTYPE: title
+:END:
 *** Org
 **** Example Inc.
 :PROPERTIES:

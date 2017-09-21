@@ -11,6 +11,7 @@
 :ADDRESS_WORK: ;123 Main Street;Any Town;;;
 :EMAIL: joan@example.com
 :ROLE: Manager
+:TITLE: Manager
 :ORG: Example Inc.
 :CATEGORIES: category a, category b
 :END:

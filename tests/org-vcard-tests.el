@@ -569,6 +569,7 @@ vCard 2.1."
                          "FN:Joan Smith" crlf
                          "CATEGORIES:category a, category b" crlf
                          "ORG:Example Inc." crlf
+                         "TITLE:Manager" crlf
                          "ROLE:Manager" crlf
                          "EMAIL:joan@example.com" crlf
                          "ADR;TYPE=\"work\":;123 Main Street;Any Town;;;" crlf
@@ -619,6 +620,7 @@ vCard 2.1."
                          "N:" crlf
                          "CATEGORIES:category a, category b" crlf
                          "ORG:Example Inc." crlf
+                         "TITLE:Manager" crlf
                          "ROLE:Manager" crlf
                          "EMAIL:joan@example.com" crlf
                          "ADR;TYPE=work:;123 Main Street;Any Town;;;" crlf
@@ -670,6 +672,7 @@ vCard 2.1."
                          "N;CHARSET=US-ASCII:" crlf
                          "CATEGORIES;CHARSET=US-ASCII:category a, category b" crlf
                          "ORG;CHARSET=US-ASCII:Example Inc." crlf
+                         "TITLE;CHARSET=US-ASCII:Manager" crlf
                          "ROLE;CHARSET=US-ASCII:Manager" crlf
                          "EMAIL;CHARSET=US-ASCII:joan@example.com" crlf
                          "ADR;WORK;CHARSET=US-ASCII:;123 Main Street;Any Town;;;" crlf
@@ -725,6 +728,7 @@ vCard 2.1."
                          ":LANDLINE: 00 9999 9999" lf
                          ":FAX: 00 9999 9998" lf
                          ":ROLE: Manager" lf
+                         ":TITLE: Manager" lf
                          ":ORG: Example Inc." lf
                          ":CATEGORIES: category a,category b" lf
                          ":END:" lf
@@ -777,6 +781,7 @@ vCard 2.1."
                          ":LANDLINE: 00 9999 9999" lf
                          ":FAX: 00 9999 9998" lf
                          ":ROLE: Manager" lf
+                         ":TITLE: Manager" lf
                          ":ORG: Example Inc." lf
                          ":CATEGORIES: category a,category b" lf
                          ":END:" lf
@@ -829,6 +834,7 @@ vCard 2.1."
                          ":LANDLINE: 00 9999 9999" lf
                          ":FAX: 00 9999 9998" lf
                          ":ROLE: Manager" lf
+                         ":TITLE: Manager" lf
                          ":ORG: Example Inc." lf
                          ":CATEGORIES: category a,category b" lf
                          ":END:" lf
@@ -882,6 +888,7 @@ vCard 2.1."
                          "TEL;TYPE=\"cell\":0000 999 999" crlf
                          "EMAIL;PREF=1:joan@example.com" crlf
                          "ROLE:Manager" crlf
+                         "TITLE:Manager" crlf
                          "ORG:Example Inc." crlf
                          "CATEGORIES:category a, category b" crlf
                          "END:VCARD" crlf
@@ -929,6 +936,7 @@ vCard 2.1."
                          "TEL;TYPE=cell:0000 999 999" crlf
                          "EMAIL;TYPE=pref:joan@example.com" crlf
                          "ROLE:Manager" crlf
+                         "TITLE:Manager" crlf
                          "ORG:Example Inc." crlf
                          "CATEGORIES:category a, category b" crlf
                          "END:VCARD" crlf
@@ -977,6 +985,7 @@ vCard 2.1."
                          "TEL;CELL;CHARSET=US-ASCII:0000 999 999" crlf
                          "EMAIL;PREF;CHARSET=US-ASCII:joan@example.com" crlf
                          "ROLE;CHARSET=US-ASCII:Manager" crlf
+                         "TITLE;CHARSET=US-ASCII:Manager" crlf
                          "ORG;CHARSET=US-ASCII:Example Inc." crlf
                          "CATEGORIES;CHARSET=US-ASCII:category a, category b" crlf
                          "END:VCARD" crlf
@@ -1055,6 +1064,10 @@ vCard 2.1."
                          "** 00 9999 9999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: landline" lf
+                         ":END:" lf
+                         "** Manager" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: title" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
@@ -1162,6 +1175,10 @@ vCard 2.1."
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: landline" lf
                          ":END:" lf
+                         "** Manager" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: title" lf
+                         ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
                          ":KIND: individual" lf
@@ -1267,6 +1284,10 @@ vCard 2.1."
                          "** 00 9999 9999" lf
                          ":PROPERTIES:" lf
                          ":FIELDTYPE: landline" lf
+                         ":END:" lf
+                         "** Manager" lf
+                         ":PROPERTIES:" lf
+                         ":FIELDTYPE: title" lf
                          ":END:" lf
                          "* John" lf
                          ":PROPERTIES:" lf
