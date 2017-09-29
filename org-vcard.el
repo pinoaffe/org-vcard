@@ -48,7 +48,7 @@
 
 ;; * _Basic support for vCard 4.0, 3.0 and 2.1._
 
-;; `org-vcard' is working towards full compliance with the vCard 4.0 ([RFC 6350](https://tools.ietf.org/html/rfc6350)), 3.0 ([RFC 2426](https://tools.ietf.org/html/rfc2426) and [RFC 4770](https://tools.ietf.org/html/rfc4770)) and [2.1](http://www.imc.org/pdi/vcard-21.txt) specifications.
+;; `org-vcard' is working towards full compliance with the vCard 4.0 ([RFC 6350](https://tools.ietf.org/html/rfc6350)), 3.0 ([RFC 2426](https://tools.ietf.org/html/rfc2426) and [RFC 4770](https://tools.ietf.org/html/rfc4770)) and [2.1](http://www.imagescript.com/atg/resources/vcard-21.doc) specifications.
 
 ;; * _New contacts style: `tree'._
 
