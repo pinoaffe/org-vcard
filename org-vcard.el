@@ -854,6 +854,8 @@ PROPERTY-NAME must be a string containing the vCard property name."
         property-canonicalised))))
 
 
+(declare-function quoted-printable-decode-string "qp")
+
 (defun org-vcard-import-parse (source)
   "Utility function to read from SOURCE and return a list of
 vCards, each in the form of a list of cons cells, with each
@@ -861,9 +863,10 @@ cell containing the vCard property in the car, and the value
 of that property in the cdr.
 
 SOURCE must be one of \"file\", \"buffer\" or \"region\"."
-  (let ((current-line nil)
-        (property "")
+  (let ((property "")
         (value "")
+        charset
+        encoding
         (cards '())
         (current-card '()))
     (cond
@@ -883,39 +886,61 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
       (while (not (looking-at "END:VCARD"))
         (setq current-line
               (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
-        (string-match "\\([^:]+\\): *\\(.*?\\)\\(?:\u000D\\|\015\\)?$" current-line)
-        (setq property (match-string 1 current-line))
-        (setq value (match-string 2 current-line))
+        (re-search-forward "^\\([^:]+\\): *")
+        ;; Parse property:
+        (setq property (match-string-no-properties 1)
+              value ""
+              charset (when (string-match ";CHARSET=\\([^;:]+\\)" property)
+                        (prog1 (match-string-no-properties 1 property) ; Save the value of the charset.
+                          ;; Remove the charset from the property name:
+                          (setq property (replace-match "" nil nil property))))
+              charset (cdr (assoc-string charset org-vcard-character-set-mapping))
+              encoding (when (string-match ";ENCODING=\\([^;:]+\\)" property)
+                         (prog1 (match-string-no-properties 1 property) ; Save the value of the encoding.
+                           ;; Remove the encoding from the property name:
+                           (setq property (replace-match "" nil nil property)))))
+        ;; Consume value and continuation lines:
+        (while (progn ; Idiomatic do-while loop.
+                 ;; Add the text from the current point to the end of the the line (minus line ending) to the value:
+                 (setq value (concat value
+                                     (string-trim-right (buffer-substring-no-properties (point)
+                                                                                        (line-end-position))
+                                                        ;; Remove DOS line ending:
+                                                        "[\u000D\015]")))
+                 ;; Set the point to the start of the next continuation line, if there is one:
+                 (or (re-search-forward "^[\u0009\u0020\011\040]"
+                                        (line-end-position 2) ; Don't go past the next line.
+                                        t ; No error and don't move point if failed.
+                                        )
+                     ;; = can also be a continuation line when encoded with quoted-printable:
+                     (when (re-search-forward "^=" (line-end-position 2) t)
+                       (setq value (concat value "\n")) ; Quoted-printable encoding needs the \n character for the previous line.
+                       (backward-char) ; Move point before the = so it is included in the value.
+                       ))))
         (forward-line)
-        (setq current-line
-              (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
-        (while (not (string-match "^\\([^\u0009\u0020\011\040:]+\\):" current-line))
-          (string-match "^\\(?:\u0009\\|\u0020\\|\011\\|\040\\)\\(.*?\\)\\(?:\u000D\\|\015\\)?$" current-line)
-          (setq value (concat value (match-string 1 current-line)))
-          (forward-line)
-          (setq current-line
-                (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-        (if (string-match ";CHARSET=\\([^;:]+\\)" property)
-            (let ((encoding (match-string 1 property)))
-              (setq property (replace-regexp-in-string ";CHARSET=[^;:]+" "" property))
-              (cond
-               ((or (string= "4.0" org-vcard-active-version)
-                    (string= "3.0" org-vcard-active-version))
-                ;; vCard 4.0 mandates UTF-8 as the only possible encoding,
-                ;; and 3.0 mandates encoding not per-property, but via the
-                ;; CHARSET parameter on the containing MIME object. So we
-                ;; just ignore the presence and/or value of the CHARSET
-                ;; modifier in 4.0 and 3.0 contexts.
-                t)
-               ((string= "2.1" org-vcard-active-version)
-                (setq value (string-as-multibyte
-                             (encode-coding-string
-                              value
-                              (cdr (assoc encoding org-vcard-character-set-mapping)))))))))
+        ;; Deal with possible quoted-printable encoding:
+        (when (and encoding
+                   (string= (upcase encoding) "QUOTED-PRINTABLE"))
+          (require 'qp) ; Part of GNU Emacs.
+          (setq value (decode-coding-string (quoted-printable-decode-string value)
+                                            (or charset 'utf-8-emacs)
+                                            :nocopy)))
+        ;; Handle CHARSET if necessary:
+        (pcase org-vcard-active-version
+          ((or "4.0" "3.0")
+           ;; vCard 4.0 mandates UTF-8 as the only possible encoding,
+           ;; and 3.0 mandates encoding not per-property, but via the
+           ;; CHARSET parameter on the containing MIME object. So we
+           ;; just ignore the presence and/or value of the CHARSET
+           ;; modifier in 4.0 and 3.0 contexts.
+           t
+           )
+          ("2.1"
+           (setq value (string-as-multibyte (encode-coding-string value charset)))))
         (setq property (org-vcard-canonicalise-property-name property))
         (setq current-card (append current-card (list (cons property value)))))
-      (setq cards (append cards (list current-card))))
-    cards))
+      (push current-card cards))
+    (nreverse cards)))
 
 
 (defun org-vcard-transfer-write (direction content destination)
