@@ -896,10 +896,9 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
                           (setq property (replace-match "" nil nil property))))
               charset (cdr (assoc-string charset org-vcard-character-set-mapping :case-fold))
               encoding (when (string-match ";ENCODING=\\([^;:]+\\)" property)
-                         (prog1 (match-string-no-properties 1 property) ; Save the value of the encoding.
+                         (prog1 (upcase (match-string-no-properties 1 property)) ; Save the value of the encoding.
                            ;; Remove the encoding from the property name:
-                           (setq property (replace-match "" nil nil property))))
-              encoding (upcase encoding))
+                           (setq property (replace-match "" nil nil property)))))
         ;; Consume value and continuation lines:
         (while (progn ; Idiomatic do-while loop.
                  ;; Add the text from the current point to the end of the the line (minus line ending) to the value:
