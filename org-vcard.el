@@ -898,7 +898,8 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
               encoding (when (string-match ";ENCODING=\\([^;:]+\\)" property)
                          (prog1 (match-string-no-properties 1 property) ; Save the value of the encoding.
                            ;; Remove the encoding from the property name:
-                           (setq property (replace-match "" nil nil property)))))
+                           (setq property (replace-match "" nil nil property))))
+              encoding (upcase encoding))
         ;; Consume value and continuation lines:
         (while (progn ; Idiomatic do-while loop.
                  ;; Add the text from the current point to the end of the the line (minus line ending) to the value:
@@ -912,15 +913,16 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
                                         (line-end-position 2) ; Don't go past the next line.
                                         t ; No error and don't move point if failed.
                                         )
-                     ;; = can also be a continuation line when encoded with quoted-printable:
-                     (when (re-search-forward "^=" (line-end-position 2) t)
-                       (setq value (concat value "\n")) ; Quoted-printable encoding needs the \n character for the previous line.
-                       (backward-char) ; Move point before the = so it is included in the value.
-                       ))))
+                     (and (string= encoding "QUOTED-PRINTABLE")
+                          ;; = at the end of a line encoded with quoted-printable means to continue on to the next line:
+                          (re-search-forward "=$" (line-end-position 2) t)
+                          (setq value (concat value "\n")) ; Include the line break in the value
+                          (forward-line) ; Consume the next line as long as `forward-line' returns non-nil.
+                          ))))
         (forward-line)
         ;; Deal with possible quoted-printable encoding:
         (when (and encoding
-                   (string= (upcase encoding) "QUOTED-PRINTABLE"))
+                   (string= encoding "QUOTED-PRINTABLE"))
           (require 'qp) ; Part of GNU Emacs.
           (setq value (decode-coding-string (quoted-printable-decode-string value)
                                             (or charset 'utf-8-emacs)
