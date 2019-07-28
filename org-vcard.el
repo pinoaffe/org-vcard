@@ -894,7 +894,7 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
                         (prog1 (match-string-no-properties 1 property) ; Save the value of the charset.
                           ;; Remove the charset from the property name:
                           (setq property (replace-match "" nil nil property))))
-              charset (cdr (assoc-string charset org-vcard-character-set-mapping))
+              charset (cdr (assoc-string charset org-vcard-character-set-mapping :case-fold))
               encoding (when (string-match ";ENCODING=\\([^;:]+\\)" property)
                          (prog1 (match-string-no-properties 1 property) ; Save the value of the encoding.
                            ;; Remove the encoding from the property name:
