@@ -226,7 +226,7 @@
 
 (require 'org)
 (require 'org-element)
-
+(require 'subr-x)
 
 ;;
 ;; Setup.
