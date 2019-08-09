@@ -865,8 +865,8 @@ of that property in the cdr.
 SOURCE must be one of \"file\", \"buffer\" or \"region\"."
   (let ((property "")
         (value "")
-        charset
-        encoding
+        (charset "")
+        (encoding "")
         (cards '())
         (current-card '()))
     (cond
