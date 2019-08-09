@@ -884,8 +884,6 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
       (setq current-card '())
       (forward-line)
       (while (not (looking-at "END:VCARD"))
-        (setq current-line
-              (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
         (re-search-forward "^\\([^:]+\\): *")
         ;; Parse property:
         (setq property (match-string-no-properties 1)
