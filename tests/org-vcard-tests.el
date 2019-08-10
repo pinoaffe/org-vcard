@@ -515,7 +515,13 @@ vCard 2.1."
             (insert "NOTE:A\u000D\u000A  multiline\u000D\u000A\u0009 comment.\u000D\u000A")
             (insert "END:VCARD\u000D\u000A")
             (equal '((("NOTE" . "A multiline comment.")))
-                   (org-vcard-import-parse "buffer")))))
+                   (org-vcard-import-parse "buffer"))))
+  (should (with-temp-buffer
+	    (insert "BEGIN:vcard\u000D\u000A")
+	    (insert "NOTE;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=65=6E=63=6F=64=65=64\u000D\u000A")
+	    (insert "END:VCARD\u000D\u000A")
+	    (equal '((("NOTE" . "encoded")))
+		   (org-vcard-import-parse "buffer")))))
 
 
 (ert-deftest org-vcard-test-transfer-write ()
