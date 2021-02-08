@@ -116,10 +116,16 @@ DESTINATION must be one of \"buffer\" or \"file\"."
           (setq org-vcard-active-version org-vcard-default-version))
         (setq heading
               (or (cdr (assoc org-vcard-default-property-for-heading card))
-                  (replace-regexp-in-string "^;\\|;$" ""
-                                            (cdr (assoc (if (string= org-vcard-default-property-for-heading "FN")
-                                                            "N"
-                                                          "FN") card)))))
+                  (let ((value (cdr
+                                (assoc
+                                 (if (string=
+                                      org-vcard-default-property-for-heading
+                                      "FN")
+                                     "N"
+                                   "FN") card))))
+                    (if value
+                        (replace-regexp-in-string "^;\\|;$" "" value)
+                      "NO TITLE"))))
         (setq content (concat content
                               "* " heading "\n"
                               ":PROPERTIES:\n"))
