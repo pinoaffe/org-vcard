@@ -12,64 +12,64 @@
 
 
 (ert-deftest org-vcard-test-check-contacts-styles ()
-  "Test the org-vcard-check-contacts-styles function."
+  "Test the org-vcard--check-contacts-styles function."
   :tags '(org-vcard)
 
-  (should-error (let ((org-vcard-styles-functions
+  (should-error (let ((org-vcard--styles-functions
                        '(("flat"
                           (nil org-vcard-import-to-flat))
                          ("tree"
                           (org-vcard-export-from-tree org-vcard-import-to-tree)))))
-                  (org-vcard-check-contacts-styles)))
-  (should-error (let ((org-vcard-styles-functions
+                  (org-vcard--check-contacts-styles)))
+  (should-error (let ((org-vcard--styles-functions
                        '(("flat"
                           (org-vcard-export-from-flat nil))
                          ("tree"
                           (org-vcard-export-from-tree org-vcard-import-to-tree)))))
-                  (org-vcard-check-contacts-styles)))
-  (should-error (let ((org-vcard-styles-functions
+                  (org-vcard--check-contacts-styles)))
+  (should-error (let ((org-vcard--styles-functions
                        '(("flat"
                           (org-vcard-export-from-flat org-vcard-import-to-flat))
                          ("tree"
                           (nil org-vcard-import-to-tree)))))
-                  (org-vcard-check-contacts-styles)))
-  (should-error (let ((org-vcard-styles-functions
+                  (org-vcard--check-contacts-styles)))
+  (should-error (let ((org-vcard--styles-functions
                        '(("flat"
                           (org-vcard-export-from-flat org-vcard-import-to-flat))
                          ("tree"
                           (org-vcard-export-from-tree nil)))))
-                  (org-vcard-check-contacts-styles))))
+                  (org-vcard--check-contacts-styles))))
 
 
 (ert-deftest org-vcard-test-escape-value-string ()
-  "Test the org-vcard-escape-value-string function."
+  "Test the org-vcard--escape-value-string function."
   :tags '(org-vcard)
   
   (should (string=
            "word"
-           (org-vcard-escape-value-string '(":") "word")))
+           (org-vcard--escape-value-string '(":") "word")))
   (should (string=
            "word"
-           (org-vcard-escape-value-string '(";") "word")))
+           (org-vcard--escape-value-string '(";") "word")))
   (should (string=
            "word"
-           (org-vcard-escape-value-string '("\134") "word")))
+           (org-vcard--escape-value-string '("\134") "word")))
   (should (string=
            "word\\:word"
-           (org-vcard-escape-value-string '(":") "word:word")))
+           (org-vcard--escape-value-string '(":") "word:word")))
   (should (string=
            "word\\;word"
-           (org-vcard-escape-value-string '(";") "word;word")))
+           (org-vcard--escape-value-string '(";") "word;word")))
   (should (string=
            "word\\\\word"
-           (org-vcard-escape-value-string '("\134") "word\\word")))
+           (org-vcard--escape-value-string '("\134") "word\\word")))
   (should (string=
            "word\\\\word\\;word\\:word"
-           (org-vcard-escape-value-string '("\134" ":" ";") "word\\word;word:word"))))
+           (org-vcard--escape-value-string '("\134" ":" ";") "word\\word;word:word"))))
 
 
 (ert-deftest org-vcard-test-export-line ()
-  "Test the org-vcard-export-line function."
+  "Test the org-vcard--export-line function."
   :tags '(org-vcard)
   
   ;; Tests for when NOSEPARATOR is absent or nil.
@@ -77,65 +77,65 @@
   (should (let ((org-vcard-active-version "4.0"))
             (string=
              "FN:word\u000D\u000A"
-             (org-vcard-export-line "FN" "word"))))
+             (org-vcard--export-line "FN" "word"))))
   (should (let ((org-vcard-active-version "3.0"))
             (string=
              "FN:word\015\012"
-             (org-vcard-export-line "FN" "word"))))
+             (org-vcard--export-line "FN" "word"))))
   (should (let ((org-vcard-active-version "2.1"))
             (string=
              "FN;CHARSET=US-ASCII:word\015\012"
-             (org-vcard-export-line "FN" "word"))))
+             (org-vcard--export-line "FN" "word"))))
   (should (let ((org-vcard-active-version "4.0"))
             (string=
              "FN:word word\u000D\u000A"
-             (org-vcard-export-line "FN" "word word"))))
+             (org-vcard--export-line "FN" "word word"))))
   (should (let ((org-vcard-active-version "3.0"))
             (string=
              "FN:word word\015\012"
-             (org-vcard-export-line "FN" "word word"))))
+             (org-vcard--export-line "FN" "word word"))))
   (should (let ((org-vcard-active-version "2.1"))
             (string=
              "FN;CHARSET=US-ASCII:word word\015\012"
-             (org-vcard-export-line "FN" "word word"))))
+             (org-vcard--export-line "FN" "word word"))))
 
   ;; Tests for when NOSEPARATOR is non-nil.
   
   (should (let ((org-vcard-active-version "4.0"))
             (string=
              "FNword\u000D\u000A"
-             (org-vcard-export-line "FN" "word" t))))
+             (org-vcard--export-line "FN" "word" t))))
   (should (let ((org-vcard-active-version "3.0"))
             (string=
              "FNword\015\012"
-             (org-vcard-export-line "FN" "word" t))))
+             (org-vcard--export-line "FN" "word" t))))
   (should (let ((org-vcard-active-version "2.1"))
             (string=
              "FN;CHARSET=US-ASCIIword\015\012"
-             (org-vcard-export-line "FN" "word" t)))))
+             (org-vcard--export-line "FN" "word" t)))))
 
 
 (ert-deftest org-vcard-test-set-active-settings-style ()
-  "Test the org-vcard-set-active-settings function with
+  "Test the org-vcard--set-active-settings function with
 the CONTACTS_STYLE in-buffer setting."
   :tags '(org-vcard)
   
   (should (with-temp-buffer
             (insert "#+CONTACTS_STYLE: flat\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "flat" org-vcard-active-style)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
             (insert "#+CONTACTS_STYLE: flat\n")
             (insert "#+CONSTANTS: a=1\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "flat" org-vcard-active-style)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
             (insert "#+CONTACTS_STYLE: flat\n")
             (insert "#+CONSTANTS: a=1\n")
             (insert "#+CONTACTS_STYLE: tree\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "tree" org-vcard-active-style)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
@@ -143,45 +143,45 @@ the CONTACTS_STYLE in-buffer setting."
             (insert "#+CONSTANTS: a=1\n")
             (insert "#+CONTACTS_STYLE: tree\n")
             (insert "#+CONSTANTS: b=2\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "tree" org-vcard-active-style)))
   (should (with-temp-buffer
             (insert "#+CONTACTS_STYLE: flat\n")
             (insert "#+VCARD_VERSION: 4.0\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "flat" org-vcard-active-style)))
   (should (with-temp-buffer
             (insert "#+VCARD_VERSION: 4.0\n")
             (insert "#+CONTACTS_STYLE: flat\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "flat" org-vcard-active-style)))
 
   (should-error (with-temp-buffer
                   (insert "#+CONTACTS_STYLE: syzygy\n")
-                  (org-vcard-set-active-settings))))
+                  (org-vcard--set-active-settings))))
 
 
 (ert-deftest org-vcard-test-set-active-settings-language ()
-  "Test the org-vcard-set-active-settings function with
+  "Test the org-vcard--set-active-settings function with
 the CONTACTS_LANGUAGE in-buffer setting."
   :tags '(org-vcard)
   
   (should (with-temp-buffer
             (insert "#+CONTACTS_LANGUAGE: en\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "en" org-vcard-active-language)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
             (insert "#+CONTACTS_LANGUAGE: en\n")
             (insert "#+CONSTANTS: a=1\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "en" org-vcard-active-language)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
             (insert "#+CONTACTS_LANGUAGE: en\n")
             (insert "#+CONSTANTS: a=1\n")
             (insert "#+CONTACTS_LANGUAGE: en_AU\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "en_AU" org-vcard-active-language)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
@@ -189,45 +189,45 @@ the CONTACTS_LANGUAGE in-buffer setting."
             (insert "#+CONSTANTS: a=1\n")
             (insert "#+CONTACTS_LANGUAGE: en_AU\n")
             (insert "#+CONSTANTS: b=2\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "en_AU" org-vcard-active-language)))
   (should (with-temp-buffer
             (insert "#+CONTACTS_LANGUAGE: en\n")
             (insert "#+VCARD_VERSION: 4.0\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "en" org-vcard-active-language)))
   (should (with-temp-buffer
             (insert "#+VCARD_VERSION: 4.0\n")
             (insert "#+CONTACTS_LANGUAGE: en\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "en" org-vcard-active-language)))
 
   (should-error (with-temp-buffer
                   (insert "#+CONTACTS_LANGUAGE: syzygy\n")
-                  (org-vcard-set-active-settings))))
+                  (org-vcard--set-active-settings))))
 
 
 (ert-deftest org-vcard-test-set-active-settings-version ()
-  "Test the org-vcard-set-active-settings function with
+  "Test the org-vcard--set-active-settings function with
 the VCARD_VERSION in-buffer setting."
   :tags '(org-vcard)
 
   (should (with-temp-buffer
             (insert "#+VCARD_VERSION: 4.0\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "4.0" org-vcard-active-version)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
             (insert "#+VCARD_VERSION: 4.0\n")
             (insert "#+CONSTANTS: a=1\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "4.0" org-vcard-active-version)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
             (insert "#+VCARD_VERSION: 4.0\n")
             (insert "#+CONSTANTS: a=1\n")
             (insert "#+VCARD_VERSION: 3.0\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "3.0" org-vcard-active-version)))
   (should (with-temp-buffer
             (insert "#+STARTUP: overview\n")
@@ -235,243 +235,243 @@ the VCARD_VERSION in-buffer setting."
             (insert "#+CONSTANTS: a=1\n")
             (insert "#+VCARD_VERSION: 3.0\n")
             (insert "#+CONSTANTS: b=2\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "3.0" org-vcard-active-version)))
   (should (with-temp-buffer
             (insert "#+VCARD_VERSION: 4.0\n")
             (insert "#+CONTACTS_STYLE: flat\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "4.0" org-vcard-active-version)))
   (should (with-temp-buffer
             (insert "#+CONTACTS_STYLE: flat\n")
             (insert "#+VCARD_VERSION: 4.0\n")
-            (org-vcard-set-active-settings)
+            (org-vcard--set-active-settings)
             (string= "4.0" org-vcard-active-version)))
 
   (should-error (with-temp-buffer
                   (insert "#+VCARD_VERSION: 1.0\n")
-                  (org-vcard-set-active-settings))))
+                  (org-vcard--set-active-settings))))
 
 
 (ert-deftest org-vcard-test-canonicalise-property-name-vcard-40 ()
-  "Test the org-vcard-canonicalise-property-name function with
+  "Test the org-vcard--canonicalise-property-name function with
 vCard 4.0."
   :tags '(org-vcard)
 
   (let ((org-vcard-active-version "4.0"))
     
     (should (string= "TEL"
-                     (org-vcard-canonicalise-property-name "TEL")))
+                     (org-vcard--canonicalise-property-name "TEL")))
 
     (should (string= "TEL;TYPE=\"cell\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"CELL\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"CELL\"")))
     (should (string= "TEL;TYPE=\"cell\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"VOICE,CELL\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"VOICE,CELL\"")))
     (should (string= "TEL;TYPE=\"cell,home\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"CELL,HOME\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"CELL,HOME\"")))
     (should (string= "TEL;TYPE=\"cell,work\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"CELL,WORK\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"CELL,WORK\"")))
     (should (string= "TEL;TYPE=\"cell,home\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"VOICE,CELL,HOME\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"VOICE,CELL,HOME\"")))
     (should (string= "TEL;TYPE=\"cell,work\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"voice,CELL,WORK\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"voice,CELL,WORK\"")))
     (should (string= "TEL;TYPE=\"cell,home\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"HOME,CELL\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"HOME,CELL\"")))
     (should (string= "TEL;TYPE=\"cell,work\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK,CELL\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"WORK,CELL\"")))
     (should (string= "TEL;TYPE=\"cell,home\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"home,VOICE,CELL\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"home,VOICE,CELL\"")))
     (should (string= "TEL;TYPE=\"cell,work\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK,voice,CELL\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"WORK,voice,CELL\"")))
 
     (should (string= "TEL;TYPE=\"fax\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"FAX\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"FAX\"")))
     (should (string= "TEL;TYPE=\"fax\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"fax\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"fax\"")))
     (should (string= "TEL;TYPE=\"fax,home\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"FAX,HOME\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"FAX,HOME\"")))
     (should (string= "TEL;TYPE=\"fax,work\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"work,fax\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"work,fax\"")))
 
     (should (string= "TEL;TYPE=\"voice\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"VOICE\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"VOICE\"")))
     (should (string= "TEL;TYPE=\"voice,home\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"HOME\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"HOME\"")))
     (should (string= "TEL;TYPE=\"voice,work\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"WORK\"")))
     (should (string= "TEL;TYPE=\"voice,home\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"voice,HOME\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"voice,HOME\"")))
     (should (string= "TEL;TYPE=\"voice,work\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"WORK,voice\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"WORK,voice\"")))
 
     (should (string= "EMAIL"
-                     (org-vcard-canonicalise-property-name "EMAIL")))
+                     (org-vcard--canonicalise-property-name "EMAIL")))
     (should (string= "EMAIL;TYPE=\"work\""
-                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=work")))
+                     (org-vcard--canonicalise-property-name "EMAIL;TYPE=work")))
     (should (string= "EMAIL;TYPE=\"home\""
-                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=\"home\"")))
+                     (org-vcard--canonicalise-property-name "EMAIL;TYPE=\"home\"")))
     (should (string= "EMAIL;PREF=1"
-                     (org-vcard-canonicalise-property-name "EMAIL;PREF=1")))
+                     (org-vcard--canonicalise-property-name "EMAIL;PREF=1")))
     (should (string= "EMAIL;TYPE=\"home\";PREF=1"
-                     (org-vcard-canonicalise-property-name "EMAIL;PREF=1;TYPE=\"home\"")))
+                     (org-vcard--canonicalise-property-name "EMAIL;PREF=1;TYPE=\"home\"")))
 
     (should (string= "TEL;TYPE=\"PAGER\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"PAGER\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"PAGER\"")))
     (should (string= "TEL;TYPE=\"pager\""
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=\"pager\"")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=\"pager\"")))
 
     (should (string= "ADR"
-                     (org-vcard-canonicalise-property-name "ADR")))
+                     (org-vcard--canonicalise-property-name "ADR")))
     (should (string= "ADR;TYPE=\"work\""
-                     (org-vcard-canonicalise-property-name "ADR;TYPE=WORK")))
+                     (org-vcard--canonicalise-property-name "ADR;TYPE=WORK")))
     (should (string= "ADR;TYPE=\"home\""
-                     (org-vcard-canonicalise-property-name "ADR;TYPE=\"home\"")))))
+                     (org-vcard--canonicalise-property-name "ADR;TYPE=\"home\"")))))
 
   
 (ert-deftest org-vcard-test-canonicalise-property-name-vcard-30 ()
-  "Test the org-vcard-canonicalise-property-name function with
+  "Test the org-vcard--canonicalise-property-name function with
 vCard 3.0."
   :tags '(org-vcard)
   
   (let ((org-vcard-active-version "3.0"))
     
     (should (string= "TEL"
-                     (org-vcard-canonicalise-property-name "TEL")))
+                     (org-vcard--canonicalise-property-name "TEL")))
 
     (should (string= "TEL;TYPE=cell"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=CELL")))
     (should (string= "TEL;TYPE=cell"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=VOICE,CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=VOICE,CELL")))
     (should (string= "TEL;TYPE=cell,home"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=CELL,HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=CELL,HOME")))
     (should (string= "TEL;TYPE=cell,work"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=CELL,WORK")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=CELL,WORK")))
     (should (string= "TEL;TYPE=cell,home"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=VOICE,CELL,HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=VOICE,CELL,HOME")))
     (should (string= "TEL;TYPE=cell,work"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=voice,CELL,WORK")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=voice,CELL,WORK")))
     (should (string= "TEL;TYPE=cell,home"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=HOME,CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=HOME,CELL")))
     (should (string= "TEL;TYPE=cell,work"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=WORK,CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=WORK,CELL")))
     (should (string= "TEL;TYPE=cell,home"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=home,VOICE,CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=home,VOICE,CELL")))
     (should (string= "TEL;TYPE=cell,work"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=WORK,voice,CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=WORK,voice,CELL")))
 
     (should (string= "TEL;TYPE=fax"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=fax")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=fax")))
     (should (string= "TEL;TYPE=fax"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=FAX")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=FAX")))
     (should (string= "TEL;TYPE=fax,home"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=FAX,HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=FAX,HOME")))
     (should (string= "TEL;TYPE=fax,work"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=work,fax")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=work,fax")))
     
     (should (string= "TEL;TYPE=voice"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=VOICE")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=VOICE")))
     (should (string= "TEL;TYPE=voice,home"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=HOME")))
     (should (string= "TEL;TYPE=voice,work"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=WORK")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=WORK")))
     (should (string= "TEL;TYPE=voice,home"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=voice,HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=voice,HOME")))
     (should (string= "TEL;TYPE=voice,work"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=WORK,voice")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=WORK,voice")))
 
     (should (string= "EMAIL"
-                     (org-vcard-canonicalise-property-name "EMAIL")))
+                     (org-vcard--canonicalise-property-name "EMAIL")))
     (should (string= "EMAIL;TYPE=work"
-                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=work")))
+                     (org-vcard--canonicalise-property-name "EMAIL;TYPE=work")))
     (should (string= "EMAIL;TYPE=home"
-                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=home")))
+                     (org-vcard--canonicalise-property-name "EMAIL;TYPE=home")))
     (should (string= "EMAIL;TYPE=pref"
-                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=PREF")))
+                     (org-vcard--canonicalise-property-name "EMAIL;TYPE=PREF")))
     (should (string= "EMAIL;TYPE=home,pref"
-                     (org-vcard-canonicalise-property-name "EMAIL;TYPE=pref,home")))
+                     (org-vcard--canonicalise-property-name "EMAIL;TYPE=pref,home")))
 
     (should (string= "TEL;TYPE=PAGER"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=PAGER")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=PAGER")))
     (should (string= "TEL;TYPE=pager"
-                     (org-vcard-canonicalise-property-name "TEL;TYPE=pager")))
+                     (org-vcard--canonicalise-property-name "TEL;TYPE=pager")))
 
     (should (string= "ADR"
-                     (org-vcard-canonicalise-property-name "ADR")))
+                     (org-vcard--canonicalise-property-name "ADR")))
     (should (string= "ADR;TYPE=work"
-                     (org-vcard-canonicalise-property-name "ADR;TYPE=WORK")))
+                     (org-vcard--canonicalise-property-name "ADR;TYPE=WORK")))
     (should (string= "ADR;TYPE=home"
-                     (org-vcard-canonicalise-property-name "ADR;TYPE=home")))))
+                     (org-vcard--canonicalise-property-name "ADR;TYPE=home")))))
 
 
 (ert-deftest org-vcard-test-canonicalise-property-name-vcard-21 ()
-  "Test the org-vcard-canonicalise-property-name function with
+  "Test the org-vcard--canonicalise-property-name function with
 vCard 2.1."
   :tags '(org-vcard)
 
   (let ((org-vcard-active-version "2.1"))
     
     (should (string= "TEL"
-                     (org-vcard-canonicalise-property-name "TEL")))
+                     (org-vcard--canonicalise-property-name "TEL")))
 
     (should (string= "TEL;CELL"
-                     (org-vcard-canonicalise-property-name "TEL;CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;CELL")))
     (should (string= "TEL;CELL"
-                     (org-vcard-canonicalise-property-name "TEL;VOICE;CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;VOICE;CELL")))
     (should (string= "TEL;CELL;HOME"
-                     (org-vcard-canonicalise-property-name "TEL;CELL;HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;CELL;HOME")))
     (should (string= "TEL;CELL;WORK"
-                     (org-vcard-canonicalise-property-name "TEL;CELL;WORK")))
+                     (org-vcard--canonicalise-property-name "TEL;CELL;WORK")))
     (should (string= "TEL;CELL;HOME"
-                     (org-vcard-canonicalise-property-name "TEL;VOICE;CELL;HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;VOICE;CELL;HOME")))
     (should (string= "TEL;CELL;WORK"
-                     (org-vcard-canonicalise-property-name "TEL;VOICE;CELL;WORK")))
+                     (org-vcard--canonicalise-property-name "TEL;VOICE;CELL;WORK")))
     (should (string= "TEL;CELL;HOME"
-                     (org-vcard-canonicalise-property-name "TEL;HOME;CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;HOME;CELL")))
     (should (string= "TEL;CELL;WORK"
-                     (org-vcard-canonicalise-property-name "TEL;WORK;CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;WORK;CELL")))
     (should (string= "TEL;CELL;HOME"
-                     (org-vcard-canonicalise-property-name "TEL;HOME;VOICE;CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;HOME;VOICE;CELL")))
     (should (string= "TEL;CELL;WORK"
-                     (org-vcard-canonicalise-property-name "TEL;WORK;VOICE;CELL")))
+                     (org-vcard--canonicalise-property-name "TEL;WORK;VOICE;CELL")))
 
     (should (string= "TEL;FAX"
-                     (org-vcard-canonicalise-property-name "TEL;FAX")))
+                     (org-vcard--canonicalise-property-name "TEL;FAX")))
     (should (string= "TEL;FAX;HOME"
-                     (org-vcard-canonicalise-property-name "TEL;FAX;HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;FAX;HOME")))
     (should (string= "TEL;FAX;WORK"
-                     (org-vcard-canonicalise-property-name "TEL;WORK;FAX")))
+                     (org-vcard--canonicalise-property-name "TEL;WORK;FAX")))
     
     (should (string= "TEL;VOICE"
-                     (org-vcard-canonicalise-property-name "TEL;VOICE")))
+                     (org-vcard--canonicalise-property-name "TEL;VOICE")))
     (should (string= "TEL;VOICE;HOME"
-                     (org-vcard-canonicalise-property-name "TEL;HOME")))
+                     (org-vcard--canonicalise-property-name "TEL;HOME")))
     (should (string= "TEL;VOICE;WORK"
-                     (org-vcard-canonicalise-property-name "TEL;WORK")))
+                     (org-vcard--canonicalise-property-name "TEL;WORK")))
     (should (string= "TEL;VOICE;HOME"
-                     (org-vcard-canonicalise-property-name "TEL;HOME;VOICE")))
+                     (org-vcard--canonicalise-property-name "TEL;HOME;VOICE")))
     (should (string= "TEL;VOICE;WORK"
-                     (org-vcard-canonicalise-property-name "TEL;WORK;VOICE")))
+                     (org-vcard--canonicalise-property-name "TEL;WORK;VOICE")))
 
     (should (string= "EMAIL"
-                     (org-vcard-canonicalise-property-name "EMAIL")))
+                     (org-vcard--canonicalise-property-name "EMAIL")))
     (should (string= "EMAIL;HOME"
-                     (org-vcard-canonicalise-property-name "EMAIL;HOME")))
+                     (org-vcard--canonicalise-property-name "EMAIL;HOME")))
     (should (string= "EMAIL;WORK"
-                     (org-vcard-canonicalise-property-name "EMAIL;WORK")))
+                     (org-vcard--canonicalise-property-name "EMAIL;WORK")))
     (should (string= "EMAIL;PREF"
-                     (org-vcard-canonicalise-property-name "EMAIL;PREF")))
+                     (org-vcard--canonicalise-property-name "EMAIL;PREF")))
     (should (string= "EMAIL;HOME;PREF"
-                     (org-vcard-canonicalise-property-name "EMAIL;PREF;HOME")))
+                     (org-vcard--canonicalise-property-name "EMAIL;PREF;HOME")))
 
     (should (string= "TEL;PAGER"
-                     (org-vcard-canonicalise-property-name "TEL;PAGER")))
+                     (org-vcard--canonicalise-property-name "TEL;PAGER")))
 
     (should (string= "ADR"
-                     (org-vcard-canonicalise-property-name "ADR")))
+                     (org-vcard--canonicalise-property-name "ADR")))
     (should (string= "ADR;HOME"
-                     (org-vcard-canonicalise-property-name "ADR;home")))
+                     (org-vcard--canonicalise-property-name "ADR;home")))
     (should (string= "ADR;WORK"
-                     (org-vcard-canonicalise-property-name "ADR;WORK")))))
+                     (org-vcard--canonicalise-property-name "ADR;WORK")))))
 
 
 (ert-deftest org-vcard-test-import-parse ()
@@ -525,7 +525,7 @@ vCard 2.1."
 
 
 (ert-deftest org-vcard-test-transfer-write ()
-  "Test the org-vcard-transfer-write function."
+  "Test the org-vcard--transfer-write function."
   :tags '(org-vcard)
 
   (progn
@@ -535,7 +535,7 @@ vCard 2.1."
                      (progn
                        (if (get-buffer "*org-vcard-export*")
                            (kill-buffer "*org-vcard-export*"))
-                       (org-vcard-transfer-write
+                       (org-vcard--transfer-write
                         'export
                         (concat "A line of text\u000D\u000A"
                                 "A second line of text\015\012"
@@ -545,7 +545,7 @@ vCard 2.1."
                        (buffer-string))))
     (kill-buffer "*org-vcard-export*"))
 
-  (should-error (org-vcard-transfer-write
+  (should-error (org-vcard--transfer-write
                  'export
                  '("A line of text\u000D\u000A"
                    "A second line of text\015\012"

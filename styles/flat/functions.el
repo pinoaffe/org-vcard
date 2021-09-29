@@ -16,9 +16,9 @@
 (defvar org-vcard-remove-external-semicolons)
 (defvar org-vcard-styles-languages-mappings)
 
-(declare-function org-vcard-export-line "org-vcard.el")
+(declare-function org-vcard--export-line "org-vcard.el")
 (declare-function org-vcard-import-parse "org-vcard.el")
-(declare-function org-vcard-transfer-write "org-vcard.el")
+(declare-function org-vcard--transfer-write "org-vcard.el")
 
 
 ;;
@@ -68,28 +68,28 @@ DESTINATION must be either \"buffer\" or \"file\"."
                     (not (member "N" (mapcar 'car properties))))
                (setq content (concat
                               content
-                              (org-vcard-export-line "N" ""))))
+                              (org-vcard--export-line "N" ""))))
            (dolist (p properties)
              (if (and (not (string= "VERSION" (car p)))
                       (assoc (car p) flat-style-properties))
                  (setq content (concat
                                 content
-                                (org-vcard-export-line
+                                (org-vcard--export-line
                                  (cdr (assoc (car p) flat-style-properties))
                                  (cdr p))))))
            (setq output
                  (concat
                   output
-                  (org-vcard-export-line "BEGIN" "VCARD")
-                  (org-vcard-export-line "VERSION" org-vcard-active-version)
-                  (org-vcard-export-line org-vcard-default-property-for-heading
+                  (org-vcard--export-line "BEGIN" "VCARD")
+                  (org-vcard--export-line "VERSION" org-vcard-active-version)
+                  (org-vcard--export-line org-vcard-default-property-for-heading
                                          (plist-get
                                           (nth 1 (org-element-headline-parser (line-end-position)))
                                           :raw-value))
                   content
-                  (org-vcard-export-line "END" "VCARD"))))))
+                  (org-vcard--export-line "END" "VCARD"))))))
      nil scope)
-    (org-vcard-transfer-write 'export output destination)))
+    (org-vcard--transfer-write 'export output destination)))
 
 
 (defun org-vcard-import-to-flat (source destination)
@@ -155,4 +155,4 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                                             property-value
                                             "\n")))))))
         (setq content (concat content ":END:\n"))))
-    (org-vcard-transfer-write 'import content destination)))
+    (org-vcard--transfer-write 'import content destination)))

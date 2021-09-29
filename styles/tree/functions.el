@@ -14,9 +14,9 @@
 (defvar org-vcard-remove-external-semicolons)
 (defvar org-vcard-styles-languages-mappings)
 
-(declare-function org-vcard-export-line "org-vcard.el")
+(declare-function org-vcard--export-line "org-vcard.el")
 (declare-function org-vcard-import-parse "org-vcard.el")
-(declare-function org-vcard-transfer-write "org-vcard.el")
+(declare-function org-vcard--transfer-write "org-vcard.el")
 
 
 ;; 
@@ -51,11 +51,11 @@ DESTINATION must be either \"buffer\" or \"file\"."
         (goto-char (point-min))
         (setq case-fold-search t)
         (while (re-search-forward "\\s *:FIELDTYPE:\\s *name" nil t)
-          (let ((content (concat (org-vcard-export-line "BEGIN" "VCARD")
-                                 (org-vcard-export-line "VERSION" org-vcard-active-version)))
+          (let ((content (concat (org-vcard--export-line "BEGIN" "VCARD")
+                                 (org-vcard--export-line "VERSION" org-vcard-active-version)))
                 (end-vcard nil))
             (setq content (concat content
-                                  (org-vcard-export-line org-vcard-default-property-for-heading (org-get-heading t t))))
+                                  (org-vcard--export-line org-vcard-default-property-for-heading (org-get-heading t t))))
             ;; vCard 2.1 and 3.0 require the 'N' property be present.
             ;; Trying to create this by parsing the heading which has
             ;; FIELDTYPE 'name' is fraught with challenges - cf.
@@ -65,7 +65,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
                      (or (string= "3.0" org-vcard-active-version)
                          (string= "2.1" org-vcard-active-version)))
                 (setq content (concat content
-                                      (org-vcard-export-line "N" ""))))
+                                      (org-vcard--export-line "N" ""))))
             (while (and (setq search-result (re-search-forward "\\s *:FIELDTYPE:\\s *\\(\\(?:\\w\\|-\\)+\\)" nil t))
                         (not end-vcard))
               (let ((fieldtype (match-string 1)))
@@ -85,16 +85,16 @@ DESTINATION must be either \"buffer\" or \"file\"."
                              ((string= "2.1" org-vcard-active-version)
                               (setq property (concat property ";PREF"))))))                             
                       (setq content (concat content
-                                            (org-vcard-export-line
+                                            (org-vcard--export-line
                                              property
                                              (org-get-heading t t)))))
                   (setq end-vcard t))))
             (setq content (concat content
-                                  (org-vcard-export-line "END" "VCARD")))
+                                  (org-vcard--export-line "END" "VCARD")))
             (setq output (concat output content)))
           (if search-result
               (re-search-backward "\\s *:FIELDTYPE:\\s *name")))
-        (org-vcard-transfer-write 'export output destination)))))
+        (org-vcard--transfer-write 'export output destination)))))
 
 
 (defun org-vcard-import-to-tree (source destination)
@@ -189,4 +189,4 @@ DESTINATION must be one of \"buffer\" or \"file\"."
                                               ":PREFERRED:\n")
                                           ":END:\n"))))))))
             (setq card (delq (assoc property-original card) card))))))
-    (org-vcard-transfer-write 'import content destination)))
+    (org-vcard--transfer-write 'import content destination)))

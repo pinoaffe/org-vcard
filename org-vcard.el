@@ -322,7 +322,7 @@ Such properties can contain one or more values, separated by commas.")
 Such properties contain a value with multiple components,
 each component separated by a semicolon.")
 
-(defun org-vcard-create-styles-functions ()
+(defun org-vcard--create-styles-functions ()
   "Create a data structure for use by `org-vcard-styles-function'."
   (let ((the-list) '())
     (dolist (style-dir org-vcard-styles-dirs)
@@ -355,10 +355,10 @@ each component separated by a semicolon.")
                   t
                 nil)))))
 
-(defvar org-vcard-styles-functions (org-vcard-create-styles-functions)
-  "Internal variable; available styles and associated import/export functions.")
+(defvar org-vcard--styles-functions (org-vcard--create-styles-functions)
+  "Available styles and associated import/export functions.")
 
-(defun org-vcard-create-styles-languages-mappings ()
+(defun org-vcard--create-styles-languages-mappings ()
   "Create a data structure for use by `org-vcard-styles-languages-mappings'."
   (let ((style-mappings '()))
     (dolist (style-dir org-vcard-styles-dirs)
@@ -420,7 +420,7 @@ each component separated by a semicolon.")
     style-mappings))
 
 (defcustom org-vcard-styles-languages-mappings
-  (org-vcard-create-styles-languages-mappings)
+  (org-vcard--create-styles-languages-mappings)
   "Details of the available styles and their associated mappings."
   :type '(repeat
           (list string
@@ -569,13 +569,13 @@ Enabling org-vcard mode will add an Org-vCard entry to Emacs' menu bar."
 
 
 ;;
-;; Utility functions.
+;; Internal functions.
 ;;
 
-(defun org-vcard-check-contacts-styles ()
-  "Internal function; check integrity of `org-vcard-contacts-styles'."
+(defun org-vcard--check-contacts-styles ()
+  "Check integrity of `org-vcard-contacts-styles'."
   (let ((styles '()))
-    (dolist (style org-vcard-styles-functions)
+    (dolist (style org-vcard--styles-functions)
       (if (not (member (car style) styles))
           (setq styles (append styles `(,(car style))))
         (error
@@ -596,8 +596,8 @@ Enabling org-vcard mode will add an Org-vCard entry to Emacs' menu bar."
             (car style)
             "' has an invalid import function"))))))
 
-(defun org-vcard-escape-value-string (characters value)
-  "Internal function; escape each instance of each character in CHARACTERS.
+(defun org-vcard--escape-value-string (characters value)
+  "Escape each instance of each character in CHARACTERS.
 
 CHARACTERS must be a list of strings. VALUE is the string to be
 escaped."
@@ -618,8 +618,8 @@ escaped."
                value nil t))))
   value)
 
-(defun org-vcard-export-line (property value &optional noseparator)
-  "Internal function; export a line as appropriate for each vCard version.
+(defun org-vcard--export-line (property value &optional noseparator)
+  "Export a line as appropriate for each vCard version.
 
 PROPERTY is the vCard property/type to output, VALUE its value.
 If NOSEPARATOR is non-nil, don't output colon to separate PROPERTY
@@ -642,11 +642,11 @@ from VALUE."
         separator
         (cond
          ((member property-name org-vcard-comma-separated-properties)
-          (org-vcard-escape-value-string '(";" "\134") value))
+          (org-vcard--escape-value-string '(";" "\134") value))
          ((member property-name org-vcard-compound-properties)
-          (org-vcard-escape-value-string '("," "\134") value))
+          (org-vcard--escape-value-string '("," "\134") value))
          (t
-          (org-vcard-escape-value-string '("," ";" "\134") value)))
+          (org-vcard--escape-value-string '("," ";" "\134") value)))
         "\u000D\u000A")
        'utf-8))
      ((string= org-vcard-active-version "3.0")
@@ -659,11 +659,11 @@ from VALUE."
         separator
         (cond
          ((member property-name org-vcard-comma-separated-properties)
-          (org-vcard-escape-value-string '(";" "\134") value))
+          (org-vcard--escape-value-string '(";" "\134") value))
          ((member property-name org-vcard-compound-properties)
-          (org-vcard-escape-value-string '("," "\134") value))
+          (org-vcard--escape-value-string '("," "\134") value))
          (t
-          (org-vcard-escape-value-string '("," ";" "\134") value)))
+          (org-vcard--escape-value-string '("," ";" "\134") value)))
         "\015\012")
        'utf-8))
      ((string= org-vcard-active-version "2.1")
@@ -686,20 +686,20 @@ from VALUE."
        (encode-coding-string separator 'us-ascii)
        (if (not (member property-name org-vcard-compound-properties))
            (encode-coding-string
-            (org-vcard-escape-value-string '(";") value)
+            (org-vcard--escape-value-string '(";") value)
             org-vcard-default-vcard-21-character-set)
          (encode-coding-string
           value
           org-vcard-default-vcard-21-character-set))
        (encode-coding-string "\015\012" 'us-ascii))))))
 
-(defun org-vcard-set-active-settings ()
-  "Internal function; set active settings to values of last in-buffer settings.
+(defun org-vcard--set-active-settings ()
+  "Set active settings to values of last in-buffer settings.
 
 Fall back to value of custom variables."
   (save-excursion
     (goto-char (point-min))
-    (let* ((valid-styles (mapcar 'car org-vcard-styles-functions))
+    (let* ((valid-styles (mapcar 'car org-vcard--styles-functions))
            (valid-languages '("en" "en_AU" "en_US"))
            (valid-versions '("4.0" "3.0" "2.1"))
            (found-keywords '()))
@@ -747,10 +747,10 @@ Fall back to value of custom variables."
        ((not (member "VCARD_VERSION" found-keywords))
         (setq org-vcard-active-version org-vcard-default-version))))))
 
-(defun org-vcard-canonicalise-adr-property (property-name)
-  "Internal function; canonicalise a vCard ADR property.
+(defun org-vcard--canonicalise-adr-property (property-name)
+  "Canonicalise a vCard ADR property.
 
-Intended for use by `org-vcard-canonicalise-property-name'.
+Intended for use by `org-vcard--canonicalise-property-name'.
 
 PROPERTY-NAME must be a string containing a vCard property name."
   (let ((property-canonicalised "ADR")
@@ -781,10 +781,10 @@ PROPERTY-NAME must be a string containing a vCard property name."
     `(,property-canonicalised ,property-type-data)))
 
 
-(defun org-vcard-canonicalise-email-property (property-name)
-  "Internal function; canonicalise a vCard EMAIL property.
+(defun org-vcard--canonicalise-email-property (property-name)
+  "Canonicalise a vCard EMAIL property.
 
-Intended for use by `org-vcard-canonicalise-property-name'.
+Intended for use by `org-vcard--canonicalise-property-name'.
 
 PROPERTY-NAME must be a string containing a vCard property name."
   (let ((property-canonicalised "EMAIL")
@@ -814,10 +814,10 @@ PROPERTY-NAME must be a string containing a vCard property name."
                 (append property-type-data '(";WORK"))))))
     `(,property-canonicalised ,property-type-data)))
 
-(defun org-vcard-canonicalise-tel-property (property-name)
-  "Internal function; canonicalise a vCard TEL property.
+(defun org-vcard--canonicalise-tel-property (property-name)
+  "Canonicalise a vCard TEL property.
 
-Intended for use by `org-vcard-canonicalise-property-name'.
+Intended for use by `org-vcard--canonicalise-property-name'.
 
 PROPERTY-NAME must be a string containing a vCard property name."
   (let ((property-canonicalised "TEL")
@@ -884,7 +884,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
                 (append property-type-data '(";WORK"))))))
     `(,property-canonicalised ,property-type-data)))
 
-(defun org-vcard-canonicalise-property-name (property-name)
+(defun org-vcard--canonicalise-property-name (property-name)
   "Canonicalise a vCard property name.
 
 Canonicalisation of a property enable its lookup in an org-vcard mapping.
@@ -919,17 +919,17 @@ PROPERTY-NAME must be a string containing the vCard property name."
         (cond
          ((string-match "^ADR" property-name)
           (progn 
-            (setq retval (org-vcard-canonicalise-adr-property property-name))
+            (setq retval (org-vcard--canonicalise-adr-property property-name))
             (setq property-canonicalised (car retval))
             (setq property-type-data (cadr retval))))
          ((string-match "^EMAIL" property-name)
           (progn 
-            (setq retval (org-vcard-canonicalise-email-property property-name))
+            (setq retval (org-vcard--canonicalise-email-property property-name))
             (setq property-canonicalised (car retval))
             (setq property-type-data (cadr retval))))
          ((string-match "^TEL" property-name)
           (progn 
-            (setq retval (org-vcard-canonicalise-tel-property property-name))
+            (setq retval (org-vcard--canonicalise-tel-property property-name))
             (setq property-canonicalised (car retval))
             (setq property-type-data (cadr retval)))))
         (cond
@@ -985,9 +985,8 @@ PROPERTY-NAME must be a string containing the vCard property name."
         property-canonicalised))))
 
 (declare-function quoted-printable-decode-string "qp")
-
 (defun org-vcard-import-parse (source)
-  "Internal function; read and parse SOURCE and return a list of vCards.
+  "Read and parse SOURCE and return a list of vCards.
 
 Each vCard is a list of cons cells, each cell containing the vCard property
 in the car, and the value of that property in the cdr.
@@ -1091,14 +1090,14 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
                  (string-as-multibyte
                   (encode-coding-string value charset)))))
         (setq property
-              (org-vcard-canonicalise-property-name property))
+              (org-vcard--canonicalise-property-name property))
         (setq current-card
               (append current-card (list (cons property value)))))
       (push current-card cards))
     (nreverse cards)))
 
-(defun org-vcard-transfer-write (direction content destination)
-  "Internal function; during import, write CONTENT to DESTINATION.
+(defun org-vcard--transfer-write (direction content destination)
+  "During import, write CONTENT to DESTINATION.
 
 DIRECTION must be either 'import or 'export. CONTENT must be a string.
 DESTINATION must be either \"buffer\" or \"file\"."
@@ -1171,14 +1170,14 @@ DESTINATION must be either \"buffer\" or \"file\"."
 
 (defun org-vcard-transfer-helper
     (source destination style language version direction)
-  "Internal function; dispatch export and import requests to the appropriate functions.
+  "Dispatch export and import requests to the appropriate functions.
 
 Appropriate values for SOURCE and DESTINATION are determined by
 the functions called. Appropriate values for STYLE and VERSION are
 determined by the contents of the `org-vcard-contacts-styles-mappings'
 variable. DIRECTION must be either 'export or 'import."
   (let ((position nil))
-    (org-vcard-check-contacts-styles)
+    (org-vcard--check-contacts-styles)
     (setq org-vcard-active-style style)
     (setq org-vcard-active-language language)
     (setq org-vcard-active-version version)
@@ -1189,7 +1188,7 @@ variable. DIRECTION must be either 'export or 'import."
       (setq position 1))
      (t
       (error "Invalid direction type")))
-    (dolist (style org-vcard-styles-functions)
+    (dolist (style org-vcard--styles-functions)
       (if (string= (car style) org-vcard-active-style)
           (funcall (nth position (cadr style)) source destination)))))
 
@@ -1258,7 +1257,7 @@ argument of:
              "Style: "
              (mapcar
               'car
-              org-vcard-styles-functions)
+              org-vcard--styles-functions)
              nil t org-vcard-default-style)))
      ((= 4 arg)
       (progn
@@ -1290,7 +1289,7 @@ argument of:
                "Style: "
                (mapcar
                 'car
-                org-vcard-styles-functions)
+                org-vcard--styles-functions)
                nil t org-vcard-default-style)))))
     (org-vcard-transfer-helper
      source destination style language version 'export)))
@@ -1355,7 +1354,7 @@ argument of:
              "Style: "
              (mapcar
               'car
-              org-vcard-styles-functions)
+              org-vcard--styles-functions)
              nil t org-vcard-default-style)))
      ((= 4 arg)
       (progn
@@ -1387,7 +1386,7 @@ argument of:
                "Style: "
                (mapcar
                 'car
-                org-vcard-styles-functions)
+                org-vcard--styles-functions)
                nil t org-vcard-default-style)))))
     (org-vcard-transfer-helper
      source destination style language version 'import)))
@@ -1535,10 +1534,10 @@ argument of:
 (defun org-vcard-reload-styles ()
   "Reload the styles in the org-vcard 'styles' directory."
   (interactive)
-  (setq org-vcard-styles-functions
-        (org-vcard-create-styles-functions))
+  (setq org-vcard--styles-functions
+        (org-vcard--create-styles-functions))
   (setq org-vcard-styles-languages-mappings
-        (org-vcard-create-styles-languages-mappings))
+        (org-vcard--create-styles-languages-mappings))
   (org-vcard-create-org-vcard-mode-menu))
 
 
