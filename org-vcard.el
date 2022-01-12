@@ -1376,105 +1376,106 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
         (current-card '()))
     (cond
      ((string= "file" source)
-      (if filename
-          (find-file filename)
-        (find-file
-         (read-file-name
-          "Source filename? "
-          default-directory
-          org-vcard-default-import-file
-          t))))
+      (unless filename
+        (setq filename
+              (read-file-name
+               "Source filename? "
+               default-directory
+               org-vcard-default-import-file
+               t))))
      ((string= "region" source)
       (narrow-to-region (region-beginning) (region-end)))
      ((string= "buffer" source)
       t)
      (t
       (error "Invalid source type")))
-    (goto-char (point-min))
-    (setq case-fold-search t)
-    (while (re-search-forward "BEGIN:VCARD" (point-max) t)
-      (setq current-card '())
-      (forward-line)
-      (while (not (looking-at "END:VCARD"))
-        (re-search-forward "^\\([^:]+\\): *")
-        ;; Parse property.
-        (setq property (match-string-no-properties 1)
-              value ""
-              charset (when (string-match ";CHARSET=\\([^;:]+\\)" property)
-                        ;; Save the value of the charset.
-                        (prog1 (match-string-no-properties 1 property)
-                          ;; Remove the charset from the property name.
-                          (setq property (replace-match "" nil nil property))))
-              charset (cdr
-                       (assoc-string
-                        charset
-                        org-vcard-character-set-mapping
-                        :case-fold))
-              encoding (when (string-match ";ENCODING=\\([^;:]+\\)" property)
-                         ;; Save the value of the encoding.
-                         (prog1 (upcase (match-string-no-properties 1 property))
-                           ;; Remove the encoding from the property name.
-                           (setq property (replace-match "" nil nil property)))))
-        ;; Consume value and continuation lines.
-        (while
-            (progn
-              ;; Add the text from the current point to the end of the
-              ;; line (minus line ending) to the value.
-              (setq value
-                    (concat
-                     value
-                     (string-trim-right
-                      (buffer-substring-no-properties
-                       (point)
-                       (line-end-position))
-                      ;; Remove DOS line ending.
-                      "[\u000D\015]")))
-              ;; Set point to the start of the next continuation line,
-              ;; if there is one.
-              (or (re-search-forward "^[\u0009\u0020\011\040]"
-                                     ;; Don't go past the next line.
-                                     (line-end-position 2)
-                                     ;; No error and don't move point if failed.
-                                     t)
-                  (and (string= encoding "QUOTED-PRINTABLE")
-                       ;; = at the end of a line encoded with quoted-printable
-                       ;; means to continue on to the next line.
-                       (re-search-forward "=$" (line-end-position 2) t)
-                       ;; Include the line break in the value.
-                       (setq value (concat value "\n"))
-                       ;; Consume the next line as long as `forward-line'
-                       ;; returns non-nil.
-                       (forward-line)))))
+    (with-temp-buffer
+      (insert-file-contents-literally filename)
+      (goto-char (point-min))
+      (setq case-fold-search t)
+      (while (re-search-forward "BEGIN:VCARD" (point-max) t)
+        (setq current-card '())
         (forward-line)
-        ;; Deal with possible quoted-printable encoding.
-        (when (and
-               encoding
-               (string= encoding "QUOTED-PRINTABLE"))
-          (require 'qp) ; Part of GNU Emacs.
-          (setq value
-                (decode-coding-string
-                 (quoted-printable-decode-string value)
-                 (or charset 'utf-8-emacs)
-                 :nocopy)))
-        ;; Handle CHARSET if necessary.
-        (pcase org-vcard-active-version
-          ((or "4.0" "3.0")
-           ;; vCard 4.0 mandates UTF-8 as the only possible encoding,
-           ;; and 3.0 mandates encoding not per-property, but via the
-           ;; CHARSET parameter on the containing MIME object. So we
-           ;; just ignore the presence and/or value of the CHARSET
-           ;; modifier in 4.0 and 3.0 contexts.
-           t)
-          ("2.1"
-           (setq value
-                 (string-as-multibyte
-                  (encode-coding-string value charset)))))
-        (setq property
-              (org-vcard--canonicalise-property-name property))
-        (setq current-card
-              (append current-card (list (cons property value)))))
-      (push current-card cards))
-    (nreverse cards)))
+        (while (not (looking-at "END:VCARD"))
+          (re-search-forward "^\\([^:]+\\): *")
+          ;; Parse property.
+          (setq property (match-string-no-properties 1)
+                value ""
+                charset (when (string-match ";CHARSET=\\([^;:]+\\)" property)
+                          ;; Save the value of the charset.
+                          (prog1 (match-string-no-properties 1 property)
+                            ;; Remove the charset from the property name.
+                            (setq property (replace-match "" nil nil property))))
+                charset (cdr
+                         (assoc-string
+                          charset
+                          org-vcard-character-set-mapping
+                          :case-fold))
+                encoding (when (string-match ";ENCODING=\\([^;:]+\\)" property)
+                           ;; Save the value of the encoding.
+                           (prog1 (upcase (match-string-no-properties 1 property))
+                             ;; Remove the encoding from the property name.
+                             (setq property (replace-match "" nil nil property)))))
+          ;; Consume value and continuation lines.
+          (while
+              (progn
+                ;; Add the text from the current point to the end of the
+                ;; line (minus line ending) to the value.
+                (setq value
+                      (concat
+                       value
+                       (string-trim-right
+                        (buffer-substring-no-properties
+                         (point)
+                         (line-end-position))
+                        ;; Remove DOS line ending.
+                        "[\u000D\015]")))
+                ;; Set point to the start of the next continuation line,
+                ;; if there is one.
+                (or (re-search-forward "^[\u0009\u0020\011\040]"
+                                       ;; Don't go past the next line.
+                                       (line-end-position 2)
+                                       ;; No error and don't move point if failed.
+                                       t)
+                    (and (string= encoding "QUOTED-PRINTABLE")
+                         ;; = at the end of a line encoded with quoted-printable
+                         ;; means to continue on to the next line.
+                         (re-search-forward "=$" (line-end-position 2) t)
+                         ;; Include the line break in the value.
+                         (setq value (concat value "\n"))
+                         ;; Consume the next line as long as `forward-line'
+                         ;; returns non-nil.
+                         (forward-line)))))
+          (forward-line)
+          ;; Deal with possible quoted-printable encoding.
+          (when (and
+                 encoding
+                 (string= encoding "QUOTED-PRINTABLE"))
+            (require 'qp) ; Part of GNU Emacs.
+            (setq value
+                  (decode-coding-string
+                   (quoted-printable-decode-string value)
+                   (or charset 'utf-8-emacs)
+                   :nocopy)))
+          ;; Handle CHARSET if necessary.
+          (pcase org-vcard-active-version
+            ((or "4.0" "3.0")
+             ;; vCard 4.0 mandates UTF-8 as the only possible encoding,
+             ;; and 3.0 mandates encoding not per-property, but via the
+             ;; CHARSET parameter on the containing MIME object. So we
+             ;; just ignore the presence and/or value of the CHARSET
+             ;; modifier in 4.0 and 3.0 contexts.
+             t)
+            ("2.1"
+             (setq value
+                   (string-as-multibyte
+                    (encode-coding-string value charset)))))
+          (setq property
+                (org-vcard--canonicalise-property-name property))
+          (setq current-card
+                (append current-card (list (cons property value)))))
+        (push current-card cards))
+      (nreverse cards))))
 
 ;;;###autoload
 (defun org-vcard-import-via-menu (style language version)
