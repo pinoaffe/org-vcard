@@ -836,19 +836,15 @@ DESTINATION must be either \"buffer\" or \"file\"."
          ((eq 'import direction)
           (if org-vcard-append-to-existing-import-buffer
               (setq the-buffer
-                    (get-buffer-create
-                     (concat "*org-vcard-import*")))
+                    (get-buffer-create "*org-vcard-import*"))
             (setq the-buffer
-                  (generate-new-buffer
-                   "*org-vcard-import*"))))
+                  (generate-new-buffer "*org-vcard-import*"))))
          ((eq 'export direction)
           (if org-vcard-append-to-existing-export-buffer
               (setq the-buffer
-                    (get-buffer-create
-                     (concat "*org-vcard-export*")))
+                    (get-buffer-create "*org-vcard-export*"))
             (setq the-buffer
-                  (generate-new-buffer
-                   "*org-vcard-export*")))))
+                  (generate-new-buffer "*org-vcard-export*")))))
         (set-buffer the-buffer)
         (insert (string-as-multibyte content))
         (message
