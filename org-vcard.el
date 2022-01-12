@@ -1361,7 +1361,7 @@ argument of:
      source destination style language version 'import)))
 
 (declare-function quoted-printable-decode-string "qp")
-(defun org-vcard-import-parse (source)
+(defun org-vcard-import-parse (source &optional filename)
   "Read and parse SOURCE and return a list of vCards.
 
 Each vCard is a list of cons cells, each cell containing the vCard property
@@ -1376,10 +1376,14 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
         (current-card '()))
     (cond
      ((string= "file" source)
-      (find-file
-       (read-from-minibuffer
-        "Filename? "
-        org-vcard-default-import-file)))
+      (if filename
+          (find-file filename)
+        (find-file
+         (read-file-name
+          "Filename? "
+          default-directory
+          org-vcard-default-import-file
+          t))))
      ((string= "region" source)
       (narrow-to-region (region-beginning) (region-end)))
      ((string= "buffer" source)
