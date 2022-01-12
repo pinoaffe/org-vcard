@@ -29,15 +29,17 @@ to DESTINATION.
 
 SOURCE must be either \"buffer\", \"region\" or \"subtree\".
 DESTINATION must be either \"buffer\" or \"file\"."
-  (let* ((scope (cond
-                 ((string= "buffer" source) nil)
-                 ((string= "region" source) 'region)
-                 ((string= "subtree" source) 'tree)
-                 (t (error "Invalid source type"))))
-         (encoding (cond
-                    ((string= "4.0" org-vcard-active-version) 'utf-8)
-                    ((string= "3.0" org-vcard-active-version) 'utf-8)
-                    ((string= "2.1" org-vcard-active-version) 'us-ascii)))
+  (let* ((scope
+          (cond
+           ((string= "buffer" source) nil)
+           ((string= "region" source) 'region)
+           ((string= "subtree" source) 'tree)
+           (t (error "Invalid source type"))))
+         (encoding
+          (cond
+           ((string= "4.0" org-vcard-active-version) 'utf-8)
+           ((string= "3.0" org-vcard-active-version) 'utf-8)
+           ((string= "2.1" org-vcard-active-version) 'us-ascii)))
          (output (encode-coding-string "" encoding)))
     (org-mode)
     (org-map-entries
@@ -45,10 +47,18 @@ DESTINATION must be either \"buffer\" or \"file\"."
        (let ((properties (org-entry-properties))
              (in-contact-entry nil)
              (flat-style-properties
-              (or (cadr (assoc org-vcard-active-version
-                               (cadr (assoc org-vcard-active-language
-                                            (cadr (assoc "flat" org-vcard-styles-languages-mappings))))))
-                  (error "No mapping available for specified vCard version")))
+              (or
+               (cadr
+                (assoc
+                 org-vcard-active-version
+                 (cadr
+                  (assoc
+                   org-vcard-active-language
+                   (cadr
+                    (assoc
+                     "flat"
+                     org-vcard-styles-languages-mappings))))))
+               (error "No mapping available for specified vCard version")))
              (content (encode-coding-string "" encoding)))
          ;; Does this entry contain a PROPERTY listed in
          ;; the "flat" mapping? If so, assume we're in
@@ -72,20 +82,22 @@ DESTINATION must be either \"buffer\" or \"file\"."
            (dolist (p properties)
              (if (and (not (string= "VERSION" (car p)))
                       (assoc (car p) flat-style-properties))
-                 (setq content (concat
-                                content
-                                (org-vcard--export-line
-                                 (cdr (assoc (car p) flat-style-properties))
-                                 (cdr p))))))
+                 (setq content
+                       (concat
+                        content
+                        (org-vcard--export-line
+                         (cdr (assoc (car p) flat-style-properties))
+                         (cdr p))))))
            (setq output
                  (concat
                   output
                   (org-vcard--export-line "BEGIN" "VCARD")
                   (org-vcard--export-line "VERSION" org-vcard-active-version)
-                  (org-vcard--export-line org-vcard-default-property-for-heading
-                                         (plist-get
-                                          (nth 1 (org-element-headline-parser (line-end-position)))
-                                          :raw-value))
+                  (org-vcard--export-line
+                   org-vcard-default-property-for-heading
+                   (plist-get
+                    (nth 1 (org-element-headline-parser (line-end-position)))
+                    :raw-value))
                   content
                   (org-vcard--export-line "END" "VCARD"))))))
      nil scope)
@@ -106,53 +118,78 @@ DESTINATION must be one of \"buffer\" or \"file\"."
     (if (not (member source '("buffer" "file" "region")))
         (error "Invalid source type"))
     (let ((flat-style-properties
-           (or (cadr (assoc org-vcard-active-version
-                           (cadr (assoc org-vcard-active-language
-                                        (cadr (assoc "flat" org-vcard-styles-languages-mappings))))))
-              (error "No mapping available for specified vCard version"))))
+           (or
+            (cadr
+             (assoc
+              org-vcard-active-version
+              (cadr
+               (assoc
+                org-vcard-active-language
+                (cadr
+                 (assoc "flat" org-vcard-styles-languages-mappings))))))
+            (error "No mapping available for specified vCard version"))))
       (dolist (card cards)
         (if (assoc "VERSION" card)
             (setq org-vcard-active-version (cdr (assoc "VERSION" card)))
           (setq org-vcard-active-version org-vcard-default-version))
         (setq heading
               (or (cdr (assoc org-vcard-default-property-for-heading card))
-                  (let ((value (cdr
-                                (assoc
-                                 (if (string=
-                                      org-vcard-default-property-for-heading
-                                      "FN")
-                                     "N"
-                                   "FN") card))))
+                  (let ((value
+                         (cdr
+                          (assoc
+                           (if (string=
+                                org-vcard-default-property-for-heading
+                                "FN")
+                               "N"
+                             "FN") card))))
                     (if value
-                        (replace-regexp-in-string "^;\\|;$" "" value)
+                        (replace-regexp-in-string
+                         "^;\\|;$"
+                         ""
+                         value)
                       "NO TITLE"))))
-        (setq content (concat content
-                              "* " heading "\n"
-                              ":PROPERTIES:\n"))
+        (setq content
+              (concat
+               content
+               "* " heading "\n"
+               ":PROPERTIES:\n"))
         (dolist (entry card)
           (if (not (string= org-vcard-default-property-for-heading (car entry)))
               (let* ((property (car entry))
-                     (property-name (progn
-                                      (string-match "^[^;:]+" property)
-                                      (match-string 0 property)))
+                     (property-name
+                      (progn
+                        (string-match "^[^;:]+" property)
+                        (match-string 0 property)))
                      (property-value (cdr entry)))
                 (if (and org-vcard-remove-external-semicolons
                          (member property-name org-vcard-compound-properties))
-                    ;; Remove leading and trailing semicolons from value of property.
-                    (setq property-value (replace-regexp-in-string "^[;]+\\|[;]+$" "" property-value)))
+                    ;; Remove leading and trailing semicolons from value of
+                    ;; property.
+                    (setq property-value
+                          (replace-regexp-in-string
+                           "^[;]+\\|[;]+$"
+                           ""
+                           property-value)))
                 (if (car (rassoc property flat-style-properties))              
-                    (setq content (concat content
-                                          ":"
-                                          (car (rassoc property flat-style-properties))
-                                          ": "
-                                          property-value
-                                          "\n"))
+                    (setq content
+                          (concat
+                           content
+                           ":"
+                           (car (rassoc property flat-style-properties))
+                           ": "
+                           property-value
+                           "\n"))
                   (if org-vcard-include-import-unknowns
-                      (setq content (concat content
-                                            ":"
-                                            property
-                                            ": "
-                                            property-value
-                                            "\n")))))))
-        (setq content (concat content ":END:\n"))))
+                      (setq content
+                            (concat
+                             content
+                             ":"
+                             property
+                             ": "
+                             property-value
+                             "\n")))))))
+        (setq content
+              (concat
+               content
+               ":END:\n"))))
     (org-vcard--transfer-write 'import content destination)))
