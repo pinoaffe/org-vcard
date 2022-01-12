@@ -810,7 +810,7 @@ Fall back to value of custom variables."
        ((not (member "VCARD_VERSION" found-keywords))
         (setq org-vcard-active-version org-vcard-default-version))))))
 
-(defun org-vcard--transfer-write (direction content destination)
+(defun org-vcard--transfer-write (direction content destination &optional filename)
   "During import, write CONTENT to DESTINATION.
 
 DIRECTION must be either 'import or 'export. CONTENT must be a string.
@@ -859,13 +859,17 @@ DESTINATION must be either \"buffer\" or \"file\"."
           "'."))))
      ((string= "file" destination)
       (let ((filename
-             (read-from-minibuffer
-              "Filename? "
-              (cond
-               ((eq 'import direction)
-                org-vcard-default-import-file)
-               ((eq 'export direction)
-                org-vcard-default-export-file)))))
+             (if filename
+                 filename
+               (read-file-name
+                "Destination filename? "
+                default-directory
+                (cond
+                 ((eq 'import direction)
+                  org-vcard-default-import-file)
+                 ((eq 'export direction)
+                  org-vcard-default-export-file))
+                nil))))
         (with-temp-buffer
           (insert (string-as-multibyte content))
           (when (file-writable-p filename)
