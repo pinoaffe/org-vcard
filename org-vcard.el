@@ -1384,7 +1384,7 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
           (find-file filename)
         (find-file
          (read-file-name
-          "Filename? "
+          "Source filename? "
           default-directory
           org-vcard-default-import-file
           t))))
