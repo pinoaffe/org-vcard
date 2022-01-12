@@ -1,9 +1,9 @@
 
-(if (not (boundp 'org-vcard-elisp-dir))
-    (error "Variable org-vcard-elisp-dir not set; have you loaded org-vcard.el?"))
+(if (not (boundp 'org-vcard--elisp-dir))
+    (error "Variable org-vcard--elisp-dir not set; have you loaded org-vcard.el?"))
 
 (defconst org-vcard-tests-data-dir (file-name-as-directory
-                                    (concat org-vcard-elisp-dir "tests/data")))
+                                    (concat org-vcard--elisp-dir "tests/data")))
 
 
 ;;;;
