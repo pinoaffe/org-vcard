@@ -289,14 +289,17 @@
 (defconst org-vcard--elisp-dir (file-name-directory load-file-name)
   "Absolute path of the directory of org-vcard.el.")
 
-(defcustom org-vcard-custom-styles-dir "~/.config/emacs/org-vcard-styles/"
+(defcustom org-vcard-custom-styles-dir nil
   "Directory containing custom styles."
   :type 'directory
   :group 'org-vcard)
 
 (defvar org-vcard--styles-dirs
-  `(,(file-name-as-directory (concat org-vcard--elisp-dir "styles"))
-    ,org-vcard-custom-styles-dir)
+  (let ((default (file-name-as-directory
+                  (concat org-vcard--elisp-dir "styles"))))
+    (if org-vcard-custom-styles-dir
+        (list default org-vcard-custom-styles-dir)
+      (list default)))
   "List of directories containing org-vcard styles.")
 
 
@@ -569,8 +572,6 @@ PROPERTY-NAME must be a string containing a vCard property name."
   "Create a data structure for use by `org-vcard-styles-function'."
   (let ((the-list) '())
     (dolist (style-dir org-vcard--styles-dirs)
-      (if (not (file-exists-p style-dir))
-          (make-directory style-dir))
       (dolist (style (directory-files style-dir))
         (if (and
              (not (string= "." (file-name-nondirectory style)))
