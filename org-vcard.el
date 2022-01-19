@@ -604,8 +604,6 @@ PROPERTY-NAME must be a string containing a vCard property name."
   "Create a data structure for use by `org-vcard-styles-languages-mappings'."
   (let ((style-mappings '()))
     (dolist (style-dir org-vcard--styles-dirs)
-      (if (not (file-exists-p style-dir))
-          (make-directory style-dir))
       (dolist (style
                ;; Reverse the list so the repeated calls to
                ;; add-to-list will produce a lexicographically-sorted
