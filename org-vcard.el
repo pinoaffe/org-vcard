@@ -294,12 +294,12 @@
   :type 'directory
   :group 'org-vcard)
 
-(defvar org-vcard--styles-dirs
-  (let ((default (file-name-as-directory
-                  (concat org-vcard--elisp-dir "styles"))))
-    (if org-vcard-custom-styles-dir
-        (list default org-vcard-custom-styles-dir)
-      (list default)))
+(defun org-vcard--styles-dirs
+    (let ((default (file-name-as-directory
+                    (concat org-vcard--elisp-dir "styles"))))
+      (if org-vcard-custom-styles-dir
+          (list default org-vcard-custom-styles-dir)
+        (list default)))
   "List of directories containing org-vcard styles.")
 
 
@@ -569,10 +569,9 @@ PROPERTY-NAME must be a string containing a vCard property name."
             "' has an invalid import function"))))))
 
 (defun org-vcard--create-styles-functions ()
-  "Create a data structure for use by `org-vcard-styles-function'."
   "Create a data structure for use by `org-vcard-styles-functions'."
   (let ((the-list) '())
-    (dolist (style-dir org-vcard--styles-dirs)
+    (dolist (style-dir (org-vcard--styles-dirs))
       (dolist (style (directory-files style-dir))
         (if (and
              (not (string= "." (file-name-nondirectory style)))
@@ -603,7 +602,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
 (defun org-vcard--create-styles-languages-mappings ()
   "Create a data structure for use by `org-vcard-styles-languages-mappings'."
   (let ((style-mappings '()))
-    (dolist (style-dir org-vcard--styles-dirs)
+    (dolist (style-dir (org-vcard--styles-dirs))
       (dolist (style
                ;; Reverse the list so the repeated calls to
                ;; add-to-list will produce a lexicographically-sorted
