@@ -294,13 +294,13 @@
   :type 'directory
   :group 'org-vcard)
 
-(defun org-vcard--styles-dirs
-    (let ((default (file-name-as-directory
-                    (concat org-vcard--elisp-dir "styles"))))
-      (if org-vcard-custom-styles-dir
-          (list default org-vcard-custom-styles-dir)
-        (list default)))
-  "List of directories containing org-vcard styles.")
+(defun org-vcard--styles-dirs ()
+  "List of directories containing org-vcard styles."
+  (let ((default (file-name-as-directory
+                  (concat org-vcard--elisp-dir "styles"))))
+    (if org-vcard-custom-styles-dir
+        (list default org-vcard-custom-styles-dir)
+      (list default))))
 
 
 ;;
