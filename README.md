@@ -3,6 +3,10 @@
 *Author:* Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com><br>
 *URL:* [https://github.com/flexibeast/org-vcard](https://github.com/flexibeast/org-vcard)<br>
 
+*This project is currently unmaintained, and needs a new
+maintainer. If you wish to take maintainership, please email
+Alexis.*
+
 `org-vcard` is a package for exporting and importing
 [vCards](https://en.wikipedia.org/wiki/Vcard) from within [GNU
 Emacs](https://www.gnu.org/software/emacs/)' [Org
@@ -53,7 +57,7 @@ your own code to handle export and import.
 Install `org-vcard` from [MELPA](http://melpa.org/#/org-vcard),
 [MELPA Stable](http://stable.melpa.org/#/org-vcard), or put the
 `org-vcard` folder in your load-path and do a `(require
-'org-vcard)'.
+'org-vcard)`.
 
 ## Usage
 
