@@ -1546,9 +1546,9 @@ When called from Lisp, argument omitted or nil enables the mode, and
  `toggle' toggles the mode.
 
 Enabling org-vcard mode will add an Org-vCard entry to Emacs' menu bar."
-  nil                    ; The initial value.
-  nil                    ; The indicator for the mode line.
-  org-vcard-mode-keymap  ; The minor mode bindings.
+  :init-value nil                ; The initial value.
+  :lighter nil                   ; The indicator for the mode line.
+  :keymap org-vcard-mode-keymap  ; The minor mode bindings.
   :group 'org-vcard)
 
 
