@@ -1470,7 +1470,7 @@ variable. DIRECTION must be either 'export or 'import."
         (org-vcard--create-styles-functions))
   (setq org-vcard-styles-languages-mappings
         (org-vcard--create-styles-languages-mappings))
-  (org-vcard-create-org-vcard-mode-menu))
+  (org-vcard--create-org-vcard-mode-menu))
 
 
 ;;
