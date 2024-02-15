@@ -902,106 +902,47 @@ DESTINATION must be either \"buffer\" or \"file\"."
                               (repeat (cons string string))))))))
   :group 'org-vcard)
 
+(defun org-vcard--sort-by-car (list)
+  (sort list
+        (lambda (a b)
+          (string< (car a) (car b)))))
+
+(defun org-vcard--conversion-menu-helper (exportp)
+  (mapcar (lambda (style)
+            (cons (concat (if exportp
+                              "from "
+                            "to ")
+                          (car style))
+                  (mapcar (lambda (language)
+                            (cons (car language)
+                                  (mapcar (lambda (version)
+                                            (vector
+                                             (concat (if exportp
+                                                         "to vCard "
+                                                       "from vCard")
+                                                     (car version))
+                                             `(,(if exportp
+                                                    'org-vcard-export-via-menu
+                                                  'org-vcard-import-via-menu)
+                                               ,(car style)
+                                               ,(car language)
+                                               ,(car version))
+                                             t))
+                                          (org-vcard--sort-by-car (cadr language)))))
+                          (org-vcard--sort-by-car (cadr style)))))
+          (org-vcard--sort-by-car org-vcard-styles-languages-mappings)))
+
 (defun org-vcard--create-org-vcard-mode-menu ()
   "Create or recreate the `org-vcard-mode' menu."
   (easy-menu-define org-vcard-menu org-vcard-mode-keymap
     "Menu bar entry for org-vcard"
     `("Org-vCard"
-      ,(let ((export '("Export")))
-         (let ((style-list '()))
-           (dolist (style
-                    (sort (mapcar
-                           'car
-                           org-vcard-styles-languages-mappings)
-                          'string<))
-             (setq style-list
-                   (list (concat "from " style)))
-             (let ((language-list '()))
-               (dolist (language
-                        (sort (mapcar
-                               'car
-                               (cadr
-                                (assoc
-                                 style
-                                 org-vcard-styles-languages-mappings)))
-                              'string<))
-                 (setq language-list (list language))
-                 (let ((version-list '()))
-                   (dolist (version
-                            (sort (mapcar
-                                   'car
-                                   (cadr
-                                    (assoc
-                                     language
-                                     (cadr
-                                      (assoc
-                                       style
-                                       org-vcard-styles-languages-mappings)))))
-                                  'string<))
-                     (setq version-list
-                           (append
-                            version-list
-                            (list
-                             (vector
-                              (concat "to vCard " version)
-                              `(org-vcard-export-via-menu
-                                ,style
-                                ,language
-                                ,version)
-                              t)))))
-                   (setq language-list
-                         (append language-list version-list)))
-                 (setq style-list
-                       (append style-list `(,language-list)))))
-             (setq export
-                   (append export `(,style-list)))))
-         export)
-      ,(let ((import '("Import")))
-         (let ((style-list '()))
-           (dolist (style
-                    (sort (mapcar
-                           'car
-                           org-vcard-styles-languages-mappings)
-                          'string<))
-             (setq style-list
-                   (list (concat "to " style)))
-             (let ((language-list '()))
-               (dolist (language
-                        (sort (mapcar
-                               'car
-                               (cadr
-                                (assoc
-                                 style
-                                 org-vcard-styles-languages-mappings)))
-                              'string<))
-                 (setq language-list (list language))
-                 (let ((version-list '()))
-                   (dolist (version
-                            (sort (mapcar
-                                   'car
-                                   (cadr
-                                    (assoc
-                                     language
-                                     (cadr
-                                      (assoc
-                                       style
-                                       org-vcard-styles-languages-mappings)))))
-                                  'string<))
-                     (setq version-list
-                           (append version-list
-                                   (list
-                                    (vector
-                                     (concat "from vCard " version)
-                                     `(org-vcard-import-via-menu
-                                       ,style
-                                       ,language
-                                       ,version)
-                                     t)))))
-                   (setq language-list (append language-list version-list)))
-                 (setq style-list (append style-list `(,language-list)))))
-             (setq import (append import `(,style-list)))))
-         import)
+      ("Export" .
+       ,(org-vcard--conversion-menu-helper t))
+      ("Import" .
+       ,(org-vcard--conversion-menu-helper nil))
       ["Customize" (customize-group 'org-vcard) t])))
+
 (org-vcard--create-org-vcard-mode-menu)
 
 
