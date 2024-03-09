@@ -3,9 +3,9 @@
 ;; Copyright (C) 2014-2019,2021-2022 Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com>
 
 ;; Author: Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com>
-;; Maintainer: Alexis <flexibeast@gmail.com>
+;; Maintainer: pinoaffe <pinoaffe@gmail.com>
 ;; Created: 2014-07-31
-;; URL: https://github.com/flexibeast/org-vcard
+;; URL: https://github.com/pinoaffe/org-vcard
 ;; Keywords: outlines, org, vcard
 
 ;;
@@ -28,9 +28,8 @@
 
 ;;; Commentary:
 
-;; *This project is currently unmaintained, and needs a new
-;; maintainer. If you wish to take maintainership, please email
-;; Alexis.*
+;; *As of march 2024, I (pinoaffe) have taken over maintainership of
+;; org-vcard.*
 
 ;; `org-vcard' is a package for exporting and importing
 ;; [vCards](https://en.wikipedia.org/wiki/Vcard) from within [GNU
@@ -224,7 +223,7 @@
 ;; * as a TODO item, or
 
 ;; * in [the project's "Issues" section on
-;; GitHub](https://github.com/flexibeast/org-vcard/issues),
+;; GitHub](https://github.com/pinoaffe/org-vcard/issues),
 
 ;; please create a new issue with as much detail as possible, including:
 

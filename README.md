@@ -1,11 +1,10 @@
 # org-vcard - org-mode support for vCard export and import
 
 *Author:* Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com><br>
-*URL:* [https://github.com/flexibeast/org-vcard](https://github.com/flexibeast/org-vcard)<br>
+*URL:* [https://github.com/pinoaffe/org-vcard](https://github.com/pinoaffe/org-vcard)<br>
 
-*This project is currently unmaintained, and needs a new
-maintainer. If you wish to take maintainership, please email
-Alexis.*
+*As of march 2024, I (pinoaffe) have taken over maintainership of
+org-vcard.*
 
 `org-vcard` is a package for exporting and importing
 [vCards](https://en.wikipedia.org/wiki/Vcard) from within [GNU
@@ -199,7 +198,7 @@ If you discover an issue or bug in `org-vcard` not already noted:
 * as a TODO item, or
 
 * in [the project's "Issues" section on
-GitHub](https://github.com/flexibeast/org-vcard/issues),
+GitHub](https://github.com/pinoaffe/org-vcard/issues),
 
 please create a new issue with as much detail as possible, including:
 
