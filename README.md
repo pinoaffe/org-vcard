@@ -1,6 +1,6 @@
 # org-vcard - org-mode support for vCard export and import
 
-*Author:* Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com><br>
+*Author:* Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com>, pinoaffe <pinoaffe@gmail.com><br>
 *URL:* [https://github.com/pinoaffe/org-vcard](https://github.com/pinoaffe/org-vcard)<br>
 
 *As of march 2024, I (pinoaffe) have taken over maintainership of

@@ -1,8 +1,10 @@
 ;;; org-vcard.el --- org-mode support for vCard export and import.
 
-;; Copyright (C) 2014-2019,2021-2022 Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com>
+;; Copyright (C) 2014-2019,2021-2022 Alexis <flexibeast@gmail.com>
+;; Copyright (C) 2019 Will Dey <will123dey@gmail.com>
+;; Copyright (C) 2024 pinoaffe <pinoaffe@gmail.com>
 
-;; Author: Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com>
+;; Author: Alexis <flexibeast@gmail.com>, Will Dey <will123dey@gmail.com>, pinoaffe <pinoaffe@gmail.com>
 ;; Maintainer: pinoaffe <pinoaffe@gmail.com>
 ;; Created: 2014-07-31
 ;; URL: https://github.com/pinoaffe/org-vcard
