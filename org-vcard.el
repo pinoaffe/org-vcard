@@ -596,9 +596,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
                      (file-name-nondirectory style))))))))))
     (sort the-list
           #'(lambda (a b)
-              (if (string< (car a) (car b))
-                  t
-                nil)))))
+              (string< (car a) (car b))))))
 
 (defun org-vcard--create-styles-languages-mappings ()
   "Create a data structure for use by `org-vcard-styles-languages-mappings'."
@@ -610,9 +608,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
                ;; list.
                (sort (directory-files style-dir)
                      #'(lambda (a b)
-                         (if (not (string< a b))
-                             t
-                           nil))))
+                         (not (string< a b)))))
         (if (and
              (not (string= "." style))
              (not (string= ".." style)))
@@ -630,9 +626,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
                               "mappings"))
                             t)
                            #'(lambda (a b)
-                               (if (not (string< a b))
-                                   t
-                                 nil))))
+                               (not (string< a b)))))
                   (if (and
                        (not
                         (string=
