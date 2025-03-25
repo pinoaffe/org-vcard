@@ -942,6 +942,18 @@ DESTINATION must be either \"buffer\" or \"file\"."
 
 (org-vcard--create-org-vcard-mode-menu)
 
+;;
+;; Org-mode element functions.
+;;
+(defalias 'org-vcard--resolve-element-properties
+  (if (version<= "9.7" org-version)
+      (lambda (node)
+        "Resolve NODE's properties using `org-element-properties-resolve'."
+        ;; Silence warnings about `org-element-properties-resolve'
+        ;; being unresolved on earlier Org versions.
+        (with-no-warnings
+          (org-element-properties-resolve node 'force-undefer)))
+    #'identity))
 
 ;;
 ;; Additional user-customisable variables.

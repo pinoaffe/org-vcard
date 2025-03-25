@@ -96,7 +96,8 @@ DESTINATION must be either \"buffer\" or \"file\"."
                   (org-vcard--export-line
                    org-vcard-default-property-for-heading
                    (plist-get
-                    (nth 1 (org-element-headline-parser (line-end-position)))
+                    (cadr (org-vcard--resolve-element-properties
+			    (org-element-headline-parser (line-end-position))))
                     :raw-value))
                   content
                   (org-vcard--export-line "END" "VCARD"))))))
