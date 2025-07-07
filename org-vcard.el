@@ -1287,6 +1287,11 @@ DIRECTION must be either \='export or \='import."
 ;;
 
 (defun org-vcard--export-helper (&optional mode _async subtreep _visible-only _body-only _ext-plist)
+  "Helper function to export org file containing contacts to vcf format.
+
+For use in an org export backend.  MODE is one of buffer, file, or open.
+SUBTREEP encodes whether to export the file or just the current tree.
+_ASYNC, _VISIBLE-ONLY, _BODY-ONLY, and _EXT-PLIST are currently ignored."
   (let ((filename (org-export-output-file-name ".vcf" subtreep))
         (source (if (region-active-p)
                     "region"
@@ -1306,10 +1311,21 @@ DIRECTION must be either \='export or \='import."
       (org-open-file org-vcard-default-export-file))))
 
 (defun org-vcard--export-helper-buffer (&optional async subtreep visible-only body-only ext-plist)
+  "Export an org file containing contacts to a vcf format buffer.
+For use in an org export backend.  See `org-vcard--export-helper' for
+valid values of ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, and EXT-PLIST."
   (org-vcard--export-helper 'buffer async subtreep visible-only body-only ext-plist))
+
 (defun org-vcard--export-helper-file (&optional async subtreep visible-only body-only ext-plist)
+  "Export an org file containing contacts to a vcf file.
+For use in an org export backend.  See `org-vcard--export-helper' for
+valid values of ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, and EXT-PLIST."
   (org-vcard--export-helper 'file async subtreep visible-only body-only ext-plist))
+
 (defun org-vcard--export-helper-open (&optional async subtreep visible-only body-only ext-plist)
+  "Export an org file containing contacts to a vcf file and open it.
+For use in an org export backend.  See `org-vcard--export-helper' for
+valid values of ASYNC, SUBTREEP, VISIBLE-ONLY, BODY-ONLY, and EXT-PLIST."
   (org-vcard--export-helper 'open async subtreep visible-only body-only ext-plist))
 
 
