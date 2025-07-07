@@ -574,7 +574,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
 
 (defun org-vcard--create-styles-functions ()
   "Create a data structure for use by `org-vcard-styles-functions'."
-  (let ((the-list) '())
+  (let ((the-list '()))
     (dolist (style-dir (org-vcard--styles-dirs))
       (dolist (style (directory-files style-dir))
         (if (and
