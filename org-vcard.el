@@ -843,7 +843,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
             (setq the-buffer
                   (generate-new-buffer "*org-vcard-export*")))))
         (set-buffer the-buffer)
-        (insert (string-as-multibyte content))
+        (insert (decode-coding-string content 'utf-8-emacs))
         (message
          (concat
           direction-string
@@ -864,7 +864,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
                   org-vcard-default-export-file))
                 nil))))
         (with-temp-buffer
-          (insert (string-as-multibyte content))
+          (insert (decode-coding-string content 'utf-8-emacs))
           (when (file-writable-p filename)
             (write-region
              (point-min)
@@ -1418,8 +1418,9 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
              t)
             ("2.1"
              (setq value
-                   (string-as-multibyte
-                    (encode-coding-string value charset)))))
+                   (decode-coding-string
+                    (encode-coding-string value charset)
+                    'utf-8-emacs))))
           (setq property
                 (org-vcard--canonicalise-property-name property))
           (setq current-card
