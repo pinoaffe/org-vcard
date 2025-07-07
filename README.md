@@ -171,23 +171,23 @@ way to structure contacts; equivalently, one could do:
     :FIELDTYPE: email-home
     :END:
 
-## TODO
+## TODOs
 
-* Add support for one-vCard-per-file export.
+* TODO: Add support for one-vCard-per-file export.
 
-* Add support for line folding when exporting.
+* TODO: Add support for line folding when exporting.
 
-* Add support for multiple instances of EMAIL property.
+* TODO: Add support for multiple instances of EMAIL property.
 
-* Add support for vCard PREF for style `flat`.
+* TODO: Add support for vCard PREF for style `flat`.
 
-* Add support for vCard KINDs `group` and `org`.
+* TODO: Add support for vCard KINDs `group` and `org`.
 
-* Add support for per-card version handling on import.
+* TODO: Add support for per-card version handling on import.
 
-* Improve compliance with each version of the vCard specification.
+* TODO: Improve compliance with each version of the vCard specification.
 
-* Extend test coverage.
+* TODO: Extend test coverage.
 
 <a name="issues"></a>
 
