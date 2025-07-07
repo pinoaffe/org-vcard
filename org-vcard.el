@@ -585,8 +585,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
                (concat
                 (file-name-as-directory (concat style-dir style))
                 "functions.el"))
-              (add-to-list
-               'the-list
+              (push
                `(,(file-name-nondirectory style)
                  ,(list
                    (intern
@@ -596,7 +595,8 @@ PROPERTY-NAME must be a string containing a vCard property name."
                    (intern
                     (concat
                      "org-vcard-import-to-"
-                     (file-name-nondirectory style))))))))))
+                     (file-name-nondirectory style)))))
+               the-list)))))
     (sort the-list
           #'(lambda (a b)
               (string< (car a) (car b))))))
@@ -607,7 +607,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
     (dolist (style-dir (org-vcard--styles-dirs))
       (dolist (style
                ;; Reverse the list so the repeated calls to
-               ;; add-to-list will produce a lexicographically-sorted
+               ;; push will produce a lexicographically-sorted
                ;; list.
                (sort (directory-files style-dir)
                      #'(lambda (a b)
@@ -619,7 +619,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
               (let ((language-mapping '()))
                 (dolist
                     (mapping
-                     ;; Reverse the list so the repeated calls to add-to-list
+                     ;; Reverse the list so the repeated calls to push
                      ;; will produce a lexicographically-sorted list.
                      (sort (directory-files
                             (file-name-as-directory
@@ -640,20 +640,20 @@ PROPERTY-NAME must be a string containing a vCard property name."
                          ".."
                          (file-name-nondirectory mapping))))
                       (progn
-                        (add-to-list
-                         'language-mapping
+                        (push
                          `(,(file-name-nondirectory mapping)
                            ,@(list
                               (car
                                (read-from-string
                                 (with-temp-buffer
                                   (insert-file-contents-literally mapping)
-                                  (buffer-string))))))))))
+                                  (buffer-string))))))
+                         language-mapping))))
                 (setq language-mapping (list language-mapping))
-                (add-to-list
-                 'style-mappings
+                (push
                  `(,style
-                   ,@language-mapping)))))))
+                   ,@language-mapping)
+                 style-mappings))))))
     style-mappings))
 
 (defun org-vcard--escape-value-string (characters value)
