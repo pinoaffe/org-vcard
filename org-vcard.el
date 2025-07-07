@@ -1286,7 +1286,7 @@ DIRECTION must be either \='export or \='import."
 ;; Export backend
 ;;
 
-(defun org-vcard-export-helper (&optional mode async subtreep visible-only body-only ext-plist)
+(defun org-vcard-export-helper (&optional mode _async subtreep _visible-only _body-only _ext-plist)
   (let ((filename (org-export-output-file-name ".vcf" subtreep))
         (source (if (region-active-p)
                     "region"
