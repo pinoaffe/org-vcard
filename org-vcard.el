@@ -900,11 +900,13 @@ DESTINATION must be either \"buffer\" or \"file\"."
   :group 'org-vcard)
 
 (defun org-vcard--sort-by-car (list)
+  "Sort alist LIST by the string keys."
   (sort list
         (lambda (a b)
           (string< (car a) (car b)))))
 
 (defun org-vcard--conversion-menu-helper (exportp)
+  "Helper to create import or export conversion menu based on flag EXPORTP."
   (mapcar (lambda (style)
             (cons (concat (if exportp
                               "from "
@@ -960,7 +962,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
 ;;
 
 (defgroup org-vcard nil
-  "vCard support for Org mode."
+  "Import and export vCard files for Org mode."
   :group 'org
   :prefix "org-vcard-")
 
@@ -1031,7 +1033,7 @@ Initially set to \"en\"."
   :group 'org-vcard)
 
 (defcustom org-vcard-default-property-for-heading "FN"
-  "vCard property whose value to use for a contact's Org heading."
+  "Which vCard property to use for a contact's Org heading."
   :type '(radio (const :tag "FN" "FN")
                 (const :tag "N" "N"))
   :group 'org-vcard)
@@ -1104,7 +1106,7 @@ each component separated by a semicolon.")
 (defun org-vcard-export (arg)
   "User command to export to vCard.  Intended only for interactive use.
 
-With no prefix argument, use the values of `org-vcard-default-version',
+With no prefix ARG, use the values of `org-vcard-default-version',
 `org-vcard-default-language' and `org-vcard-default-style'.  With prefix
 argument of:
 
@@ -1199,7 +1201,10 @@ argument of:
 
 ;;;###autoload
 (defun org-vcard-export-via-menu (style language version)
-  "User command for exporting to vCard via Emacs' menu bar."
+  "User command for exporting to vCard via Emacs' menu bar.
+
+STYLE defines the org format to use, LANGUAGE the language to use for
+vCard attribute mapping, and VERSION the vCard version."
   (let ((source nil)
         (destination nil))
     (setq source
@@ -1217,7 +1222,7 @@ argument of:
 (defun org-vcard-import (arg)
   "User command to import from vCard.  Intended only for interactive use.
 
-With no prefix argument, use the values of `org-vcard-default-version',
+With no prefix ARG, use the values of `org-vcard-default-version',
 `org-vcard-default-language' and `org-vcard-default-style'.  With prefix
 argument of:
 
@@ -1317,7 +1322,10 @@ argument of:
 Each vCard is a list of cons cells, each cell containing the vCard property
 in the car, and the value of that property in the cdr.
 
-SOURCE must be one of \"file\", \"buffer\" or \"region\"."
+SOURCE must be one of \"file\", \"buffer\" or \"region\".
+
+If SOURCE is \"file\" and FILENAME is a filename, use that, otherwise,
+query the user for a filename."
   (let ((property "")
         (value "")
         (charset "")
@@ -1430,7 +1438,10 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
 
 ;;;###autoload
 (defun org-vcard-import-via-menu (style language version)
-  "User command for importing from vCard via Emacs' menu bar."
+  "User command for importing from vCard via Emacs' menu bar.
+
+STYLE defines the org format to use, LANGUAGE the language to use for
+vCard attribute mapping, and VERSION the vCard version."
   (let ((source nil)
         (destination nil))
     (setq source
@@ -1451,7 +1462,8 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
 Appropriate values for SOURCE and DESTINATION are determined by
 the functions called.  Appropriate values for STYLE and VERSION are
 determined by the contents of the `org-vcard-contacts-styles-mappings'
-variable.  DIRECTION must be either \='export or \='import."
+variable.  LANGUAGE determines the language used for vCard files.
+DIRECTION must be either \='export or \='import."
   (let ((position nil))
     (org-vcard--check-contacts-styles)
     (setq org-vcard-active-style style)
@@ -1474,7 +1486,7 @@ variable.  DIRECTION must be either \='export or \='import."
 ;;
 
 (defun org-vcard-reload-styles ()
-  "Reload the styles in the org-vcard 'styles' directory."
+  "Reload the styles in the org-vcard `styles' directory."
   (interactive)
   (setq org-vcard--styles-functions
         (org-vcard--create-styles-functions))
