@@ -54,7 +54,7 @@
 
 ;; `org-vcard' comes with a built-in contacts style called `flat',
 ;; which adheres to org-contacts' method of structuring contacts and
-;; contact information. It not only supports the properties specified
+;; contact information.  It not only supports the properties specified
 ;; in org-contacts.el, but many other properties as well.
 
 ;; * _Basic support for vCard 4.0, 3.0 and 2.1._
@@ -69,13 +69,13 @@
 ;; * _New contacts style: `tree'._
 
 ;; `org-vcard' introduces a new style for Org contacts, called
-;; `tree'. More details [below](#tree).
+;; `tree'.  More details [below](#tree).
 
 ;; * _Highly customisable, via Emacs' `customize' interface._
 
 ;; Modify existing contact styles; change the labels used to map
 ;; contact details in `org-mode' to various vCard properties/types, or
-;; add new ones. Create completely new contact styles by plugging in
+;; add new ones.  Create completely new contact styles by plugging in
 ;; your own code to handle export and import.
 
 ;; ## Installation
@@ -94,7 +94,7 @@
 
 ;; Both `org-vcard-export' and `org-vcard-import' are wrappers around
 ;; the `org-vcard-transfer-helper'
-;; function. `org-vcard-transfer-helper' can be used to export and
+;; function.  `org-vcard-transfer-helper' can be used to export and
 ;; import programmatically (i.e. via Emacs Lisp).
 
 ;; Enabling `org-vcard-mode' will add an "Org-vCard" menu to the menu
@@ -102,7 +102,7 @@
 ;; customisation options.
 
 ;; **Note!** When exporting to vCard using the source `buffer',
-;; narrowing is respected. If you wish to export the entire buffer
+;; narrowing is respected.  If you wish to export the entire buffer
 ;; without restriction, remove any narrowing in effect.
 
 ;; For a list of the properties available by default for each contacts
@@ -112,10 +112,10 @@
 ;; variable.
 
 ;; **Note!** The default mappings might need to be tweaked for
-;; particular use-cases. For example, some systems create vCards
+;; particular use-cases.  For example, some systems create vCards
 ;; with a bare `TEL' property, whereas others use `TEL;TYPE=voice';
 ;; but both are mapped to the Org `PHONE' property (for `flat'
-;; style) or `phone' FIELDTYPE (for `tree' style). In this case, the
+;; style) or `phone' FIELDTYPE (for `tree' style).  In this case, the
 ;; `customize' interface could be used to delete whichever of the
 ;; two mappings is unwanted.
 
@@ -126,7 +126,7 @@
 ;; The value of the `org-vcard-append-to-existing-import-buffer' and
 ;; `org-vcard-append-to-existing-export-buffer' (boolean) variables
 ;; specify whether the import/export process should append to any
-;; existing import/export buffer. If not, a new import/export buffer
+;; existing import/export buffer.  If not, a new import/export buffer
 ;; is created for each import/export.
 
 ;; <a name="tree"></a>
@@ -236,7 +236,7 @@
 ;; ## Testing
 
 ;; A basic test suite is located in the repository `tests' directory,
-;; in `org-vcard-tests.el`. To run the suite:
+;; in `org-vcard-tests.el`.  To run the suite:
 
 ;; 1. Ensure `org-vcard.el' has been loaded, e.g. `(load "~/org-vcard/org-vcard.el")'.
 ;; 2. Load the test suite: e.g. `(load "~/org-vcard/tests/org-vcard-tests.el")'.
@@ -659,7 +659,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
 (defun org-vcard--escape-value-string (characters value)
   "Escape each instance of each character in CHARACTERS.
 
-CHARACTERS must be a list of strings. VALUE is the string to be
+CHARACTERS must be a list of strings.  VALUE is the string to be
 escaped."
   (if (member "\134" characters)
       ;; Process backslashes first.
@@ -810,7 +810,7 @@ Fall back to value of custom variables."
 (defun org-vcard--transfer-write (direction content destination &optional filename)
   "During import, write CONTENT to DESTINATION.
 
-DIRECTION must be either 'import or 'export. CONTENT must be a string.
+DIRECTION must be either \='import or \='export.  CONTENT must be a string.
 DESTINATION must be either \"buffer\" or \"file\"."
   (if (not
        (or
@@ -1070,7 +1070,7 @@ Initially set to 4.0."
 
 NB! Since the components of compound values are positional,
 removing such semicolons will change the meaning of the value
-if/when it is subsequently exported to vCard. If in doubt, leave
+if/when it is subsequently exported to vCard.  If in doubt, leave
 this set to nil."
   :type 'boolean
   :group 'org-vcard)
@@ -1102,10 +1102,10 @@ each component separated by a semicolon.")
 
 ;;;###autoload
 (defun org-vcard-export (arg)
-  "User command to export to vCard. Intended only for interactive use.
+  "User command to export to vCard.  Intended only for interactive use.
 
 With no prefix argument, use the values of `org-vcard-default-version',
-`org-vcard-default-language' and `org-vcard-default-style'. With prefix
+`org-vcard-default-language' and `org-vcard-default-style'.  With prefix
 argument of:
 
 1 : prompt for version;
@@ -1215,10 +1215,10 @@ argument of:
 
 ;;;###autoload
 (defun org-vcard-import (arg)
-  "User command to import from vCard. Intended only for interactive use.
+  "User command to import from vCard.  Intended only for interactive use.
 
 With no prefix argument, use the values of `org-vcard-default-version',
-`org-vcard-default-language' and `org-vcard-default-style'. With prefix
+`org-vcard-default-language' and `org-vcard-default-style'.  With prefix
 argument of:
 
 1 : prompt for version;
@@ -1448,9 +1448,9 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\"."
   "Dispatch export and import requests to the appropriate functions.
 
 Appropriate values for SOURCE and DESTINATION are determined by
-the functions called. Appropriate values for STYLE and VERSION are
+the functions called.  Appropriate values for STYLE and VERSION are
 determined by the contents of the `org-vcard-contacts-styles-mappings'
-variable. DIRECTION must be either 'export or 'import."
+variable.  DIRECTION must be either \='export or \='import."
   (let ((position nil))
     (org-vcard--check-contacts-styles)
     (setq org-vcard-active-style style)
