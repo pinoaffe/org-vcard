@@ -1,4 +1,4 @@
-;;; org-vcard.el --- org-mode support for vCard export and import.
+;;; org-vcard.el --- org-mode support for vCard export and import. -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2019,2021-2022 Alexis <flexibeast@gmail.com>
 ;; Copyright (C) 2019 Will Dey <will123dey@gmail.com>
