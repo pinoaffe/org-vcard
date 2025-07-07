@@ -1292,6 +1292,7 @@ DIRECTION must be either \='export or \='import."
 For use in an org export backend.  MODE is one of buffer, file, or open.
 SUBTREEP encodes whether to export the file or just the current tree.
 _ASYNC, _VISIBLE-ONLY, _BODY-ONLY, and _EXT-PLIST are currently ignored."
+  (kill-buffer "*org-vcard-export*")
   (let ((filename (org-export-output-file-name ".vcf" subtreep))
         (source (if (region-active-p)
                     "region"
