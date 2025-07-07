@@ -1286,7 +1286,7 @@ DIRECTION must be either \='export or \='import."
 ;; Export backend
 ;;
 
-(defun org-vcard-export-helper (&optional mode _async subtreep _visible-only _body-only _ext-plist)
+(defun org-vcard--export-helper (&optional mode _async subtreep _visible-only _body-only _ext-plist)
   (let ((filename (org-export-output-file-name ".vcf" subtreep))
         (source (if (region-active-p)
                     "region"
@@ -1305,20 +1305,20 @@ DIRECTION must be either \='export or \='import."
     (when (equal mode 'open)
       (org-open-file org-vcard-default-export-file))))
 
-(defun org-vcard-export-helper-buffer (&optional async subtreep visible-only body-only ext-plist)
-  (org-vcard-export-helper 'buffer async subtreep visible-only body-only ext-plist))
-(defun org-vcard-export-helper-file (&optional async subtreep visible-only body-only ext-plist)
-  (org-vcard-export-helper 'file async subtreep visible-only body-only ext-plist))
-(defun org-vcard-export-helper-open (&optional async subtreep visible-only body-only ext-plist)
-  (org-vcard-export-helper 'open async subtreep visible-only body-only ext-plist))
+(defun org-vcard--export-helper-buffer (&optional async subtreep visible-only body-only ext-plist)
+  (org-vcard--export-helper 'buffer async subtreep visible-only body-only ext-plist))
+(defun org-vcard--export-helper-file (&optional async subtreep visible-only body-only ext-plist)
+  (org-vcard--export-helper 'file async subtreep visible-only body-only ext-plist))
+(defun org-vcard--export-helper-open (&optional async subtreep visible-only body-only ext-plist)
+  (org-vcard--export-helper 'open async subtreep visible-only body-only ext-plist))
 
 
 (org-export-define-backend
     'contacts
   '()
-  :menu-entry '(?v "Export to VCARD" ((?V "As VCARD buffer" org-vcard-export-helper-buffer)
-                                      (?v "As VCARD file" org-vcard-export-helper-file)
-                                      (?o "As VCARD file and open" org-vcard-export-helper-open))))
+  :menu-entry '(?v "Export to VCARD" ((?V "As VCARD buffer" org-vcard--export-helper-buffer)
+                                      (?v "As VCARD file" org-vcard--export-helper-file)
+                                      (?o "As VCARD file and open" org-vcard--export-helper-open))))
 
 
 ;;
