@@ -285,7 +285,6 @@
 
 (defconst org-vcard-mode-keymap (make-sparse-keymap))
 
-
 ;;
 ;; Directory configuration.
 ;;
@@ -305,6 +304,161 @@
     (if org-vcard-custom-styles-dir
         (list default org-vcard-custom-styles-dir)
       (list default))))
+
+;;
+;; User-customisable variables.
+;;
+
+(defgroup org-vcard nil
+  "Import and export vCard files for Org mode."
+  :group 'org
+  :prefix "org-vcard-")
+
+(defcustom org-vcard-append-to-existing-export-buffer t
+  "Whether export should append to an existing export buffer.
+
+If not, create a new export buffer per export."
+  :type 'boolean
+  :group 'org-vcard)
+
+(defcustom org-vcard-append-to-existing-import-buffer t
+  "Whether import should append to an existing import buffer.
+
+If not, create a new import buffer per import."
+  :type 'boolean
+  :group 'org-vcard)
+
+(defcustom org-vcard-character-set-mapping
+  '(("Big5" . big5)
+    ("EUC-JP" . euc-jp)
+    ("EUC-KR" . euc-kr)
+    ("GB2312" . gb2312)
+    ("ISO-2022-JP" . iso-2022-jp)
+    ("ISO-2022-JP-2" . iso-2022-jp-2)
+    ("ISO-2022-KR" . iso-2022-kr)
+    ("ISO-8859-1" . iso-8859-1)
+    ("ISO-8859-2" . iso-8859-2)
+    ("ISO-8859-3" . iso-8859-3)
+    ("ISO-8859-4" . iso-8859-4)
+    ("ISO-8859-5" . iso-8859-5)
+    ("ISO-8859-6" . iso-8859-6)
+    ("ISO-8859-6-E" . iso-8859-6-e)
+    ("ISO-8859-6-I" . iso-8859-6-i)
+    ("ISO-8859-7" . iso-8859-7)
+    ("ISO-8859-8" . iso-8859-8)
+    ("ISO-8859-8-E" . iso-8859-8-e)
+    ("ISO-8859-8-I" . iso-8859-8-i)
+    ("ISO-8859-9" . iso-8859-9)
+    ("ISO-8859-10" . iso-8859-10)
+    ("KOI8-R" . koi8-r)
+    ("Shift_JIS" . shift_jis)
+    ("US-ASCII" . us-ascii)
+    ("UTF-8" . utf-8)
+    ("UTF-16" . utf-16))
+  "Alist mapping IANA MIME names for character sets to Emacs coding systems.
+
+Derived from:
+http://www.iana.org/assignments/character-sets/character-sets.xhtml"
+  :type '(repeat (cons string symbol))
+  :group 'org-vcard)
+
+(defcustom org-vcard-default-export-file "~/org-vcard-export.vcf"
+  "Default file to which to export."
+  :type 'file
+  :group 'org-vcard)
+
+(defcustom org-vcard-default-import-file "~/org-vcard-import.vcf"
+  "Default file from which to import."
+  :type 'file
+  :group 'org-vcard)
+
+;; The in-buffer setting #+CONTACT_LANGUAGE.
+(defcustom org-vcard-default-language "en"
+  "Default language to use.
+
+Initially set to \"en\"."
+  :type 'string
+  :group 'org-vcard)
+
+(defcustom org-vcard-default-property-for-heading "FN"
+  "Which vCard property to use for a contact's Org heading."
+  :type '(radio (const :tag "FN" "FN")
+                (const :tag "N" "N"))
+  :group 'org-vcard)
+
+(defvar org-vcard--styles-functions (org-vcard--create-styles-functions)
+  "Available styles and associated import/export functions.")
+
+;; The in-buffer setting #+CONTACT_STYLE.
+(defcustom org-vcard-default-style "flat"
+  "Default contact style to use.
+
+Initially set to \"flat\"."
+  :type 'string
+  :group 'org-vcard)
+
+(defcustom org-vcard-styles-languages-mappings
+  (org-vcard--create-styles-languages-mappings)
+  "Details of the available styles and their associated mappings."
+  :type '(repeat
+          (list string
+                (repeat
+                 (list string
+                       (repeat
+                        (list string
+                              (repeat (cons string string))))))))
+  :group 'org-vcard)
+
+(defcustom org-vcard-default-vcard-21-character-set 'us-ascii
+  "CHARSET modifier for all vCard properties when exporting to vCard 2.1."
+  :type `(radio ,@(mapcar #'(lambda (entry)
+                              `(const :tag ,(car entry) ,(cdr entry)))
+                          org-vcard-character-set-mapping))
+  :group 'org-vcard)
+
+;; The in-buffer setting #+VCARD_VERSION;
+;; can be "4.0", "3.0" or "2.1".
+(defcustom org-vcard-default-version "4.0"
+  "Default version of the vCard standard to use.
+
+Initially set to 4.0."
+  :type '(radio (const "4.0") (const "3.0") (const "2.1"))
+  :group 'org-vcard)
+
+(defcustom org-vcard-include-import-unknowns nil
+  "Whether to import vCard properties not listed in the mapping being used."
+  :type 'boolean
+  :group 'org-vcard)
+
+(defcustom org-vcard-remove-external-semicolons nil
+  "Whether import should remove leading/trailing semicolons from compound values.
+
+NB! Since the components of compound values are positional,
+removing such semicolons will change the meaning of the value
+if/when it is subsequently exported to vCard.  If in doubt, leave
+this set to nil."
+  :type 'boolean
+  :group 'org-vcard)
+
+(defvar org-vcard-active-style ""
+  "The currently-active contacts style.")
+
+(defvar org-vcard-active-language ""
+  "The currently-active language.")
+
+(defvar org-vcard-active-version ""
+  "The currently-active version of vCard.")
+
+(defvar org-vcard-comma-separated-properties '("CATEGORIES" "NICKNAME")
+  "List of non-compound vCard properties.
+
+Such properties can contain one or more values, separated by commas.")
+
+(defvar org-vcard-compound-properties '("ADR" "N" "ORG")
+  "List of compound vCard properties.
+
+Such properties contain a value with multiple components,
+each component separated by a semicolon.")
 
 
 ;;
@@ -884,21 +1038,6 @@ DESTINATION must be either \"buffer\" or \"file\"."
 ;; org-vcard-mode menu setup.
 ;;
 
-(defvar org-vcard--styles-functions (org-vcard--create-styles-functions)
-  "Available styles and associated import/export functions.")
-
-(defcustom org-vcard-styles-languages-mappings
-  (org-vcard--create-styles-languages-mappings)
-  "Details of the available styles and their associated mappings."
-  :type '(repeat
-          (list string
-                (repeat
-                 (list string
-                       (repeat
-                        (list string
-                              (repeat (cons string string))))))))
-  :group 'org-vcard)
-
 (defun org-vcard--sort-by-car (list)
   "Sort alist LIST by the string keys."
   (sort list
@@ -957,145 +1096,6 @@ DESTINATION must be either \"buffer\" or \"file\"."
           (org-element-properties-resolve node 'force-undefer)))
     #'identity))
 
-;;
-;; Additional user-customisable variables.
-;;
-
-(defgroup org-vcard nil
-  "Import and export vCard files for Org mode."
-  :group 'org
-  :prefix "org-vcard-")
-
-(defcustom org-vcard-append-to-existing-export-buffer t
-  "Whether export should append to an existing export buffer.
-
-If not, create a new export buffer per export."
-  :type 'boolean
-  :group 'org-vcard)
-
-(defcustom org-vcard-append-to-existing-import-buffer t
-  "Whether import should append to an existing import buffer.
-
-If not, create a new import buffer per import."
-  :type 'boolean
-  :group 'org-vcard)
-
-(defcustom org-vcard-character-set-mapping
-  '(("Big5" . big5)
-    ("EUC-JP" . euc-jp)
-    ("EUC-KR" . euc-kr)
-    ("GB2312" . gb2312)
-    ("ISO-2022-JP" . iso-2022-jp)
-    ("ISO-2022-JP-2" . iso-2022-jp-2)
-    ("ISO-2022-KR" . iso-2022-kr)
-    ("ISO-8859-1" . iso-8859-1)
-    ("ISO-8859-2" . iso-8859-2)
-    ("ISO-8859-3" . iso-8859-3)
-    ("ISO-8859-4" . iso-8859-4)
-    ("ISO-8859-5" . iso-8859-5)
-    ("ISO-8859-6" . iso-8859-6)
-    ("ISO-8859-6-E" . iso-8859-6-e)
-    ("ISO-8859-6-I" . iso-8859-6-i)
-    ("ISO-8859-7" . iso-8859-7)
-    ("ISO-8859-8" . iso-8859-8)
-    ("ISO-8859-8-E" . iso-8859-8-e)
-    ("ISO-8859-8-I" . iso-8859-8-i)
-    ("ISO-8859-9" . iso-8859-9)
-    ("ISO-8859-10" . iso-8859-10)
-    ("KOI8-R" . koi8-r)
-    ("Shift_JIS" . shift_jis)
-    ("US-ASCII" . us-ascii)
-    ("UTF-8" . utf-8)
-    ("UTF-16" . utf-16))
-  "Alist mapping IANA MIME names for character sets to Emacs coding systems.
-
-Derived from:
-http://www.iana.org/assignments/character-sets/character-sets.xhtml"
-  :type '(repeat (cons string symbol))
-  :group 'org-vcard)
-
-(defcustom org-vcard-default-export-file "~/org-vcard-export.vcf"
-  "Default file to which to export."
-  :type 'file
-  :group 'org-vcard)
-
-(defcustom org-vcard-default-import-file "~/org-vcard-import.vcf"
-  "Default file from which to import."
-  :type 'file
-  :group 'org-vcard)
-
-;; The in-buffer setting #+CONTACT_LANGUAGE.
-(defcustom org-vcard-default-language "en"
-  "Default language to use.
-
-Initially set to \"en\"."
-  :type 'string
-  :group 'org-vcard)
-
-(defcustom org-vcard-default-property-for-heading "FN"
-  "Which vCard property to use for a contact's Org heading."
-  :type '(radio (const :tag "FN" "FN")
-                (const :tag "N" "N"))
-  :group 'org-vcard)
-
-;; The in-buffer setting #+CONTACT_STYLE.
-(defcustom org-vcard-default-style "flat"
-  "Default contact style to use.
-
-Initially set to \"flat\"."
-  :type 'string
-  :group 'org-vcard)
-
-(defcustom org-vcard-default-vcard-21-character-set 'us-ascii
-  "CHARSET modifier for all vCard properties when exporting to vCard 2.1."
-  :type `(radio ,@(mapcar #'(lambda (entry)
-                              `(const :tag ,(car entry) ,(cdr entry)))
-                          org-vcard-character-set-mapping))
-  :group 'org-vcard)
-
-;; The in-buffer setting #+VCARD_VERSION;
-;; can be "4.0", "3.0" or "2.1".
-(defcustom org-vcard-default-version "4.0"
-  "Default version of the vCard standard to use.
-
-Initially set to 4.0."
-  :type '(radio (const "4.0") (const "3.0") (const "2.1"))
-  :group 'org-vcard)
-
-(defcustom org-vcard-include-import-unknowns nil
-  "Whether to import vCard properties not listed in the mapping being used."
-  :type 'boolean
-  :group 'org-vcard)
-
-(defcustom org-vcard-remove-external-semicolons nil
-  "Whether import should remove leading/trailing semicolons from compound values.
-
-NB! Since the components of compound values are positional,
-removing such semicolons will change the meaning of the value
-if/when it is subsequently exported to vCard.  If in doubt, leave
-this set to nil."
-  :type 'boolean
-  :group 'org-vcard)
-
-(defvar org-vcard-active-style ""
-  "The currently-active contacts style.")
-
-(defvar org-vcard-active-language ""
-  "The currently-active language.")
-
-(defvar org-vcard-active-version ""
-  "The currently-active version of vCard.")
-
-(defvar org-vcard-comma-separated-properties '("CATEGORIES" "NICKNAME")
-  "List of non-compound vCard properties.
-
-Such properties can contain one or more values, separated by commas.")
-
-(defvar org-vcard-compound-properties '("ADR" "N" "ORG")
-  "List of compound vCard properties.
-
-Such properties contain a value with multiple components,
-each component separated by a semicolon.")
 
 
 ;;
