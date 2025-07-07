@@ -412,17 +412,17 @@ PROPERTY-NAME must be a string containing the vCard property name."
                 nil)))
         (cond
          ((string-match "^ADR" property-name)
-          (progn 
+          (progn
             (setq retval (org-vcard--canonicalise-adr-property property-name))
             (setq property-canonicalised (car retval))
             (setq property-type-data (cadr retval))))
          ((string-match "^EMAIL" property-name)
-          (progn 
+          (progn
             (setq retval (org-vcard--canonicalise-email-property property-name))
             (setq property-canonicalised (car retval))
             (setq property-type-data (cadr retval))))
          ((string-match "^TEL" property-name)
-          (progn 
+          (progn
             (setq retval (org-vcard--canonicalise-tel-property property-name))
             (setq property-canonicalised (car retval))
             (setq property-type-data (cadr retval)))))
