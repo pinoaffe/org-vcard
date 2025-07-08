@@ -189,6 +189,8 @@ way to structure contacts; equivalently, one could do:
 
 * TODO: Extend test coverage.
 
+* TODO: Write (and use) a proper vCard parser.
+
 <a name="issues"></a>
 
 ## Issues / bugs
