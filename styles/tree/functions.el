@@ -1,3 +1,6 @@
+;;; org-vcard.el --- org-mode support for vCard export and import. -*- lexical-binding: t; -*-
+;;; Commentary:
+;;; Code:
 
 ;; Declare the variables and functions of library `org-vcard' that
 ;; we use, to avoid compiler warnings.
@@ -17,262 +20,142 @@
 (declare-function org-vcard--export-line "org-vcard.el")
 (declare-function org-vcard-import-parse "org-vcard.el")
 (declare-function org-vcard--transfer-write "org-vcard.el")
+(declare-function org-vcard--get-mapping "org-vcard.el")
+(declare-function org-vcard--get-encoding "org-vcard.el")
+(declare-function org-vcard--card-name "org-vcard.el")
+(declare-function org-vcard--property-without-pref "org-vcard.el")
+(declare-function org-vcard--property-with-pref "org-vcard.el")
+(declare-function org-vcard--property-name "org-vcard.el")
+(declare-function org-vcard--remove-external-semicolons "org-vcard.el")
+(declare-function org-vcard--ensure-n-property "org-vcard.el")
 
+(declare-function org-narrow-to-subtree "org.el")
+(declare-function org-get-heading "org.el")
+(declare-function org-entry-properties "org.el")
+(declare-function org-map-entries "org.el")
 
 ;; 
 
 (defun org-vcard-export-from-tree (source destination)
-  "Export tree-style SOURCE to vCard format, sending output
-to DESTINATION.
+  "Export tree-style SOURCE to vCard format DESTINATION.
 
 SOURCE must be \"buffer\", \"region\" or \"subtree\".
 DESTINATION must be either \"buffer\" or \"file\"."
-  (let* ((in-contact-entry nil)
-         (tree-style-properties
-          (or (cadr
-               (assoc
-                org-vcard-active-version
-                (cadr
-                 (assoc
-                  org-vcard-active-language
-                  (cadr
-                   (assoc "tree" org-vcard-styles-languages-mappings))))))
-              (error "No mapping available for specified vCard version")))
-         (encoding
+  (let* ((mappings
+          (org-vcard--get-mapping org-vcard-active-version
+                                  org-vcard-active-language
+                                  "tree"))
+         (encoding (org-vcard--get-encoding org-vcard-active-version
+                                            org-vcard-active-language))
+         (scope
           (cond
-           ((string= "4.0" org-vcard-active-version) 'utf-8)
-           ((string= "3.0" org-vcard-active-version) 'utf-8)
-           ((string= "2.1" org-vcard-active-version) 'us-ascii)))
-         (output (encode-coding-string "" encoding)))
+           ((string= "buffer" source) nil)
+           ((string= "region" source) 'region)
+           ((string= "subtree" source) 'tree)
+           (t (error "Invalid source type"))))
+         (output (encode-coding-string "" encoding))
+         (contact-encountered nil))
     (if (not (member source '("buffer" "region" "subtree")))
         (error "Invalid source type"))
     (org-mode)
-    (save-excursion
-      (let ((search-result nil))
-        (cond
-         ((string= "region" source)
-          (narrow-to-region (region-beginning) (region-end)))
-         ((string= "subtree" source)
-          (org-narrow-to-subtree)))
-        (goto-char (point-min))
-        (setq case-fold-search t)
-        (while (re-search-forward "\\s *:FIELDTYPE:\\s *name" nil t)
-          (let ((content
-                 (concat
-                  (org-vcard--export-line "BEGIN" "VCARD")
-                  (org-vcard--export-line "VERSION" org-vcard-active-version)))
-                (end-vcard nil))
-            (setq content
-                  (concat
-                   content
-                   (org-vcard--export-line
-                    org-vcard-default-property-for-heading
-                    (org-get-heading t t))))
-            ;; vCard 2.1 and 3.0 require the 'N' property be present.
-            ;; Trying to create this by parsing the heading which has
-            ;; FIELDTYPE 'name' is fraught with challenges - cf.
-            ;; http://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
-            ;; - so we just create an empty 'N' property.
-            (if (and (string= "FN" org-vcard-default-property-for-heading)
-                     (or (string= "3.0" org-vcard-active-version)
-                         (string= "2.1" org-vcard-active-version)))
-                (setq content
+    (org-map-entries
+     (lambda ()
+       (let* ((properties (org-entry-properties))
+              (fieldtype (and (cdr (assoc "FIELDTYPE" properties))
+                              (downcase (cdr (assoc "FIELDTYPE" properties))))))
+         (cond ((not fieldtype) t)
+               ((string= fieldtype "version") t)
+               ((string= fieldtype "name")
+                (setq output
+                      (concat output
+                              (if contact-encountered
+                                  (org-vcard--export-line "END" "VCARD")
+                                "")
+                              (org-vcard--export-line "BEGIN" "VCARD")
+                              (org-vcard--export-line "VERSION" org-vcard-active-version)
+                              (org-vcard--export-line org-vcard-default-property-for-heading
+                                                      (org-get-heading t t))
+                              (org-vcard--ensure-n-property org-vcard-active-version))))
+               ((not (assoc fieldtype mappings)) t)
+               (t
+                (setq output
                       (concat
-                       content
-                       (org-vcard--export-line "N" ""))))
-            (while (and (setq search-result
-                              (re-search-forward
-                               "\\s *:FIELDTYPE:\\s *\\(\\(?:\\w\\|-\\)+\\)"
-                               nil
-                               t))
-                        (not end-vcard))
-              (let ((fieldtype (match-string 1)))
-                (if (not (string= "name" (downcase fieldtype)))
-                    (let ((property
-                           (cdr
-                            (assoc
-                             (downcase fieldtype)
-                             tree-style-properties))))
-                      (save-excursion
-                        (forward-line)
-                        (beginning-of-line)
-                        (if (looking-at "\\s *:PREFERRED:")
-                            (cond
-                             ((string= "4.0" org-vcard-active-version)
-                              (setq property
-                                    (concat
-                                     property
-                                     ";PREF=1")))
-                             ((string= "3.0" org-vcard-active-version)
-                              (if (string-match "TYPE=" property)
-                                  (setq property
-                                        (concat
-                                         property
-                                         ",pref"))
-                                (setq property
-                                      (concat
-                                       property
-                                       ";TYPE=pref"))))
-                             ((string= "2.1" org-vcard-active-version)
-                              (setq property
-                                    (concat
-                                     property
-                                     ";PREF"))))))                             
-                      (setq content
-                            (concat
-                             content
-                             (org-vcard--export-line
-                              property
-                              (org-get-heading t t)))))
-                  (setq end-vcard t))))
-            (setq content
-                  (concat
-                   content
-                   (org-vcard--export-line "END" "VCARD")))
-            (setq output
-                  (concat
-                   output
-                   content)))
-          (if search-result
-              (re-search-backward "\\s *:FIELDTYPE:\\s *name")))
-        (org-vcard--transfer-write 'export output destination)))))
+                       output
+                       (org-vcard--export-line
+                        (if (assoc "PREFERRED" properties)
+                            (org-vcard--property-with-pref org-vcard-active-version
+                                                           fieldtype)
+                          (cdr (assoc fieldtype mappings)))
+                        (org-get-heading t t))))))))
+     nil scope)
+    (when contact-encountered
+      ;; Finish the last vcard (if any)
+      (setq output
+            (concat output
+                    (org-vcard--export-line "END" "VCARD"))))
+    (org-vcard--transfer-write 'export output destination)))
+
+
+
+(defun org-vcard-import-entry-to-tree (mappings property value)
+  "Output single PROPERTY/VALUE pair in tree format corresponding to MAPPINGS."
+  (let* ((property-name (org-vcard--property-name property))
+         (preferred (not (string= (org-vcard--property-without-pref org-vcard-active-version
+                                                           property)
+                                  property)))
+         (case-fold-search t))
+    (if (and (not (member
+                   property
+                   `(,org-vcard-default-property-for-heading "KIND" "VERSION")))
+             (or (car (rassoc property mappings))
+                 org-vcard-include-import-unknowns))
+      (format "** %s\n:PROPERTIES:\n:FIELDTYPE: %s\n%s:END:\n"
+              (if (and org-vcard-remove-external-semicolons
+                       (member property-name org-vcard-compound-properties))
+                  ;; Remove leading and trailing semicolons from value of
+                  ;; property.
+                  (org-vcard--remove-external-semicolons value)
+                value)
+              (or (org-vcard--property-without-pref org-vcard-active-version
+                                           property)
+                  property)
+              (if preferred
+                  ;; Contents of 'property' were changed by
+                  ;; replace-regexp-in-string, so it must have contained
+                  ;; a 'PREF'.
+                  ":PREFERRED:\n"
+                ""))
+      "")))
+
+(defun org-vcard-import-card-to-tree (version language card)
+  (let ((mappings (org-vcard--get-mapping version language "tree"))
+        (org-vcard-active-version (or (cdr (assoc "VERSION" card))
+                                      org-vcard-default-version)))
+    (concat
+     (format "* %s\n:PROPERTIES:\n:KIND: %s\n:FIELDTYPE: name\n:END\n"
+             (org-vcard--card-name card)
+             (or (cdr (assoc "KIND" card))
+                 "individual"))
+     (string-join
+      (mapcar (lambda (pair)
+                (org-vcard-import-entry-to-tree mappings
+                                                (car pair)
+                                                (cdr pair)))
+              (sort card (lambda (a b) (string< (car a) (car b)))))))))
 
 (defun org-vcard-import-to-tree (source destination)
-  "Import contents of SOURCE from vCard format, sending tree-style
-OUTPUT to DESTINATION.
+  "Import contents of SOURCE from vCard format to DESTINATION.
 
 SOURCE must be one of \"buffer\", \"file\" or \"region\".
 DESTINATION must be one of \"buffer\" or \"file\"."
-  (let ((content "")
-        (cards (org-vcard-import-parse source))
-        (import-buffer nil)
-        (filename "")
-        (sorted-card-properties nil))
-    (if (not (member source '("buffer" "file" "region")))
-        (error "Invalid source type"))
-    (let ((tree-style-properties
-           (or (cadr
-                (assoc
-                 org-vcard-active-version
-                 (cadr
-                  (assoc
-                   org-vcard-active-language
-                   (cadr (assoc "tree" org-vcard-styles-languages-mappings)))))))))
-      (dolist (card cards)
-        (if (assoc "VERSION" card)
-            (setq org-vcard-active-version
-                  (cdr (assoc "VERSION" card)))
-          (setq org-vcard-active-version
-                org-vcard-default-version))
-        (setq content
-              (concat
-               content
-               "* "
-               (or (cdr (assoc org-vcard-default-property-for-heading card))
-                   (replace-regexp-in-string
-                    "^;\\|;$"
-                    ""
-                    (cdr
-                     (assoc
-                      (if (string= "FN" org-vcard-default-property-for-heading)
-                          "N"
-                        "FN") card))))
-               "\n"
-               ":PROPERTIES:\n"
-               ":KIND: "
-               (if (assoc "KIND" card)
-                   (cdr (assoc "KIND" card))
-                 "individual") "\n"
-               ":FIELDTYPE: name\n"
-               ":END:\n"))
-        (setq sorted-card-properties
-              (sort (mapcar 'car card) 'string<))
-        (dolist (property sorted-card-properties)
-          (let* ((property-original property)
-                 (property-name
-                  (progn
-                    (string-match "^[^;:]+" property-original)
-                    (match-string 0 property-original)))
-                 (case-fold-search t)
-                 (preferred nil))
-            (if (not
-                 (member
-                  property
-                  `(,org-vcard-default-property-for-heading "KIND" "VERSION")))
-                (progn
-                  (cond
-                   ((or (string= "4.0" org-vcard-active-version)
-                        (string= "2.1" org-vcard-active-version))
-                    (setq property
-                          (replace-regexp-in-string
-                           ";PREF\\(?:=\\w+\\)?"
-                           ""
-                           property)))
-                   ((string= "3.0" org-vcard-active-version)
-                    (progn
-                      (setq property
-                            (replace-regexp-in-string
-                             ",?pref"
-                             ""
-                             property))
-                      (if (string-match ";TYPE=\\(?:;\\|$\\)" property)
-                          (setq property
-                                (replace-regexp-in-string
-                                 ";TYPE="
-                                 ""
-                                 property))))))
-                  (if (not (string= property-original property))
-                      ;; Contents of 'property' were changed by
-                      ;; replace-regexp-in-string, so it must have contained
-                      ;; a 'PREF'.
-                      (setq preferred t))
-                  (let ((property-value (cdr (assoc property-original card))))
-                    (if (and org-vcard-remove-external-semicolons
-                             (member
-                              property-name
-                              org-vcard-compound-properties))
-                        ;; Remove leading and trailing semicolons from value of
-                        ;; property.
-                        (setq property-value
-                              (replace-regexp-in-string
-                               "^[;]+\\|[;]+$"
-                               ""
-                               property-value)))
-                    (if (car (rassoc property tree-style-properties))
-                        (progn
-                          (setq content
-                                (concat
-                                 content
-                                 "** "
-                                 property-value
-                                 "\n"))
-                          (setq content
-                                (concat
-                                 content
-                                 ":PROPERTIES:\n"
-                                 ":FIELDTYPE: "
-                                 (car (rassoc property tree-style-properties))
-                                 "\n"
-                                 (if preferred
-                                     ":PREFERRED:\n")
-                                 ":END:\n")))
-                      (if org-vcard-include-import-unknowns
-                          (progn
-                            (setq content
-                                  (concat
-                                   content
-                                   "** "
-                                   property-value
-                                   "\n"))
-                            (setq content
-                                  (concat
-                                   content
-                                   ":PROPERTIES:\n"
-                                   ":FIELDTYPE: "
-                                   property-original
-                                   "\n"
-                                   (if preferred
-                                       ":PREFERRED:\n")
-                                   ":END:\n"))))))))
-            (setq card (delq (assoc property-original card) card))))))
-    (org-vcard--transfer-write 'import content destination)))
+  (if (not (member source '("buffer" "file" "region")))
+      (error "Invalid source type"))
+  (org-vcard--transfer-write 'import
+                             (string-join
+                              (mapcar (lambda (card)
+                                        (org-vcard-import-card-to-tree
+                                         org-vcard-active-version
+                                         org-vcard-active-language
+                                         card))
+                                      (org-vcard-import-parse source)))
+                             destination))

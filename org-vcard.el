@@ -252,6 +252,103 @@ each component separated by a semicolon.")
 ;; Internal functions and variables.
 ;;
 
+(defun org-vcard--ensure-n-property (version)
+  "Return a string containing empty N property if vCard VERSION requires it.
+Otherwise, return empty string."
+  (if (and (string= "FN" org-vcard-default-property-for-heading)
+           (or (string= "3.0" version)
+               (string= "2.1" version)))
+      ;; vCard 2.1 and 3.0 require the 'N' property be present.
+      ;; Trying to create this by parsing the heading which has
+      ;; FIELDTYPE 'name' is fraught with challenges - cf.
+      ;; http://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
+      ;; - so we just create an empty 'N' property.
+      (org-vcard--export-line "N" "")
+    ""))
+
+(defun org-vcard--property-name (property)
+  "Return name of PROPERTY, without any parameter annotations."
+  ;; TODO: actually properly parse property
+  (string-match "^[^;:]+" property)
+  (match-string 0 property))
+
+(defun org-vcard--remove-external-semicolons (property-value)
+  "Remove starting and trailing semicolons from PROPERTY-VALUE."
+  (replace-regexp-in-string
+   "^[;]+\\|[;]+$"
+   ""
+   property-value))
+
+(defun org-vcard--property-with-pref (version property)
+  "Return PROPERTY annotated to be preferred according to vCard VERSION."
+  ;; TODO: actually properly parse property
+  (cond
+   ((string= "4.0" version)
+    (concat property ";PREF=1"))
+   ((and (string= "3.0" version)
+         (string-match "TYPE=" property))
+    (concat property ",pref"))
+   ((string= "3.0" version)
+    (concat property ";TYPE=pref"))
+   ((string= "2.1" version)
+    (concat property ";PREF"))
+   (t (error "Unsupported org version"))))
+
+(defun org-vcard--property-without-pref (version property)
+  "Remove any preference annotation from PROPERTY according to vCard VERSION."
+  ;; TODO: actually properly parse property
+  (cond
+   ((or (string= "4.0" version)
+        (string= "2.1" version))
+    (replace-regexp-in-string
+     ";PREF\\(?:=\\w+\\)?"
+     ""
+     property))
+   ((string= "3.0" version)
+    (setq property
+     (replace-regexp-in-string
+      ",?pref"
+      ""
+      property))
+    (if (string-match ";TYPE=\\(?:;\\|$\\)" property)
+        (replace-regexp-in-string
+         ";TYPE="
+         ""
+         property)
+      property))))
+
+(defun org-vcard--card-name (card)
+  "Derive the name associated with CARD."
+  (or (cdr (assoc org-vcard-default-property-for-heading card))
+      (cdr (assoc "FN" card))
+      (or (cdr (assoc "FN" card))
+          (replace-regexp-in-string
+             "^;\\|;$"
+             ""
+             (cdr (assoc "FN" card))))
+      "NO TITLE"))
+
+(defun org-vcard--get-mapping (version language style)
+  "Get the correct alist mapping org properties to vCard properties.
+
+This looks through `org-vcard-styles-languages-mappings' for a fitting
+VERSION, LANGUAGE, and STYLE."
+  (or
+   (cadr (assoc version
+                (cadr (assoc
+                       language
+                       (cadr (assoc style
+                                    org-vcard-styles-languages-mappings))))))
+   (error "No mapping available for specified vCard version")))
+
+(defun org-vcard--get-encoding (version _language)
+  "Get the correct text encoding for vCard VERSION."
+  (cond
+   ((string= "4.0" version) 'utf-8)
+   ((string= "3.0" version) 'utf-8)
+   ((string= "2.1" version) 'us-ascii)
+   (t (error "Unsupported version"))))
+
 (defun org-vcard--canonicalise-adr-property (property-name)
   "Canonicalise a vCard ADR property.
 
