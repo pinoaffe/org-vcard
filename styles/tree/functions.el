@@ -61,8 +61,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
     (org-map-entries
      (lambda ()
        (let* ((properties (org-entry-properties))
-              (fieldtype (and (cdr (assoc "FIELDTYPE" properties))
-                              (downcase (cdr (assoc "FIELDTYPE" properties))))))
+              (fieldtype (cdr (assoc "FIELDTYPE" properties))))
          (cond ((not fieldtype) t)
                ((string= fieldtype "version") t)
                ((string= fieldtype "name")
@@ -75,7 +74,8 @@ DESTINATION must be either \"buffer\" or \"file\"."
                               (org-vcard--export-line "VERSION" org-vcard-active-version)
                               (org-vcard--export-line org-vcard-default-property-for-heading
                                                       (org-get-heading t t))
-                              (org-vcard--ensure-n-property org-vcard-active-version))))
+                              (org-vcard--ensure-n-property org-vcard-active-version)))
+                (setq contact-encountered t))
                ((not (assoc fieldtype mappings)) t)
                (t
                 (setq output
@@ -84,8 +84,8 @@ DESTINATION must be either \"buffer\" or \"file\"."
                        (org-vcard--export-line
                         (if (assoc "PREFERRED" properties)
                             (org-vcard--property-with-pref org-vcard-active-version
-                                                           fieldtype)
-                          (cdr (assoc fieldtype mappings)))
+                                                           (cdr (assoc (downcase fieldtype) mappings)))
+                          (cdr (assoc (downcase fieldtype) mappings)))
                         (org-get-heading t t))))))))
      nil scope)
     (when contact-encountered
@@ -97,17 +97,20 @@ DESTINATION must be either \"buffer\" or \"file\"."
 
 
 
-(defun org-vcard-import-entry-to-tree (mappings property value)
-  "Output single PROPERTY/VALUE pair in tree format corresponding to MAPPINGS."
+(defun org-vcard-import-entry-to-tree (version _language mappings property value)
+  "Output single PROPERTY/VALUE pair in tree format corresponding to MAPPINGS.
+
+VERSION and LANGUAGE instruct what vCard variant to use."
   (let* ((property-name (org-vcard--property-name property))
-         (preferred (not (string= (org-vcard--property-without-pref org-vcard-active-version
-                                                           property)
-                                  property)))
+         (property-without-pref (org-vcard--property-without-pref
+                                 version
+                                 property))
          (case-fold-search t))
     (if (and (not (member
                    property
                    `(,org-vcard-default-property-for-heading "KIND" "VERSION")))
-             (or (car (rassoc property mappings))
+             (or (car (rassoc property-without-pref mappings))
+                 (car (rassoc property-name mappings))
                  org-vcard-include-import-unknowns))
       (format "** %s\n:PROPERTIES:\n:FIELDTYPE: %s\n%s:END:\n"
               (if (and org-vcard-remove-external-semicolons
@@ -116,10 +119,11 @@ DESTINATION must be either \"buffer\" or \"file\"."
                   ;; property.
                   (org-vcard--remove-external-semicolons value)
                 value)
-              (or (org-vcard--property-without-pref org-vcard-active-version
-                                           property)
-                  property)
-              (if preferred
+              (or (car (rassoc property-without-pref mappings))
+                  (car (rassoc property-name mappings))
+                  property-without-pref)
+              (if (not (string= property-without-pref
+                                property))
                   ;; Contents of 'property' were changed by
                   ;; replace-regexp-in-string, so it must have contained
                   ;; a 'PREF'.
@@ -127,18 +131,25 @@ DESTINATION must be either \"buffer\" or \"file\"."
                 ""))
       "")))
 
-(defun org-vcard-import-card-to-tree (version language card)
-  (let ((mappings (org-vcard--get-mapping version language "tree"))
-        (org-vcard-active-version (or (cdr (assoc "VERSION" card))
-                                      org-vcard-default-version)))
+(defun org-vcard-import-card-to-tree (default-version language card)
+  "Output (parsed) vCard CARD in tree format.
+
+DEFAULT-VERSION and LANGUAGE instruct what vCard variant to use."
+  (let* ((version (or (cdr (assoc "VERSION" card))
+                      default-version
+                      org-vcard-default-version))
+         (org-vcard-active-version version)
+         (mappings (org-vcard--get-mapping version language "tree")))
     (concat
-     (format "* %s\n:PROPERTIES:\n:KIND: %s\n:FIELDTYPE: name\n:END\n"
+     (format "* %s\n:PROPERTIES:\n:KIND: %s\n:FIELDTYPE: name\n:END:\n"
              (org-vcard--card-name card)
              (or (cdr (assoc "KIND" card))
                  "individual"))
      (string-join
       (mapcar (lambda (pair)
-                (org-vcard-import-entry-to-tree mappings
+                (org-vcard-import-entry-to-tree version
+                                                language
+                                                mappings
                                                 (car pair)
                                                 (cdr pair)))
               (sort card (lambda (a b) (string< (car a) (car b)))))))))

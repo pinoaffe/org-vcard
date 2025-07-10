@@ -46,15 +46,15 @@ DESTINATION must be either \"buffer\" or \"file\"."
            (t (error "Invalid source type"))))
          (encoding (org-vcard--get-encoding org-vcard-active-version
                                             org-vcard-active-language))
+         (mappings
+          (org-vcard--get-mapping org-vcard-active-version
+                                  org-vcard-active-language
+                                  "flat"))
          (output (encode-coding-string "" encoding)))
     (org-mode)
     (org-map-entries
      (lambda ()
-       (let ((properties (org-entry-properties))
-             (mappings
-              (org-vcard--get-mapping org-vcard-active-version
-                                     org-vcard-active-language
-                                     "flat")))
+       (let ((properties (org-entry-properties)))
          (when (seq-some (lambda (p) (assoc (car p) mappings))
                          properties)
            ;; Does this entry contain a PROPERTY listed in

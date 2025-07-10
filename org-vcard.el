@@ -1213,29 +1213,34 @@ SOURCE must be one of \"file\", \"buffer\" or \"region\".
 
 If SOURCE is \"file\" and FILENAME is a filename, use that, otherwise,
 query the user for a filename."
+  (cond
+   ((string= "file" source)
+    (with-temp-buffer
+      (insert-file-contents-literally (or filename
+                                          (read-file-name
+                                           "Source filename? "
+                                           default-directory
+                                           org-vcard-default-import-file
+                                           t)))
+      (org-vcard-import-parse-buffer)))
+   ((string= "region" source)
+    (narrow-to-region (region-beginning)
+                      (region-end))
+    (org-vcard-import-parse-buffer))
+   ((string= "buffer" source)
+    (org-vcard-import-parse-buffer))
+   (t
+    (error "Invalid source type"))))
+
+(defun org-vcard-import-parse-bufffer ()
+  "Read and parse (narrowed) buffer of vCards."
   (let ((property "")
         (value "")
         (charset "")
         (encoding "")
         (cards '())
         (current-card '()))
-    (cond
-     ((string= "file" source)
-      (unless filename
-        (setq filename
-              (read-file-name
-               "Source filename? "
-               default-directory
-               org-vcard-default-import-file
-               t))))
-     ((string= "region" source)
-      (narrow-to-region (region-beginning) (region-end)))
-     ((string= "buffer" source)
-      t)
-     (t
-      (error "Invalid source type")))
-    (with-temp-buffer
-      (insert-file-contents-literally filename)
+    (save-excursion
       (goto-char (point-min))
       (setq case-fold-search t)
       (while (re-search-forward "BEGIN:VCARD" (point-max) t)
