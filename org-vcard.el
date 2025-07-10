@@ -173,7 +173,8 @@ Initially set to \"en\"."
                 (const :tag "N" "N"))
   :group 'org-vcard)
 
-(defvar org-vcard--styles-functions (org-vcard--create-styles-functions)
+(defvar org-vcard--styles-functions
+  nil ;; NOTE: later updated by `org-vcard-reload-styles'
   "Available styles and associated import/export functions.")
 
 ;; The in-buffer setting #+CONTACT_STYLE.
@@ -185,7 +186,7 @@ Initially set to \"flat\"."
   :group 'org-vcard)
 
 (defcustom org-vcard-styles-languages-mappings
-  (org-vcard--create-styles-languages-mappings)
+  nil ;; NOTE: later updated by `org-vcard-reload-styles'
   "Details of the available styles and their associated mappings."
   :type '(repeat
           (list string
@@ -968,8 +969,6 @@ DESTINATION must be either \"buffer\" or \"file\"."
        ,(org-vcard--conversion-menu-helper nil))
       ["Customize" (customize-group 'org-vcard) t])))
 
-(org-vcard--create-org-vcard-mode-menu)
-
 ;;
 ;; Org-mode element functions.
 ;;
@@ -1385,6 +1384,9 @@ DIRECTION must be either \='export or \='import."
   (setq org-vcard-styles-languages-mappings
         (org-vcard--create-styles-languages-mappings))
   (org-vcard--create-org-vcard-mode-menu))
+
+
+(org-vcard-reload-styles)
 
 
 ;;
