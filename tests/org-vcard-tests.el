@@ -44,7 +44,6 @@
 (ert-deftest org-vcard-test-escape-value-string ()
   "Test the org-vcard--escape-value-string function."
   :tags '(org-vcard)
-  
   (should (string=
            "word"
            (org-vcard--escape-value-string '(":") "word")))
@@ -71,9 +70,9 @@
 (ert-deftest org-vcard-test-export-line ()
   "Test the org-vcard--export-line function."
   :tags '(org-vcard)
-  
+
   ;; Tests for when NOSEPARATOR is absent or nil.
-  
+
   (should (let ((org-vcard-active-version "4.0"))
             (string=
              "FN:word\u000D\u000A"
@@ -100,7 +99,7 @@
              (org-vcard--export-line "FN" "word word"))))
 
   ;; Tests for when NOSEPARATOR is non-nil.
-  
+
   (should (let ((org-vcard-active-version "4.0"))
             (string=
              "FNword\u000D\u000A"
@@ -119,7 +118,6 @@
   "Test the org-vcard--set-active-settings function with
 the CONTACTS_STYLE in-buffer setting."
   :tags '(org-vcard)
-  
   (should (with-temp-buffer
             (insert "#+CONTACTS_STYLE: flat\n")
             (org-vcard--set-active-settings)
@@ -165,7 +163,6 @@ the CONTACTS_STYLE in-buffer setting."
   "Test the org-vcard--set-active-settings function with
 the CONTACTS_LANGUAGE in-buffer setting."
   :tags '(org-vcard)
-  
   (should (with-temp-buffer
             (insert "#+CONTACTS_LANGUAGE: en\n")
             (org-vcard--set-active-settings)
@@ -259,7 +256,6 @@ vCard 4.0."
   :tags '(org-vcard)
 
   (let ((org-vcard-active-version "4.0"))
-    
     (should (string= "TEL"
                      (org-vcard--canonicalise-property-name "TEL")))
 
@@ -327,14 +323,11 @@ vCard 4.0."
     (should (string= "ADR;TYPE=\"home\""
                      (org-vcard--canonicalise-property-name "ADR;TYPE=\"home\"")))))
 
-  
 (ert-deftest org-vcard-test-canonicalise-property-name-vcard-30 ()
   "Test the org-vcard--canonicalise-property-name function with
 vCard 3.0."
   :tags '(org-vcard)
-  
   (let ((org-vcard-active-version "3.0"))
-    
     (should (string= "TEL"
                      (org-vcard--canonicalise-property-name "TEL")))
 
@@ -367,7 +360,7 @@ vCard 3.0."
                      (org-vcard--canonicalise-property-name "TEL;TYPE=FAX,HOME")))
     (should (string= "TEL;TYPE=fax,work"
                      (org-vcard--canonicalise-property-name "TEL;TYPE=work,fax")))
-    
+
     (should (string= "TEL;TYPE=voice"
                      (org-vcard--canonicalise-property-name "TEL;TYPE=VOICE")))
     (should (string= "TEL;TYPE=voice,home"
@@ -409,7 +402,6 @@ vCard 2.1."
   :tags '(org-vcard)
 
   (let ((org-vcard-active-version "2.1"))
-    
     (should (string= "TEL"
                      (org-vcard--canonicalise-property-name "TEL")))
 
@@ -440,7 +432,7 @@ vCard 2.1."
                      (org-vcard--canonicalise-property-name "TEL;FAX;HOME")))
     (should (string= "TEL;FAX;WORK"
                      (org-vcard--canonicalise-property-name "TEL;WORK;FAX")))
-    
+
     (should (string= "TEL;VOICE"
                      (org-vcard--canonicalise-property-name "TEL;VOICE")))
     (should (string= "TEL;VOICE;HOME"
@@ -561,7 +553,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-export-from-flat-vcard-40 ()
   "Test the org-vcard-export-from-flat function with vCard 4.0."
   :tags '(org-vcard)
-  
   (let ((crlf "\u000D\u000A")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
@@ -715,7 +706,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-import-to-flat-vcard-40 ()
   "Test the org-vcard-import-to-flat function with vCard 4.0."
   :tags '(org-vcard)
-  
   (let ((lf "\n")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-style "flat")
@@ -768,7 +758,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-import-to-flat-vcard-30 ()
   "Test the org-vcard-import-to-flat function with vCard 3.0."
   :tags '(org-vcard)
-  
   (let ((lf "\n")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-style "flat")
@@ -821,7 +810,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-import-to-flat-vcard-21 ()
   "Test the org-vcard-import-to-flat function with vCard 2.1."
   :tags '(org-vcard)
-  
   (let ((lf "\n")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-style "flat")
@@ -879,7 +867,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-export-from-tree-vcard-40 ()
   "Test the org-vcard-export-from-tree function with vCard 4.0."
   :tags '(org-vcard)
-  
   (let ((crlf "\u000D\u000A")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
@@ -926,7 +913,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-export-from-tree-vcard-30 ()
   "Test the org-vcard-export-from-tree function with vCard 3.0."
   :tags '(org-vcard)
-  
   (let ((crlf "\015\012")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
@@ -1024,7 +1010,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-import-to-tree-vcard-40 ()
   "Test the org-vcard-import-to-tree function with vCard 4.0."
   :tags '(org-vcard)
-  
   (let ((lf "\n")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
@@ -1134,7 +1119,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-import-to-tree-vcard-30 ()
   "Test the org-vcard-import-to-tree function with vCard 3.0."
   :tags '(org-vcard)
-  
   (let ((lf "\n")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
@@ -1244,7 +1228,6 @@ vCard 2.1."
 (ert-deftest org-vcard-test-import-to-tree-vcard-21 ()
   "Test the org-vcard-import-to-tree function with vCard 2.1."
   :tags '(org-vcard)
-  
   (let ((lf "\n")
         (org-vcard-default-property-for-heading "FN")
         (org-vcard-active-language "en")
