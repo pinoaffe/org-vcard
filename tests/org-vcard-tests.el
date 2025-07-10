@@ -689,13 +689,15 @@ vCard 2.1."
                          "TEL;VOICE;CHARSET=US-ASCII:01 9999 9999" crlf
                          "END:VCARD" crlf)
                  (progn
-                   (generate-new-buffer "*org-vcard-test*")
-                   (switch-to-buffer "*org-vcard-test*")
-                   (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "flat-contacts-2_1.org"))
-                   (org-vcard-export-from-flat "buffer" "buffer")
-                   (switch-to-buffer "*org-vcard-export*")
-                   (buffer-string))))
+                   (when (get-buffer "*org-vcard-export*")
+                     (kill-buffer "*org-vcard-export*"))
+                   (with-current-buffer (get-buffer-create "*org-vcard-test*")
+                     (erase-buffer)
+                     (insert-file-contents-literally (concat org-vcard-tests-data-dir
+                                                             "flat-contacts-2_1.org"))
+                     (org-vcard-export-from-flat "buffer" "buffer"))
+                   (with-current-buffer (get-buffer "*org-vcard-export*")
+                     (buffer-string)))))
       (progn
         (if (get-buffer "*org-vcard-test*")
             (kill-buffer "*org-vcard-test*"))
@@ -794,12 +796,14 @@ vCard 2.1."
                          ":CATEGORIES: category c" lf
                          ":END:" lf)
                  (progn
-                   (generate-new-buffer "*org-vcard-test*")
-                   (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "flat-vcard-source-3_0.vcf"))
-                   (org-vcard-import-to-flat "buffer" "buffer")
-                   (switch-to-buffer "*org-vcard-import*")
-                   (buffer-string))))
+                   (kill-buffer "*org-vcard-export*")
+                   (with-current-buffer (get-buffer-create "*org-vcard-test*")
+                     (erase-buffer)
+                     (insert-file-contents-literally (concat org-vcard-tests-data-dir
+                                                             "flat-contacts-3_0.org"))
+                     (org-vcard-export-from-flat "buffer" "buffer"))
+                   (with-current-buffer (get-buffer "*org-vcard-export*")
+                     (buffer-string)))))
       (progn
         (if (get-buffer "*org-vcard-test*")
             (kill-buffer "*org-vcard-test*"))
@@ -945,12 +949,15 @@ vCard 2.1."
                          "CATEGORIES:category c" crlf
                          "END:VCARD" crlf)
                  (progn
-                   (generate-new-buffer "*org-vcard-test*")
-                   (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "tree-contacts-3_0.org"))
-                   (org-vcard-export-from-tree "buffer" "buffer")
-                   (switch-to-buffer "*org-vcard-export*")
-                   (buffer-string))))
+                   (when (get-buffer "*org-vcard-export*")
+                     (kill-buffer "*org-vcard-export*"))
+                   (with-current-buffer (get-buffer-create "*org-vcard-test*")
+                     (erase-buffer)
+                     (insert-file-contents-literally (concat org-vcard-tests-data-dir
+                                                             "tree-contacts-3_0.org"))
+                     (org-vcard-export-from-tree "buffer" "buffer"))
+                   (with-current-buffer (get-buffer "*org-vcard-export*")
+                     (buffer-string)))))
       (progn
         (if (get-buffer "*org-vcard-test*")
             (kill-buffer "*org-vcard-test*"))
@@ -994,12 +1001,15 @@ vCard 2.1."
                          "CATEGORIES;CHARSET=US-ASCII:category c" crlf
                          "END:VCARD" crlf)
                  (progn
-                   (generate-new-buffer "*org-vcard-test*")
-                   (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                           "tree-contacts-2_1.org"))
-                   (org-vcard-export-from-tree "buffer" "buffer")
-                   (switch-to-buffer "*org-vcard-export*")
-                   (buffer-string))))
+                   (when (get-buffer "*org-vcard-export*")
+                     (kill-buffer "*org-vcard-export*"))
+                   (with-current-buffer (get-buffer-create "*org-vcard-test*")
+                     (erase-buffer)
+                     (insert-file-contents-literally (concat org-vcard-tests-data-dir
+                                                             "tree-contacts-2_1.org"))
+                     (org-vcard-export-from-tree "buffer" "buffer"))
+                   (with-current-buffer (get-buffer "*org-vcard-export*")
+                     (buffer-string)))))
       (progn
         (if (get-buffer "*org-vcard-test*")
             (kill-buffer "*org-vcard-test*"))
