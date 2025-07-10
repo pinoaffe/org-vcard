@@ -197,6 +197,14 @@ Initially set to \"flat\"."
                               (repeat (cons string string))))))))
   :group 'org-vcard)
 
+(defvar org-vcard--styles-languages-mappings
+  nil ;; NOTE: later updated by `org-vcard-reload-styles'
+  "Details of the available styles and their associated mappings.")
+
+(make-obsolete-variable 'org-vcard-styles-languages-mappings
+                        'org-vcard--styles-languages-mappings
+                        "org-vcard 0.8.0")
+
 (defcustom org-vcard-default-vcard-21-character-set 'us-ascii
   "CHARSET modifier for all vCard properties when exporting to vCard 2.1."
   :type `(radio ,@(mapcar #'(lambda (entry)
@@ -332,14 +340,14 @@ Otherwise, return empty string."
 (defun org-vcard--get-mapping (version language style)
   "Get the correct alist mapping org properties to vCard properties.
 
-This looks through `org-vcard-styles-languages-mappings' for a fitting
+This looks through `org-vcard--styles-languages-mappings' for a fitting
 VERSION, LANGUAGE, and STYLE."
   (or
    (cadr (assoc version
                 (cadr (assoc
                        language
                        (cadr (assoc style
-                                    org-vcard-styles-languages-mappings))))))
+                                    org-vcard--styles-languages-mappings))))))
    (error "No mapping available for specified vCard version")))
 
 (defun org-vcard--get-encoding (version _language)
@@ -641,7 +649,7 @@ PROPERTY-NAME must be a string containing a vCard property name."
               (string< (car a) (car b))))))
 
 (defun org-vcard--create-styles-languages-mappings ()
-  "Create a data structure for use by `org-vcard-styles-languages-mappings'."
+  "Create a data structure for use by `org-vcard--styles-languages-mappings'."
   (let ((style-mappings '()))
     (dolist (style-dir (org-vcard--styles-dirs))
       (dolist (style
@@ -956,7 +964,7 @@ DESTINATION must be either \"buffer\" or \"file\"."
                                              t))
                                           (org-vcard--sort-by-car (cadr language)))))
                           (org-vcard--sort-by-car (cadr style)))))
-          (org-vcard--sort-by-car org-vcard-styles-languages-mappings)))
+          (org-vcard--sort-by-car org-vcard--styles-languages-mappings)))
 
 (defun org-vcard--create-org-vcard-mode-menu ()
   "Create or recreate the `org-vcard-mode' menu."
@@ -1029,7 +1037,7 @@ argument of:
                 (cadr
                  (assoc
                   style
-                  org-vcard-styles-languages-mappings)))))
+                  org-vcard--styles-languages-mappings)))))
              nil t org-vcard-default-version)))
      ((= 2 arg)
       (setq language
@@ -1040,7 +1048,7 @@ argument of:
               (cadr
                (assoc
                 style
-                org-vcard-styles-languages-mappings)))
+                org-vcard--styles-languages-mappings)))
              nil t org-vcard-default-language)))
      ((= 3 arg)
       (setq style
@@ -1063,7 +1071,7 @@ argument of:
                   (cadr
                    (assoc
                     style
-                    org-vcard-styles-languages-mappings)))))
+                    org-vcard--styles-languages-mappings)))))
                nil t org-vcard-default-version))
         (setq language
               (completing-read
@@ -1073,7 +1081,7 @@ argument of:
                 (cadr
                  (assoc
                   style
-                  org-vcard-styles-languages-mappings)))
+                  org-vcard--styles-languages-mappings)))
                nil t org-vcard-default-language))
         (setq style
               (completing-read
@@ -1145,7 +1153,7 @@ argument of:
                 (cadr
                  (assoc
                   style
-                  org-vcard-styles-languages-mappings)))))
+                  org-vcard--styles-languages-mappings)))))
              nil t org-vcard-default-version)))
      ((= 2 arg)
       (setq language
@@ -1156,7 +1164,7 @@ argument of:
               (cadr
                (assoc
                 style
-                org-vcard-styles-languages-mappings)))
+                org-vcard--styles-languages-mappings)))
              nil t org-vcard-default-language)))
      ((= 3 arg)
       (setq style
@@ -1179,7 +1187,7 @@ argument of:
                   (cadr
                    (assoc
                     style
-                    org-vcard-styles-languages-mappings)))))
+                    org-vcard--styles-languages-mappings)))))
                nil t org-vcard-default-version))
         (setq language
               (completing-read
@@ -1189,7 +1197,7 @@ argument of:
                 (cadr
                  (assoc
                   style
-                  org-vcard-styles-languages-mappings)))
+                  org-vcard--styles-languages-mappings)))
                nil t org-vcard-default-language))
         (setq style
               (completing-read
@@ -1381,7 +1389,7 @@ DIRECTION must be either \='export or \='import."
   (interactive)
   (setq org-vcard--styles-functions
         (org-vcard--create-styles-functions))
-  (setq org-vcard-styles-languages-mappings
+  (setq org-vcard--styles-languages-mappings
         (org-vcard--create-styles-languages-mappings))
   (org-vcard--create-org-vcard-mode-menu))
 

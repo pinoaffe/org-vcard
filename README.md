@@ -81,7 +81,7 @@ without restriction, remove any narrowing in effect.
 For a list of the properties available by default for each contacts
 style and related vCard versions, visit the "Org Vcard Styles
 Languages Mappings" setting in the Org Vcard customize group, or
-examine the value of the `org-vcard-styles-languages-mappings`
+examine the value of the `org-vcard--styles-languages-mappings`
 variable.
 
 **Note!** The default mappings might need to be tweaked for
