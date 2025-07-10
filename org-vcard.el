@@ -881,7 +881,10 @@ DESTINATION must be either \"buffer\" or \"file\"."
             (setq the-buffer
                   (generate-new-buffer "*org-vcard-export*")))))
         (set-buffer the-buffer)
-        (insert (decode-coding-string content 'utf-8-emacs))
+        ;; NOTE: this used to be as below, but that strips CR
+        ;; TODO: investigate why CR are stripped, fix, and decode again
+        (insert content)
+        ;; (insert (decode-coding-string content 'utf-8))
         (message
          (concat
           direction-string
