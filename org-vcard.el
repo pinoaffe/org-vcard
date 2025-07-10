@@ -1239,7 +1239,7 @@ query the user for a filename."
    (t
     (error "Invalid source type"))))
 
-(defun org-vcard-import-parse-bufffer ()
+(defun org-vcard-import-parse-buffer ()
   "Read and parse (narrowed) buffer of vCards."
   (let ((property "")
         (value "")
