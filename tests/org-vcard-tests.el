@@ -796,14 +796,12 @@ vCard 2.1."
                          ":CATEGORIES: category c" lf
                          ":END:" lf)
                  (progn
-                   (kill-buffer "*org-vcard-export*")
-                   (with-current-buffer (get-buffer-create "*org-vcard-test*")
-                     (erase-buffer)
-                     (insert-file-contents-literally (concat org-vcard-tests-data-dir
-                                                             "flat-contacts-3_0.org"))
-                     (org-vcard-export-from-flat "buffer" "buffer"))
-                   (with-current-buffer (get-buffer "*org-vcard-export*")
-                     (buffer-string)))))
+                   (generate-new-buffer "*org-vcard-test*")
+                   (insert-file-contents-literally (concat org-vcard-tests-data-dir
+                                                           "flat-vcard-source-3_0.vcf"))
+                   (org-vcard-import-to-flat "buffer" "buffer")
+                   (switch-to-buffer "*org-vcard-import*")
+                   (buffer-string))))
       (progn
         (if (get-buffer "*org-vcard-test*")
             (kill-buffer "*org-vcard-test*"))
