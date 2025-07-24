@@ -16,6 +16,7 @@
 (defvar org-vcard-default-property-for-heading)
 (defvar org-vcard-default-version)
 (defvar org-vcard-include-import-unknowns)
+(defvar org-vcard-include-export-unknowns)
 (defvar org-vcard-remove-external-semicolons)
 (defvar org-vcard-styles-languages-mappings)
 
@@ -73,11 +74,14 @@ DESTINATION must be either \"buffer\" or \"file\"."
                   (org-vcard--ensure-n-property org-vcard-active-version)
                   (string-join
                    (mapcar (lambda (p)
-                             (org-vcard--export-line (cdr (assoc (car p) mappings))
+                             (org-vcard--export-line (or (cdr (assoc (car p) mappings))
+                                                         (car p))
                                                      (cdr p)))
                            (seq-filter (lambda (p)
                                          (and (not (string= "VERSION" (car p)))
-                                              (assoc (car p) mappings)))
+                                              (or
+                                               (assoc (car p) mappings)
+                                               org-vcard-include-export-unknowns)))
                                        properties)))
                   (org-vcard--export-line "END" "VCARD"))))))
      nil scope)

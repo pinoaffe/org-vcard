@@ -226,6 +226,11 @@ Initially set to 4.0."
   :type 'boolean
   :group 'org-vcard)
 
+(defcustom org-vcard-include-export-unknowns nil
+  "Whether to export org properties not listed in the mapping being used."
+  :type 'boolean
+  :group 'org-vcard)
+
 (defcustom org-vcard-remove-external-semicolons nil
   "Whether import should remove leading/trailing semicolons from compound values.
 

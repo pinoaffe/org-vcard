@@ -14,6 +14,7 @@
 (defvar org-vcard-default-property-for-heading)
 (defvar org-vcard-default-version)
 (defvar org-vcard-include-import-unknowns)
+(defvar org-vcard-include-export-unknowns)
 (defvar org-vcard-remove-external-semicolons)
 (defvar org-vcard-styles-languages-mappings)
 
@@ -76,16 +77,20 @@ DESTINATION must be either \"buffer\" or \"file\"."
                                                       (org-get-heading t t))
                               (org-vcard--ensure-n-property org-vcard-active-version)))
                 (setq contact-encountered t))
-               ((not (assoc fieldtype mappings)) t)
+               ((not (or (assoc fieldtype mappings)
+                         org-vcard-include-export-unknowns))
+                t)
                (t
                 (setq output
                       (concat
                        output
                        (org-vcard--export-line
-                        (if (assoc "PREFERRED" properties)
-                            (org-vcard--property-with-pref org-vcard-active-version
-                                                           (cdr (assoc (downcase fieldtype) mappings)))
-                          (cdr (assoc (downcase fieldtype) mappings)))
+                        (let ((mapped-fieldtype (or (cdr (assoc (downcase fieldtype) mappings))
+                                                    fieldtype)))
+                          (if (assoc "PREFERRED" properties)
+                              (org-vcard--property-with-pref org-vcard-active-version
+                                                             mapped-fieldtype)
+                            mapped-fieldtype))
                         (org-get-heading t t))))))))
      nil scope)
     (when contact-encountered
