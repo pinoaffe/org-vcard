@@ -173,6 +173,11 @@ Initially set to \"en\"."
                 (const :tag "N" "N"))
   :group 'org-vcard)
 
+(defcustom org-vcard-trim-property-group nil
+  "Whether to trim/remove property group prefixes when parsing a vCard."
+  :type 'boolean
+  :group 'org-vcard)
+
 (defvar org-vcard--styles-functions
   nil ;; NOTE: later updated by `org-vcard-reload-styles'
   "Available styles and associated import/export functions.")
@@ -223,6 +228,11 @@ Initially set to 4.0."
 
 (defcustom org-vcard-include-import-unknowns nil
   "Whether to import vCard properties not listed in the mapping being used."
+  :type 'boolean
+  :group 'org-vcard)
+
+(defcustom org-vcard-include-export-unknowns nil
+  "Whether to export org properties not listed in the mapping being used."
   :type 'boolean
   :group 'org-vcard)
 
@@ -1273,6 +1283,12 @@ query the user for a filename."
                            (prog1 (upcase (match-string-no-properties 1 property))
                              ;; Remove the encoding from the property name.
                              (setq property (replace-match "" nil nil property)))))
+          (when (and org-vcard-trim-property-group
+                     (string-match "^[-a-zA-z0-9]+[.]" property))
+            (setq property (replace-regexp-in-string
+                            "^[-a-zA-Z0-9]+[.]"
+                            ""
+                            property)))
           ;; Consume value and continuation lines.
           (while
               (progn
