@@ -1,4 +1,4 @@
-;;; org-vcard.el --- org-mode support for vCard export and import. -*- lexical-binding: t; -*-
+;;; org-vcard.el --- Org-mode support for vCard export and import -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2014-2019,2021-2022 Alexis <flexibeast@gmail.com>
 ;; Copyright (C) 2019 Will Dey <will123dey@gmail.com>
@@ -9,6 +9,8 @@
 ;; Created: 2014-07-31
 ;; URL: https://github.com/pinoaffe/org-vcard
 ;; Keywords: outlines, org, vcard
+;; Package-Version: 0.2.0
+;; Package-Requires: ((emacs "24.4"))
 
 ;;
 ;; This file is NOT part of GNU Emacs.
