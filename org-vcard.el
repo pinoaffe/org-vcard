@@ -9,7 +9,7 @@
 ;; Created: 2014-07-31
 ;; URL: https://github.com/pinoaffe/org-vcard
 ;; Keywords: outlines, org, vcard
-;; Package-Version: 0.3.0
+;; Package-Version: 0.3.1
 ;; Package-Requires: ((emacs "24.4"))
 
 ;;
