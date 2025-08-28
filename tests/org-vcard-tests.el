@@ -1,3 +1,5 @@
+(require 'org-vcard)
+
 
 (if (not (boundp 'org-vcard--elisp-dir))
     (error "Variable org-vcard--elisp-dir not set; have you loaded org-vcard.el?"))
